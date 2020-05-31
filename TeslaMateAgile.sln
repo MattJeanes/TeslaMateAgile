@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeslaMateAgile", "TeslaMateAgile\TeslaMateAgile.csproj", "{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4E4F9D1-A905-4F00-A9D5-39A85ACF5E25}
+	EndGlobalSection
+EndGlobal
