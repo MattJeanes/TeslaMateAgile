@@ -24,6 +24,10 @@ namespace TeslaMateAgile
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            if (_options.UpdateIntervalSeconds <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(_options.UpdateIntervalSeconds), _options.UpdateIntervalSeconds, "Must be greater than 0");
+            }
             _logger.LogInformation("Price service is starting");
 
             _timer = new Timer(async (state) =>
@@ -36,6 +40,7 @@ namespace TeslaMateAgile
                 {
                     _logger.LogError(e, $"Failed to run {nameof(DoWork)}");
                 }
+                _logger.LogInformation($"Waiting {_options.UpdateIntervalSeconds} seconds until next update");
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.UpdateIntervalSeconds));
 
             return Task.CompletedTask;

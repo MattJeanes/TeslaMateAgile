@@ -14,6 +14,7 @@ namespace TeslaMateAgile
         {
             var builder = new HostBuilder()
                 .ConfigureAppConfiguration(configBuilder => {
+                    configBuilder.AddEnvironmentVariables();
                     configBuilder.AddUserSecrets<Program>(true);
                     configBuilder.AddJsonFile("appsettings.json");
                 })

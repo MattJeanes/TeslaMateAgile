@@ -14,6 +14,9 @@ namespace TeslaMateAgile.Data.TeslaMate.Entities
         [Column("date")]
         public DateTime Date { get; set; }
 
+        [Column("charge_energy_added")]
+        public decimal ChargeEnergyAdded { get; set; }
+
         [ForeignKey("charging_process_id")]
         public ChargingProcess ChargingProcess { get; set; }
     }

@@ -53,7 +53,7 @@ namespace TeslaMateAgile
                 _logger.LogInformation($"Calculated cost {cost} for charging process {chargingProcess.Id}");
                 chargingProcess.Cost = cost;
             }
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         private async Task<decimal> CalculateChargeCost(HttpClient httpClient, ChargingProcess chargingProcess)
@@ -62,12 +62,24 @@ namespace TeslaMateAgile
             var minDate = charges.Min(x => x.Date);
             var maxDate = charges.Max(x => x.Date);
             var prices = await GetAgilePrices(httpClient, minDate, maxDate);
-            return 0;
+            var totalPrice = 0M;
+            decimal? lastEnergyAdded = null;
+            foreach (var price in prices)
+            {
+                var chargesForPrice = charges.Where(x => x.Date >= price.ValidFrom && x.Date < price.ValidTo);
+                var minEnergyAdded = lastEnergyAdded ?? chargesForPrice.Min(x => x.ChargeEnergyAdded);
+                var maxEnergyAdded = chargesForPrice.Max(x => x.ChargeEnergyAdded);
+                var energyAddedInDateRange = maxEnergyAdded - minEnergyAdded;
+                var priceForEnergy = energyAddedInDateRange * price.ValueIncVAT;
+                totalPrice += priceForEnergy;
+                lastEnergyAdded = maxEnergyAdded;
+            }
+            return totalPrice;
         }
 
-        private async Task<List<AgilePrice>> GetAgilePrices(HttpClient httpClient, DateTime from, DateTime to)
+        private async Task<IOrderedEnumerable<AgilePrice>> GetAgilePrices(HttpClient httpClient, DateTime from, DateTime to)
         {
-            var url = $"{_octopusOptions.AgileUrl}?period_from={from.ToString("o")}&period_to={to.ToString("o")}";
+            var url = $"{_octopusOptions.AgileUrl}?period_from={from:o}&period_to={to:o}";
             var list = new List<AgilePrice>();
             do
             {
@@ -86,7 +98,7 @@ namespace TeslaMateAgile
                 }
             }
             while (true);
-            return list;
+            return list.OrderBy(x => x.ValidFrom);
         }
 
         private class AgileResponse

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TeslaMateAgile": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
