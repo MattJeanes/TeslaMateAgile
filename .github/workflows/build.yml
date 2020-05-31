@@ -19,13 +19,16 @@ jobs:
       run: dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --output ./output/TeslaMateAgile
     
     - name: Zip project
-      run: zip -r ./output/TeslaMateAgile.zip ./output/TeslaMateAgile
+      run: |
+        cd ./output/TeslaMateAgile
+        zip -r ../TeslaMateAgile.zip .
+        cd ../../
       
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2
       with:
         name: TeslaMateAgile
-        path: ./output/TeslaMateAgile.zip
+        path: ./output/TeslaMateAgile
       
     - name: Create Release
       id: create_release
