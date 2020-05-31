@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file ./TeslaMateAgile/Dockerfile . --tag teslamateagile:$(date +%s) --tag teslamateagile:latest
+      run: docker build --file ./TeslaMateAgile/Dockerfile . --tag teslamateagile:$(date +%s) --tag teslamateagile:latest
