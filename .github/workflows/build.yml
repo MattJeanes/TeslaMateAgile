@@ -1,25 +1,49 @@
 name: Build
-
 on:
   push:
     branches: [ master ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ master ]
-
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
+      
     - name: Build the Docker image
       run: docker build --file ./TeslaMateAgile/Dockerfile . --tag teslamateagile:$(date +%s) --tag teslamateagile:latest
+      
     - name: Build .NET Core project
       run: dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --output ./output/TeslaMateAgile
+    
+    - name: Zip project
+      run: zip -r ./output/TeslaMateAgile.zip ./output/TeslaMateAgile
+      
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2
       with:
         name: TeslaMateAgile
-        path: ./output/TeslaMateAgile
+        path: ./output/TeslaMateAgile.zip
+      
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+      if: startsWith(github.ref, 'refs/tags/')
+      
+    - name: Upload a Release Asset
+      uses: actions/upload-release-asset@v1.0.2
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./output/TeslaMateAgile.zip
+        asset_name: TeslaMateAgile.zip
+        asset_content_type: application/zip
+      if: startsWith(github.ref, 'refs/tags/')
