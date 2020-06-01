@@ -24,6 +24,9 @@ namespace TeslaMateAgile.Data.TeslaMate.Entities
         [Column("cost")]
         public decimal? Cost { get; set; }
 
+        [Column("charge_energy_used")]
+        public decimal? ChargeEnergyUsed { get; set; }
+
         public ICollection<Charge> Charges { get; set; }
     }
 }

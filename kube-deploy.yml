@@ -33,3 +33,5 @@ spec:
               value: '300'
             - name: TeslaMate__GeofenceId
               value: '1'
+            - name: TeslaMate__Phases
+              value: '1'
