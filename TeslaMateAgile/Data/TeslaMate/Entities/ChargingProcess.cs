@@ -16,7 +16,7 @@ namespace TeslaMateAgile.Data.TeslaMate.Entities
         public DateTime StartDate { get; set; }
 
         [Column("end_date")]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Column("geofence_id")]
         public int GeofenceId { get; set; }

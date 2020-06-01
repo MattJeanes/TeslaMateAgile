@@ -43,9 +43,14 @@ namespace TeslaMateAgile
             _logger.LogInformation("Updating prices");
 
             var chargingProcesses = await _context.ChargingProcesses
-                .Where(x => x.GeofenceId == _teslaMateOptions.GeofenceId && !x.Cost.HasValue)
+                .Where(x => x.GeofenceId == _teslaMateOptions.GeofenceId && x.EndDate.HasValue && !x.Cost.HasValue)
                 .Include(x => x.Charges)
                 .ToListAsync();
+
+            if (!chargingProcesses.Any())
+            {
+                _logger.LogInformation("No new charging processes");
+            }
 
             foreach (var chargingProcess in chargingProcesses)
             {
@@ -53,6 +58,7 @@ namespace TeslaMateAgile
                 _logger.LogInformation($"Calculated cost {cost} for charging process {chargingProcess.Id}");
                 chargingProcess.Cost = cost;
             }
+
             await _context.SaveChangesAsync();
         }
 
