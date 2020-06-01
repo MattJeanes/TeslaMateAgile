@@ -50,6 +50,7 @@ namespace TeslaMateAgile
             if (!chargingProcesses.Any())
             {
                 _logger.LogInformation("No new charging processes");
+                return;
             }
 
             foreach (var chargingProcess in chargingProcesses)
