@@ -23,7 +23,6 @@ spec:
       containers:
         - name: teslamateagile
           image: mattjeanes/teslamateagile:latest
-          imagePullPolicy: Always
           env:
             - name: ConnectionStrings__TeslaMate
               valueFrom:
