@@ -28,8 +28,12 @@ namespace TeslaMateAgile
                     var config = hostContext.Configuration;
                     services.AddDbContext<TeslaMateDbContext>(o => o.UseNpgsql(config.GetConnectionString("TeslaMate")));
                     services.AddHostedService<PriceService>();
-                    services.Configure<OctopusOptions>(config.GetSection("Octopus"));
-                    services.Configure<TeslaMateOptions>(config.GetSection("TeslaMate"));
+                    services.AddOptions<OctopusOptions>()
+                        .Bind(config.GetSection("Octopus"))
+                        .ValidateDataAnnotations();
+                    services.AddOptions<TeslaMateOptions>()
+                        .Bind(config.GetSection("TeslaMate"))
+                        .ValidateDataAnnotations();
                     services.AddTransient<IPriceHelper, PriceHelper>();
                     services.AddHttpClient();
                 });
