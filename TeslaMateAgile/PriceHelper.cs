@@ -102,7 +102,7 @@ namespace TeslaMateAgile
 
         private async Task<IOrderedEnumerable<AgilePrice>> GetAgilePrices(HttpClient httpClient, DateTime from, DateTime to)
         {
-            var url = $"{_octopusOptions.AgileUrl}?period_from={from:o}&period_to={to:o}";
+            var url = $"{_octopusOptions.BaseUrl}/products/{_octopusOptions.ProductCode}/electricity-tariffs/{_octopusOptions.TariffCode}-{_octopusOptions.RegionCode}/standard-unit-rates?period_from={from:o}&period_to={to:o}";
             var list = new List<AgilePrice>();
             do
             {

@@ -5,6 +5,7 @@ metadata:
 type: Opaque
 stringData:
   connectionString: '{{connectionString}}'
+  regionCode: '{{regionCode}}'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,3 +36,8 @@ spec:
               value: '1'
             - name: TeslaMate__Phases
               value: '1'
+            - name: Octopus__RegionCode
+              valueFrom:
+                secretKeyRef:
+                  name: teslamateagile-secrets
+                  key: regionCode
