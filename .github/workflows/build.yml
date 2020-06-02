@@ -82,6 +82,7 @@ jobs:
         files: ./kube-deploy.yml
       env:
         connectionString: ${{ secrets.KUBERNETES_CONNECTIONSTRING }}
+        regionCode: ${{ secrets.KUBERNETES_OCTOPUS_REGIONCODE }}
       if: startsWith(github.ref, 'refs/tags/')
     
     - name: Deploy to Kubernetes cluster
