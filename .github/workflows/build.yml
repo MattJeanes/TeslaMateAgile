@@ -15,7 +15,9 @@ jobs:
     - name: Set variables
       id: variables
       run: |
-        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        VERSION=${GITHUB_REF#refs/tags/}
+        VERSION=${VERSION#refs/heads/}
+        echo ::set-output name=SOURCE_TAG::$VERSION
         echo ::set-output name=DOCKER_USERNAME::mattjeanes
         
     - name: Build Docker images
