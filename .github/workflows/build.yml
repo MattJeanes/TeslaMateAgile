@@ -16,24 +16,23 @@ jobs:
       id: variables
       run: |
         VERSION=${GITHUB_REF#refs/tags/}
-        VERSION=${VERSION#refs/heads/}
+        DOCKER_USERNAME=mattjeanes
         echo ::set-output name=VERSION::$VERSION
-        echo ::set-output name=DOCKER_USERNAME::mattjeanes
+        echo ::set-output name=DOCKER_USERNAME::$DOCKER_USERNAME
         
     - name: Build Docker images
       run: |
         for appname in TeslaMateAgile; do
           app=`echo $appname | tr '[:upper:]' '[:lower:]'`
           echo "Building $appname docker amd64"
-          docker build -t $DOCKER_USERNAME/$app -t $DOCKER_USERNAME/$app:latest-amd64 -t $DOCKER_USERNAME/$app:$VERSION-amd64 -f "$appname/Dockerfile" . --build-arg arch=buster-slim
+          docker build -t $DOCKER_USERNAME/$app -t $DOCKER_USERNAME/$app:latest-amd64 -f "$appname/Dockerfile" . --build-arg arch=buster-slim
           echo "Building $appname docker arm32v7"
-          docker build -t $DOCKER_USERNAME/$app -t $DOCKER_USERNAME/$app:latest-arm32v7 -t $DOCKER_USERNAME/$app:$VERSION-arm32v7 -f "$appname/Dockerfile" . --build-arg arch=buster-slim-arm32v7
+          docker build -t $DOCKER_USERNAME/$app -t $DOCKER_USERNAME/$app:latest-arm32v7 -f "$appname/Dockerfile" . --build-arg arch=buster-slim-arm32v7
           echo "Building $appname docker arm64v8"
-          docker build -t $DOCKER_USERNAME/$app -t $DOCKER_USERNAME/$app:latest-arm64v8 -t $DOCKER_USERNAME/$app:$VERSION-arm64v8 -f "$appname/Dockerfile" . --build-arg arch=buster-slim-arm64v8
+          docker build -t $DOCKER_USERNAME/$app -t $DOCKER_USERNAME/$app:latest-arm64v8 -f "$appname/Dockerfile" . --build-arg arch=buster-slim-arm64v8
         done
       env:
         DOCKER_USERNAME: ${{ steps.variables.outputs.DOCKER_USERNAME }}
-        VERSION: ${{ steps.variables.outputs.VERSION }}
       
     - name: Build project
       run: |
@@ -72,6 +71,9 @@ jobs:
         for appname in TeslaMateAgile; do
           app=`echo $appname | tr '[:upper:]' '[:lower:]'`
           echo "Deploying $appname"
+          for arch in amd64 arm32v7 arm64v8; do
+            docker tag $DOCKER_USERNAME/$app:latest-$arch $DOCKER_USERNAME/$app:$VERSION-$arch
+          done
           for ver in $VERSION latest; do
             echo "Deploying version $ver"
             for arch in amd64 arm32v7 arm64v8; do
