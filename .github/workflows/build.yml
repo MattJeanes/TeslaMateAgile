@@ -28,7 +28,7 @@ jobs:
         tag_with_ref: true
         push: ${{ startsWith(github.ref, 'refs/tags/') }}
       
-    - name: Build win-x64
+    - name: Build project
       run: |
         dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-x64 --output ./output/TeslaMateAgile-linux-x64
         dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-arm64 --output ./output/TeslaMateAgile-linux-arm64
