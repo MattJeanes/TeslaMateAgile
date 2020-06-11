@@ -34,7 +34,7 @@ namespace TeslaMateAgile
                     var connectionString = config.GetConnectionString("TeslaMate");
                     if (string.IsNullOrEmpty(connectionString))
                     {
-                        Func<string, string> getDatabaseVariable = (string variableName) =>
+                        string getDatabaseVariable(string variableName)
                         {
                             var option = config[variableName];
                             if (string.IsNullOrEmpty(option))
@@ -42,7 +42,7 @@ namespace TeslaMateAgile
                                 throw new ArgumentNullException(variableName, $"Configuration '{variableName}' or 'ConnectionStrings__TeslaMate' is required");
                             }
                             return option;
-                        };
+                        }
                         var databaseHost = getDatabaseVariable("DATABASE_HOST");
                         var databaseName = getDatabaseVariable("DATABASE_NAME");
                         var databaseUsername = getDatabaseVariable("DATABASE_USER");
