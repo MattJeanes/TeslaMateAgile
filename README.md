@@ -6,15 +6,49 @@ This app will automatically update your cost for charge sessions in TeslaMate wi
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
 
-You will need to set configuration using environment variables, the required ones are below.
+If you have used the [TeslaMate Docker install guide](https://docs.teslamate.org/docs/installation/docker) you can simply add this section to the `services:` section of the `docker-compose.yml` file and change the variables as required:
+
+```yaml
+services:
+
+  teslamateagile:
+    image: mattjeanes/teslamateagile:latest
+    restart: always
+    environment:
+      - DATABASE_USER=teslamate
+      - DATABASE_PASS=secret
+      - DATABASE_NAME=teslamate
+      - DATABASE_HOST=database
+      - TeslaMate__UpdateIntervalSeconds=300
+      - TeslaMate__GeofenceId=1
+      - TeslaMate__Phases=1
+      - Octopus__RegionCode=A
+```
+
+See below for how to configure the environment variables appropriately
 
 ## Required environment variables
 ```yaml
-- ConnectionStrings__TeslaMate: 'Server=127.0.0.1;Port=5432;Database=teslamate;User Id=teslamate;Password=teslamate;'
-- TeslaMate__UpdateIntervalSeconds: '300' # Check for completed charges without a set cost every x seconds
-- TeslaMate__GeofenceId: '1' # You can get this by editing the Geofence inside TeslaMate and getting it from the url 
-- TeslaMate__Phases: '1' # How many phases your electricity has, this will usually be 1
-- Octopus__RegionCode: 'A' # See below
+- TeslaMate__UpdateIntervalSeconds=300 # Check for completed charges without a set cost every x seconds
+- TeslaMate__GeofenceId=1 # You can get this by editing the Geofence inside TeslaMate and getting it from the url 
+- TeslaMate__Phases=1 # How many phases your electricity has, this will usually be 1
+- Octopus__RegionCode=A # See below Octopus Region Code section
+```
+
+## Database connection
+You also need to configure the database connection to the TeslaMate PostgreSQL database, you can do this either by supplying a PostgreSQL connection string directly or by using the same ones used by TeslaMate in the `docker-compose.yml`
+
+```yaml
+- DATABASE_HOST=database
+- DATABASE_NAME=teslamate
+- DATABASE_USER=teslamate
+- DATABASE_PASS=secret
+```
+
+**OR** (not recommended)
+
+```yaml
+- ConnectionStrings__TeslaMate=Host=database;Database=teslamate;User Id=teslamate;Password=secret;
 ```
 
 ## Octopus Region Code
