@@ -18,6 +18,17 @@ jobs:
         VERSION=${GITHUB_REF#refs/tags/}
         echo ::set-output name=VERSION::$VERSION
         
+    - name: Test project
+      run: |
+        dotnet test ./TeslaMateAgile.Tests/TeslaMateAgile.Tests.csproj
+        
+    - name: Build project
+      run: |
+        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-x64 --output ./output/TeslaMateAgile-linux-x64
+        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-arm64 --output ./output/TeslaMateAgile-linux-arm64
+        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-arm --output ./output/TeslaMateAgile-linux-arm
+        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime win-x64 --output ./output/TeslaMateAgile-win-x64
+        
     - name: Build Docker images
       run: |
         for appname in TeslaMateAgile; do
@@ -29,13 +40,6 @@ jobs:
           echo "Building $appname docker arm64v8"
           docker build -t $app:arm64v8 -f "$appname/Dockerfile" . --build-arg arch=buster-slim-arm64v8
         done
-      
-    - name: Build project
-      run: |
-        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-x64 --output ./output/TeslaMateAgile-linux-x64
-        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-arm64 --output ./output/TeslaMateAgile-linux-arm64
-        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime linux-arm --output ./output/TeslaMateAgile-linux-arm
-        dotnet publish ./TeslaMateAgile/TeslaMateAgile.csproj --self-contained true --runtime win-x64 --output ./output/TeslaMateAgile-win-x64
       
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2
