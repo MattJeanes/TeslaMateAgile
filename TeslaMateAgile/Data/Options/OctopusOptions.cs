@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TeslaMateAgile
+namespace TeslaMateAgile.Data.Options
 {
     public class OctopusOptions
     {

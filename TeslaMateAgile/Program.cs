@@ -7,7 +7,11 @@ using Npgsql;
 using System;
 using System.Data.Common;
 using System.Threading.Tasks;
+using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Data.TeslaMate;
+using TeslaMateAgile.Helpers.Interfaces;
+using TeslaMateAgile.Services;
+using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile
 {
@@ -61,6 +65,7 @@ namespace TeslaMateAgile
 
                     var builder = new DbConnectionStringBuilder();
                     services.AddDbContext<TeslaMateDbContext>(o => o.UseNpgsql(connectionString));
+                    services.AddHttpClient<IOctopusService, OctopusService>();
                     services.AddHostedService<PriceService>();
                     services.AddOptions<OctopusOptions>()
                         .Bind(config.GetSection("Octopus"))

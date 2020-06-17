@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeslaMateAgile.Tests", "TeslaMateAgile.Tests\TeslaMateAgile.Tests.csproj", "{39487E85-962C-44E4-8EA8-FA033D771991}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,10 @@ Global
 		{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39487E85-962C-44E4-8EA8-FA033D771991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39487E85-962C-44E4-8EA8-FA033D771991}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39487E85-962C-44E4-8EA8-FA033D771991}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39487E85-962C-44E4-8EA8-FA033D771991}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

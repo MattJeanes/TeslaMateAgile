@@ -4,42 +4,36 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
-using TeslaMateAgile.Data.Octopus;
+using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Data.TeslaMate;
 using TeslaMateAgile.Data.TeslaMate.Entities;
+using TeslaMateAgile.Helpers.Interfaces;
+using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile
 {
-    public class PriceHelper : IPriceHelper
+    public partial class PriceHelper : IPriceHelper
     {
         private readonly ILogger<PriceHelper> _logger;
         private readonly TeslaMateDbContext _context;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly OctopusOptions _octopusOptions;
+        private readonly IOctopusService _octopusService;
         private readonly TeslaMateOptions _teslaMateOptions;
 
         public PriceHelper(
             ILogger<PriceHelper> logger,
             TeslaMateDbContext context,
-            IHttpClientFactory httpClientFactory,
-            IOptions<OctopusOptions> octopusOptions,
+            IOctopusService octopusService,
             IOptions<TeslaMateOptions> teslaMateOptions
             )
         {
             _logger = logger;
             _context = context;
-            _httpClientFactory = httpClientFactory;
-            _octopusOptions = octopusOptions.Value;
+            _octopusService = octopusService;
             _teslaMateOptions = teslaMateOptions.Value;
         }
         public async Task Update()
         {
-            var httpClient = _httpClientFactory.CreateClient();
             _logger.LogInformation("Updating prices");
 
             var chargingProcesses = await _context.ChargingProcesses
@@ -57,7 +51,7 @@ namespace TeslaMateAgile
             {
                 try
                 {
-                    var (cost, energy) = await CalculateChargeCost(httpClient, chargingProcess);
+                    var (cost, energy) = await CalculateChargeCost(chargingProcess.Charges);
                     _logger.LogInformation($"Calculated cost {cost} and energy {energy} kWh for charging process {chargingProcess.Id}");
                     if (chargingProcess.ChargeEnergyUsed.HasValue && chargingProcess.ChargeEnergyUsed.Value != energy)
                     {
@@ -74,12 +68,11 @@ namespace TeslaMateAgile
             await _context.SaveChangesAsync();
         }
 
-        private async Task<(decimal Price, decimal Energy)> CalculateChargeCost(HttpClient httpClient, ChargingProcess chargingProcess)
+        public async Task<(decimal Price, decimal Energy)> CalculateChargeCost(IEnumerable<Charge> charges)
         {
-            var charges = chargingProcess.Charges;
             var minDate = charges.Min(x => x.Date);
             var maxDate = charges.Max(x => x.Date);
-            var prices = await GetAgilePrices(httpClient, minDate, maxDate);
+            var prices = await _octopusService.GetAgilePrices(minDate, maxDate);
             var totalPrice = 0M;
             var totalEnergy = 0M;
             Charge lastCharge = null;
@@ -100,30 +93,6 @@ namespace TeslaMateAgile
             return (Math.Round(totalPrice, 2), Math.Round(totalEnergy, 2));
         }
 
-        private async Task<IOrderedEnumerable<AgilePrice>> GetAgilePrices(HttpClient httpClient, DateTime from, DateTime to)
-        {
-            var url = $"{_octopusOptions.BaseUrl}/products/{_octopusOptions.ProductCode}/electricity-tariffs/{_octopusOptions.TariffCode}-{_octopusOptions.RegionCode}/standard-unit-rates?period_from={from:o}&period_to={to:o}";
-            var list = new List<AgilePrice>();
-            do
-            {
-                var resp = await httpClient.GetAsync(url);
-                resp.EnsureSuccessStatusCode();
-                var agileResponse = await JsonSerializer.DeserializeAsync<AgileResponse>(await resp.Content.ReadAsStreamAsync());
-                list.AddRange(agileResponse.Results);
-                url = agileResponse.Next;
-                if (string.IsNullOrEmpty(url))
-                {
-                    break;
-                }
-                else
-                {
-                    Thread.Sleep(5000); // back off API so they don't ban us
-                }
-            }
-            while (true);
-            return list.OrderBy(x => x.ValidFrom);
-        }
-
         private decimal CalculateEnergyUsed(IEnumerable<Charge> charges)
         {
             // adapted from https://github.com/adriankumpf/teslamate/blob/0db6d6905ce804b3b8cafc0ab69aa8cd346446a8/lib/teslamate/log.ex#L464-L488
@@ -139,21 +108,6 @@ namespace TeslaMateAgile
             return power
                 .Where(x => x.HasValue && x.Value >= 0)
                 .Sum(x => x.Value);
-        }
-
-        private class AgileResponse
-        {
-            [JsonPropertyName("count")]
-            public int Count { get; set; }
-
-            [JsonPropertyName("next")]
-            public string Next { get; set; }
-
-            [JsonPropertyName("previous")]
-            public string Previous { get; set; }
-
-            [JsonPropertyName("results")]
-            public List<AgilePrice> Results { get; set; }
         }
     }
 }
