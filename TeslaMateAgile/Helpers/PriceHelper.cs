@@ -13,7 +13,7 @@ using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile
 {
-    public partial class PriceHelper : IPriceHelper
+    public class PriceHelper : IPriceHelper
     {
         private readonly ILogger<PriceHelper> _logger;
         private readonly TeslaMateDbContext _context;
