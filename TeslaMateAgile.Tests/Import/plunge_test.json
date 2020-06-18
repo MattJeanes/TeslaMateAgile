@@ -1,0 +1,73 @@
+{
+    "count": 11,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "value_exc_vat": -5.54,
+            "value_inc_vat": -5.817,
+            "valid_from": "2020-05-23T05:00:00Z",
+            "valid_to": "2020-05-23T05:30:00Z"
+        },
+        {
+            "value_exc_vat": -8.21,
+            "value_inc_vat": -8.6205,
+            "valid_from": "2020-05-23T04:30:00Z",
+            "valid_to": "2020-05-23T05:00:00Z"
+        },
+        {
+            "value_exc_vat": -8.4,
+            "value_inc_vat": -8.82,
+            "valid_from": "2020-05-23T04:00:00Z",
+            "valid_to": "2020-05-23T04:30:00Z"
+        },
+        {
+            "value_exc_vat": -7.98,
+            "value_inc_vat": -8.379,
+            "valid_from": "2020-05-23T03:30:00Z",
+            "valid_to": "2020-05-23T04:00:00Z"
+        },
+        {
+            "value_exc_vat": -7.98,
+            "value_inc_vat": -8.379,
+            "valid_from": "2020-05-23T03:00:00Z",
+            "valid_to": "2020-05-23T03:30:00Z"
+        },
+        {
+            "value_exc_vat": -6.36,
+            "value_inc_vat": -6.678,
+            "valid_from": "2020-05-23T02:30:00Z",
+            "valid_to": "2020-05-23T03:00:00Z"
+        },
+        {
+            "value_exc_vat": -4.54,
+            "value_inc_vat": -4.767,
+            "valid_from": "2020-05-23T02:00:00Z",
+            "valid_to": "2020-05-23T02:30:00Z"
+        },
+        {
+            "value_exc_vat": -4.37,
+            "value_inc_vat": -4.5885,
+            "valid_from": "2020-05-23T01:30:00Z",
+            "valid_to": "2020-05-23T02:00:00Z"
+        },
+        {
+            "value_exc_vat": -2.1,
+            "value_inc_vat": -2.205,
+            "valid_from": "2020-05-23T01:00:00Z",
+            "valid_to": "2020-05-23T01:30:00Z"
+        },
+        {
+            "value_exc_vat": -1.51,
+            "value_inc_vat": -1.5855,
+            "valid_from": "2020-05-23T00:30:00Z",
+            "valid_to": "2020-05-23T01:00:00Z"
+        },
+        {
+            "value_exc_vat": 0.0,
+            "value_inc_vat": 0.0,
+            "valid_from": "2020-05-23T00:00:00Z",
+            "valid_to": "2020-05-23T00:30:00Z"
+        }
+    ]
+}

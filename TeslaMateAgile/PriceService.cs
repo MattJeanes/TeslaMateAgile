@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TeslaMateAgile.Data.Options;
+using TeslaMateAgile.Helpers.Interfaces;
 
 namespace TeslaMateAgile
 {
