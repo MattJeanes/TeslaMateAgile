@@ -53,6 +53,11 @@ See below for how to configure the environment variables appropriately
 - Tibber__AccessToken=abc123 # See below Tibber Access Token section
 ````
 
+## Optional environment variables
+```yaml
+- Logging__LogLevel__Default=Debug # Enables debug logging, useful for seeing exactly how a charge was calculated
+```
+
 ## Database connection
 You also need to configure the database connection to the TeslaMate PostgreSQL database, you can do this either by supplying a PostgreSQL connection string directly or by using the same ones used by TeslaMate in the `docker-compose.yml`
 
