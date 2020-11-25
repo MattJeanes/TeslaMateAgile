@@ -26,6 +26,7 @@ services:
       - TeslaMate__UpdateIntervalSeconds=300
       - TeslaMate__GeofenceId=1
       - TeslaMate__Phases=1
+      - TeslaMate__EnergyProvider=Octopus
       - Octopus__RegionCode=A # Octopus Energy only
       - Tibber__AccessToken=abc123 # Tibber only
 ```
@@ -41,12 +42,14 @@ See below for how to configure the environment variables appropriately
 
 ### Octopus Energy
 ```
+- TeslaMate__EnergyProvider=Octopus
 - Octopus__RegionCode=A # See below Octopus Region Code section
 ```
 
 ### Tibber
 
 ```yaml
+- TeslaMate__EnergyProvider=Tibber
 - Tibber__AccessToken=abc123 # See below Tibber Access Token section
 ````
 
