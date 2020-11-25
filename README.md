@@ -95,6 +95,22 @@ Tibber requires users to supply their access token to provide pricing informatio
 
 You can acquire this token here: https://developer.tibber.com/settings/accesstoken
 
+## Troubleshooting
+
+### Recalculating charge costs
+
+In some cases you may want to tell TeslaMateAgile to recalculate a particular charge, to do this you need to set the `cost` column in the `charging_processes` table in the TeslaMate PostgreSQL database to `NULL` for the charges you want to recalculate.
+
+You should filter this by a particular charge `id` or by `geofence_id` if you want to recalculate everything. To find a particular charge id, look in the URL when viewing it in Grafana, it should be on the end of the URL: `...&var-charging_process_id=xxx`.
+
+TeslaMate has a guide on manually fixing data here: https://docs.teslamate.org/docs/maintenance/manually_fixing_data
+
+#### Common SQL queries
+Recalculate charge costs for a particular charge: `UPDATE charging_processes SET cost=NULL WHERE id={ChargeId}`
+Recalculate charge costs for all charges at your GeofenceId: `UPDATE charging_processes SET cost=NULL WHERE geofence_id={GeofenceId}`
+
+Please be careful when running SQL queries against your TeslaMate database as they may result in permanent data loss. Take a backup of your database before if you're not sure.
+
 ## Docker support
 This project is available on Docker
 
