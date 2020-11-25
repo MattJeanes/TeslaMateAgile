@@ -70,7 +70,7 @@ namespace TeslaMateAgile.Tests
             return JsonSerializer.Deserialize<OctopusService.AgileResponse>(json).Results
                 .Select(x => new Price
                 {
-                    Value = x.ValueIncVAT,
+                    Value = x.ValueIncVAT / 100,
                     ValidTo = x.ValidTo,
                     ValidFrom = x.ValidFrom
                 }).ToList();

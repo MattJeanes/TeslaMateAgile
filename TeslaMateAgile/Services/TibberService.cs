@@ -37,7 +37,7 @@ namespace TeslaMateAgile.Services
 
         public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
-            var first = (int)Math.Ceiling((to - from).TotalHours);
+            var fetch = (int)Math.Ceiling((to - from).TotalHours);
             var request = new GraphQLHttpRequest
             {
                 Query = @"
@@ -45,12 +45,17 @@ query PriceData($after: String, $first: Int) {
     viewer {
         homes {
             currentSubscription {
-                priceInfo{
+                priceInfo {
                     range(resolution: HOURLY, after: $after, first: $first) {
                         nodes {
                             total
                             startsAt
                         }
+                    }
+                    current {
+                        total
+                        startsAt
+                        level
                     }
                 }
             }
@@ -62,17 +67,19 @@ query PriceData($after: String, $first: Int) {
                 Variables = new
                 {
                     after = Convert.ToBase64String(Encoding.UTF8.GetBytes(from.AddHours(-1).ToString("o"))),
-                    first
+                    first = fetch
                 }
             };
             var graphQLHttpResponse = await SendRequest(request);
-            return graphQLHttpResponse
+            var priceInfo = graphQLHttpResponse
                 .Data
                 .Viewer
                 .Homes
                 .First()
                 .CurrentSubscription
-                .PriceInfo
+                .PriceInfo;
+
+            var prices = priceInfo
                 .Range
                 .Nodes
                 .Select(x => new Price
@@ -80,7 +87,31 @@ query PriceData($after: String, $first: Int) {
                     ValidFrom = x.StartsAt,
                     ValidTo = x.StartsAt.AddHours(1),
                     Value = x.Total
+                })
+                .ToList();
+
+            var count = prices.Count();
+            // The Tibber range API only returns historical and does not include the current price
+            // This will add the current price to the list if it should be in there but isn't
+            if (count + 1 == fetch
+                && priceInfo.Current.StartsAt >= from.AddHours(-1)
+                && priceInfo.Current.StartsAt < to
+                && !prices.Any(x => x.ValidFrom == priceInfo.Current.StartsAt)
+                )
+            {
+                prices.Add(new Price
+                {
+                    ValidFrom = priceInfo.Current.StartsAt,
+                    ValidTo = priceInfo.Current.StartsAt.AddHours(1),
+                    Value = priceInfo.Current.Total
                 });
+            }
+            else if (count != fetch)
+            {
+                throw new Exception($"Mismatch of requested price info from Tibber API (expected: {fetch}, actual: {count})");
+            }
+
+            return prices;
         }
 
         private async Task<GraphQLHttpResponse<ResponseType>> SendRequest(GraphQLHttpRequest request)
@@ -133,6 +164,7 @@ query PriceData($after: String, $first: Int) {
         private class PriceInfo
         {
             public RangeInfo Range { get; set; }
+            public Node Current { get; set; }
         }
 
         private class RangeInfo

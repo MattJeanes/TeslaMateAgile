@@ -85,7 +85,7 @@ namespace TeslaMateAgile
                 }
                 chargesForPrice = chargesForPrice.OrderBy(x => x.Date).ToList();
                 var energyAddedInDateRange = CalculateEnergyUsed(chargesForPrice);
-                var priceForEnergy = energyAddedInDateRange * (price.Value / 100);
+                var priceForEnergy = energyAddedInDateRange * price.Value;
                 totalPrice += priceForEnergy;
                 totalEnergy += energyAddedInDateRange;
                 lastCharge = chargesForPrice.Last();

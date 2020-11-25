@@ -26,7 +26,7 @@ namespace TeslaMateAgile.Services
 
         public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
-            var url = $"products/{_options.ProductCode}/electricity-tariffs/{_options.TariffCode}-{_options.RegionCode}/standard-unit-rates?period_from={from:o}&period_to={to:o}";
+            var url = $"products/{_options.ProductCode}/electricity-tariffs/{_options.TariffCode}-{_options.RegionCode}/standard-unit-rates?period_from={from.UtcDateTime:o}&period_to={to.UtcDateTime:o}";
             var list = new List<AgilePrice>();
             do
             {
@@ -48,7 +48,7 @@ namespace TeslaMateAgile.Services
             return list
                 .Select(x => new Price
                 {
-                    Value = x.ValueIncVAT,
+                    Value = x.ValueIncVAT / 100,
                     ValidFrom = x.ValidFrom,
                     ValidTo = x.ValidTo
                 });

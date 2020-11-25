@@ -12,11 +12,11 @@ namespace TeslaMateAgile.Data.TeslaMate.Entities
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("start_date")]
-        public DateTimeOffset StartDate { get; set; }
-
+        /// <summary>
+        /// Do not use this property for date comparisons, it must be converted to a UTC DateTimeOffset first
+        /// </summary>
         [Column("end_date")]
-        public DateTimeOffset? EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Column("geofence_id")]
         public int GeofenceId { get; set; }
