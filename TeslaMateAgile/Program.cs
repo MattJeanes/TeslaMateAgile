@@ -1,12 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GraphQL.Client.Abstractions;
+using GraphQL.Client.Serializer.SystemTextJson;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using System;
 using System.Data.Common;
 using System.Threading.Tasks;
+using TeslaMateAgile.Data.Enums;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Data.TeslaMate;
 using TeslaMateAgile.Helpers.Interfaces;
@@ -65,16 +69,43 @@ namespace TeslaMateAgile
 
                     var builder = new DbConnectionStringBuilder();
                     services.AddDbContext<TeslaMateDbContext>(o => o.UseNpgsql(connectionString));
-                    services.AddHttpClient<IOctopusService, OctopusService>();
                     services.AddHostedService<PriceService>();
-                    services.AddOptions<OctopusOptions>()
-                        .Bind(config.GetSection("Octopus"))
-                        .ValidateDataAnnotations();
                     services.AddOptions<TeslaMateOptions>()
                         .Bind(config.GetSection("TeslaMate"))
                         .ValidateDataAnnotations();
                     services.AddTransient<IPriceHelper, PriceHelper>();
                     services.AddHttpClient();
+
+                    var energyProvider = config.GetValue("EnergyProvider", EnergyProvider.Octopus);
+                    if (energyProvider == EnergyProvider.Octopus)
+                    {
+                        services.AddOptions<OctopusOptions>()
+                            .Bind(config.GetSection("Octopus"))
+                            .ValidateDataAnnotations();
+                        services.AddHttpClient<IPriceDataService, OctopusService>((serviceProvider, client) =>
+                        {
+                            var options = serviceProvider.GetRequiredService<IOptions<OctopusOptions>>().Value;
+                            var baseUrl = options.BaseUrl;
+                            if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+                            client.BaseAddress = new Uri(baseUrl);
+                        });
+                    }
+                    else if (energyProvider == EnergyProvider.Tibber)
+                    {
+                        services.AddOptions<TibberOptions>()
+                            .Bind(config.GetSection("Tibber"))
+                            .ValidateDataAnnotations();
+                        services.AddTransient<IGraphQLJsonSerializer, SystemTextJsonSerializer>();
+                        services.AddHttpClient<IPriceDataService, TibberService>((serviceProvider, client) =>
+                        {
+                            var options = serviceProvider.GetRequiredService<IOptions<TibberOptions>>().Value;
+                            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.AccessToken);
+                        });
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid energy provider set", nameof(energyProvider));
+                    }
                 });
 
             await builder.RunConsoleAsync();

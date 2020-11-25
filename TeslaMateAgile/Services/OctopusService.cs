@@ -4,15 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using TeslaMateAgile.Data.Octopus;
+using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile.Services
 {
-    public class OctopusService : IOctopusService
+    public class OctopusService : IPriceDataService
     {
         private readonly OctopusOptions _options;
         private readonly HttpClient _client;
@@ -21,12 +22,9 @@ namespace TeslaMateAgile.Services
         {
             _options = options.Value;
             _client = client;
-            var baseUrl = _options.BaseUrl;
-            if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
-            _client.BaseAddress = new Uri(baseUrl);
         }
 
-        public async Task<IOrderedEnumerable<AgilePrice>> GetAgilePrices(DateTime from, DateTime to)
+        public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
             var url = $"products/{_options.ProductCode}/electricity-tariffs/{_options.TariffCode}-{_options.RegionCode}/standard-unit-rates?period_from={from:o}&period_to={to:o}";
             var list = new List<AgilePrice>();
@@ -47,7 +45,43 @@ namespace TeslaMateAgile.Services
                 }
             }
             while (true);
-            return list.OrderBy(x => x.ValidFrom);
+            return list
+                .Select(x => new Price
+                {
+                    Value = x.ValueIncVAT,
+                    ValidFrom = x.ValidFrom,
+                    ValidTo = x.ValidTo
+                });
+        }
+
+        public class AgilePrice
+        {
+            [JsonPropertyName("value_exc_vat")]
+            public decimal ValueExcVAT { get; set; }
+
+            [JsonPropertyName("value_inc_vat")]
+            public decimal ValueIncVAT { get; set; }
+
+            [JsonPropertyName("valid_from")]
+            public DateTimeOffset ValidFrom { get; set; }
+
+            [JsonPropertyName("valid_to")]
+            public DateTimeOffset ValidTo { get; set; }
+        }
+
+        public class AgileResponse
+        {
+            [JsonPropertyName("count")]
+            public int Count { get; set; }
+
+            [JsonPropertyName("next")]
+            public string Next { get; set; }
+
+            [JsonPropertyName("previous")]
+            public string Previous { get; set; }
+
+            [JsonPropertyName("results")]
+            public List<AgilePrice> Results { get; set; }
         }
     }
 }

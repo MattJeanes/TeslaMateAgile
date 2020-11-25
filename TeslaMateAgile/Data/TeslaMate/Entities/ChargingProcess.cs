@@ -13,10 +13,10 @@ namespace TeslaMateAgile.Data.TeslaMate.Entities
         public int Id { get; set; }
 
         [Column("start_date")]
-        public DateTime StartDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
 
         [Column("end_date")]
-        public DateTime? EndDate { get; set; }
+        public DateTimeOffset? EndDate { get; set; }
 
         [Column("geofence_id")]
         public int GeofenceId { get; set; }

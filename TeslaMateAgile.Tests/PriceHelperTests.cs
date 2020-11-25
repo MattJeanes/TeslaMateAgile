@@ -1,6 +1,5 @@
 using CsvHelper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,7 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TeslaMateAgile.Data.Octopus;
+using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Data.TeslaMate;
 using TeslaMateAgile.Data.TeslaMate.Entities;
@@ -24,25 +23,12 @@ namespace TeslaMateAgile.Tests
 {
     public class PriceHelperTests
     {
-        public PriceHelper Setup(List<AgilePrice> agilePrices)
+        public PriceHelper Setup(List<Price> prices)
         {
-            var octopusService = new Mock<IOctopusService>();
-            octopusService
-                .Setup(x => x.GetAgilePrices(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(agilePrices.OrderBy(x => x.ValidFrom));
-
-            var configBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddUserSecrets<Program>();
-
-            var config = configBuilder.Build();
-
-            var services = new ServiceCollection();
-            services.AddHttpClient();
-            services.AddHttpClient<IOctopusService, OctopusService>();
-            services.Configure<OctopusOptions>(config.GetSection("Octopus"));
-
-            //var octopusServiceReal = services.BuildServiceProvider().GetRequiredService<IOctopusService>();
+            var priceDataService = new Mock<IPriceDataService>();
+            priceDataService
+                .Setup(x => x.GetPriceData(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+                .ReturnsAsync(prices.OrderBy(x => x.ValidFrom));
 
             var teslaMateDbContext = new Mock<TeslaMateDbContext>(new DbContextOptions<TeslaMateDbContext>());
 
@@ -53,7 +39,7 @@ namespace TeslaMateAgile.Tests
 
             var teslaMateOptions = Options.Create(new TeslaMateOptions { Phases = 1 });
 
-            return new PriceHelper(logger, teslaMateDbContext.Object, octopusService.Object, teslaMateOptions);
+            return new PriceHelper(logger, teslaMateDbContext.Object, priceDataService.Object, teslaMateOptions);
         }
 
         private static readonly object[][] PriceHelper_CalculateChargeCost_Cases = new object[][] {
@@ -69,81 +55,25 @@ namespace TeslaMateAgile.Tests
 
         [Test]
         [TestCaseSource(nameof(PriceHelper_CalculateChargeCost_Cases))]
-        public async Task PriceHelper_CalculateChargeCost(string testName, List<AgilePrice> agilePrices, List<Charge> charges, decimal expectedPrice, decimal expectedEnergy)
+        public async Task PriceHelper_CalculateChargeCost(string testName, List<Price> prices, List<Charge> charges, decimal expectedPrice, decimal expectedEnergy)
         {
             Console.WriteLine($"Running calculate charge cost test '{testName}'");
-            var priceHelper = Setup(agilePrices);
+            var priceHelper = Setup(prices);
             var (price, energy) = await priceHelper.CalculateChargeCost(charges);
             Assert.AreEqual(expectedPrice, price);
             Assert.AreEqual(expectedEnergy, energy);
         }
 
-        private static List<AgilePrice> GenerateAgilePrices(string fromStr, string toStr, List<decimal> prices)
-        {
-            var from = DateTime.Parse(fromStr).ToUniversalTime();
-            var to = DateTime.Parse(toStr).ToUniversalTime();
-            var agilePrices = new List<AgilePrice>();
-            var lastDate = from;
-            var index = 0;
-            while (lastDate < to)
-            {
-                var newDate = lastDate.AddMinutes(30);
-                agilePrices.Add(new AgilePrice
-                {
-                    ValueIncVAT = prices[index],
-                    ValidFrom = lastDate,
-                    ValidTo = newDate
-                });
-                lastDate = newDate;
-                index++;
-            }
-
-            return agilePrices;
-        }
-
-        private static List<AgilePrice> ImportAgilePrices(string jsonFile)
+        private static List<Price> ImportAgilePrices(string jsonFile)
         {
             var json = File.ReadAllText(Path.Combine("Import", jsonFile));
-            return JsonSerializer.Deserialize<AgileResponse>(json).Results;
-        }
-
-        private static List<Charge> GenerateCharges(string fromStr, string toStr)
-        {
-            var from = DateTime.Parse(fromStr).ToUniversalTime();
-            var to = DateTime.Parse(toStr).ToUniversalTime();
-
-            var charges = new List<Charge>
-            {
-                new Charge
+            return JsonSerializer.Deserialize<OctopusService.AgileResponse>(json).Results
+                .Select(x => new Price
                 {
-                    ChargerActualCurrent = 30,
-                    ChargerVoltage = 240,
-                    ChargerPhases = 1,
-                    Date = from
-                }
-            };
-            var lastDate = from;
-            var rand = new Random();
-            while (lastDate < to)
-            {
-                lastDate = lastDate.AddMinutes(rand.NextDouble());
-                charges.Add(new Charge
-                {
-                    ChargerActualCurrent = 30,
-                    ChargerVoltage = 240,
-                    ChargerPhases = 1,
-                    Date = lastDate
-                });
-            }
-            charges.Add(new Charge
-            {
-                ChargerActualCurrent = 30,
-                ChargerVoltage = 240,
-                ChargerPhases = 1,
-                Date = to.AddMilliseconds(-1)
-            });
-
-            return charges;
+                    Value = x.ValueIncVAT,
+                    ValidTo = x.ValidTo,
+                    ValidFrom = x.ValidFrom
+                }).ToList();
         }
 
         private static List<Charge> ImportCharges(string csvFile)
@@ -167,7 +97,9 @@ namespace TeslaMateAgile.Tests
                     ChargerPhases = csvReader.GetField<int>("charger_phases"),
                     ChargerPower = csvReader.GetField<int>("charger_power"),
                     ChargerVoltage = csvReader.GetField<int>("charger_voltage"),
-                    Date = DateTime.SpecifyKind(csvReader.GetField<DateTime>("date"), DateTimeKind.Utc).ToUniversalTime()
+#pragma warning disable CS0618 // Type or member is obsolete
+                    DateInternal = csvReader.GetField<DateTime>("date")
+#pragma warning restore CS0618 // Type or member is obsolete
                 });
             }
 

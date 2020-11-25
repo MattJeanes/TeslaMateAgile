@@ -17,19 +17,19 @@ namespace TeslaMateAgile
     {
         private readonly ILogger<PriceHelper> _logger;
         private readonly TeslaMateDbContext _context;
-        private readonly IOctopusService _octopusService;
+        private readonly IPriceDataService _priceDataService;
         private readonly TeslaMateOptions _teslaMateOptions;
 
         public PriceHelper(
             ILogger<PriceHelper> logger,
             TeslaMateDbContext context,
-            IOctopusService octopusService,
+            IPriceDataService priceDataService,
             IOptions<TeslaMateOptions> teslaMateOptions
             )
         {
             _logger = logger;
             _context = context;
-            _octopusService = octopusService;
+            _priceDataService = priceDataService;
             _teslaMateOptions = teslaMateOptions.Value;
         }
         public async Task Update()
@@ -72,7 +72,7 @@ namespace TeslaMateAgile
         {
             var minDate = charges.Min(x => x.Date);
             var maxDate = charges.Max(x => x.Date);
-            var prices = await _octopusService.GetAgilePrices(minDate, maxDate);
+            var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
             var totalPrice = 0M;
             var totalEnergy = 0M;
             Charge lastCharge = null;
@@ -85,7 +85,7 @@ namespace TeslaMateAgile
                 }
                 chargesForPrice = chargesForPrice.OrderBy(x => x.Date).ToList();
                 var energyAddedInDateRange = CalculateEnergyUsed(chargesForPrice);
-                var priceForEnergy = energyAddedInDateRange * (price.ValueIncVAT / 100);
+                var priceForEnergy = energyAddedInDateRange * (price.Value / 100);
                 totalPrice += priceForEnergy;
                 totalEnergy += energyAddedInDateRange;
                 lastCharge = chargesForPrice.Last();
