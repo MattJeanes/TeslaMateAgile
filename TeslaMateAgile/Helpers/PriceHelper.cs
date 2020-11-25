@@ -72,13 +72,16 @@ namespace TeslaMateAgile
         {
             var minDate = charges.Min(x => x.Date);
             var maxDate = charges.Max(x => x.Date);
+            _logger.LogInformation($"Calculating cost for charges {minDate.UtcDateTime} UTC - {maxDate.UtcDateTime} UTC");
             var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
             var totalPrice = 0M;
             var totalEnergy = 0M;
             Charge lastCharge = null;
+            var chargesCalculated = 0;
             foreach (var price in prices)
             {
                 var chargesForPrice = charges.Where(x => x.Date >= price.ValidFrom && x.Date < price.ValidTo).ToList();
+                chargesCalculated += chargesForPrice.Count;
                 if (lastCharge != null)
                 {
                     chargesForPrice.Add(lastCharge);
@@ -89,6 +92,12 @@ namespace TeslaMateAgile
                 totalPrice += priceForEnergy;
                 totalEnergy += energyAddedInDateRange;
                 lastCharge = chargesForPrice.Last();
+                _logger.LogDebug($"Calculated charge cost for {price.ValidFrom.UtcDateTime} UTC - {price.ValidTo.UtcDateTime} UTC (unit cost: {price.Value}): {priceForEnergy} for {energyAddedInDateRange} energy");
+            }
+            var chargesCount = charges.Count();
+            if (chargesCalculated != chargesCount)
+            {
+                throw new Exception($"Charge calculation failed, pricing calculated for {chargesCalculated} / {chargesCount}, likely missing price data");
             }
             return (Math.Round(totalPrice, 2), Math.Round(totalEnergy, 2));
         }
