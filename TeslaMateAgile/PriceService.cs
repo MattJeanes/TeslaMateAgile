@@ -31,6 +31,7 @@ namespace TeslaMateAgile
                 throw new ArgumentOutOfRangeException(nameof(_options.UpdateIntervalSeconds), _options.UpdateIntervalSeconds, "Must be greater than 0");
             }
             _logger.LogInformation("Price service is starting");
+            _logger.LogInformation($"Using energy provider {_options.EnergyProvider}");
 
             _timer = new Timer(async (state) =>
             {

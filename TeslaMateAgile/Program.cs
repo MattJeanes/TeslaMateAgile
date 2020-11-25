@@ -76,7 +76,7 @@ namespace TeslaMateAgile
                     services.AddTransient<IPriceHelper, PriceHelper>();
                     services.AddHttpClient();
 
-                    var energyProvider = config.GetValue("EnergyProvider", EnergyProvider.Octopus);
+                    var energyProvider = config.GetValue("TeslaMate:EnergyProvider", EnergyProvider.Octopus);
                     if (energyProvider == EnergyProvider.Octopus)
                     {
                         services.AddOptions<OctopusOptions>()
