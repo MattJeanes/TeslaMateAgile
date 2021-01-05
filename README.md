@@ -41,7 +41,7 @@ See below for how to configure the environment variables appropriately
 ```
 
 ### Octopus Energy
-```
+```yaml
 - TeslaMate__EnergyProvider=Octopus
 - Octopus__RegionCode=A # See below Octopus Region Code section
 ```
