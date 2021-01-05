@@ -66,6 +66,7 @@ You also need to configure the database connection to the TeslaMate PostgreSQL d
 - DATABASE_NAME=teslamate
 - DATABASE_USER=teslamate
 - DATABASE_PASS=secret
+- DATABASE_PORT=5432 # Optional (default: 5432)
 ```
 
 **OR** (not recommended)
