@@ -64,6 +64,20 @@ namespace TeslaMateAgile
                             Password = databasePassword
                         };
 
+                        var databasePortVariable = "DATABASE_PORT";
+                        var databasePortStr = config[databasePortVariable];
+                        if (!string.IsNullOrEmpty(databasePortStr))
+                        {
+                            if (int.TryParse(databasePortStr, out var databasePort))
+                            {
+                                connectionStringBuilder.Port = databasePort;
+                            }
+                            else
+                            {
+                                throw new ArgumentException(databasePortVariable, $"Configuration '{databasePortVariable}' is invalid, must be an integer");
+                            }
+                        }
+
                         connectionString = connectionStringBuilder.ConnectionString;
                     }
 
