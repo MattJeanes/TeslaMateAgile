@@ -88,11 +88,11 @@ namespace TeslaMateAgile
                 }
                 chargesForPrice = chargesForPrice.OrderBy(x => x.Date).ToList();
                 var energyAddedInDateRange = CalculateEnergyUsed(chargesForPrice);
-                var priceForEnergy = energyAddedInDateRange * price.Value;
+                var priceForEnergy = (energyAddedInDateRange * price.Value) + (energyAddedInDateRange * _teslaMateOptions.FeePerKilowattHour);
                 totalPrice += priceForEnergy;
                 totalEnergy += energyAddedInDateRange;
                 lastCharge = chargesForPrice.Last();
-                _logger.LogDebug($"Calculated charge cost for {price.ValidFrom.UtcDateTime} UTC - {price.ValidTo.UtcDateTime} UTC (unit cost: {price.Value}): {priceForEnergy} for {energyAddedInDateRange} energy");
+                _logger.LogDebug($"Calculated charge cost for {price.ValidFrom.UtcDateTime} UTC - {price.ValidTo.UtcDateTime} UTC (unit cost: {price.Value}, fee per kWh: {_teslaMateOptions.FeePerKilowattHour}): {priceForEnergy} for {energyAddedInDateRange} energy");
             }
             var chargesCount = charges.Count();
             if (chargesCalculated != chargesCount)

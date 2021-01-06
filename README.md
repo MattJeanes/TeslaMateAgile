@@ -56,6 +56,7 @@ See below for how to configure the environment variables appropriately
 ## Optional environment variables
 ```yaml
 - Logging__LogLevel__Default=Debug # Enables debug logging, useful for seeing exactly how a charge was calculated
+- TeslaMate__FeePerKilowattHour=0.25 # Adds a flat fee per kWh, useful for certain arrangements (default: 0)
 ```
 
 ## Database connection

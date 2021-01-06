@@ -15,5 +15,7 @@ namespace TeslaMateAgile.Data.Options
         public int Phases { get; set; }
 
         public EnergyProvider EnergyProvider { get; set; }
+
+        public decimal FeePerKilowattHour { get; set; }
     }
 }
