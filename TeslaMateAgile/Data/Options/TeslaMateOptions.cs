@@ -11,9 +11,6 @@ namespace TeslaMateAgile.Data.Options
         [Range(1, int.MaxValue)]
         public int UpdateIntervalSeconds { get; set; }
 
-        [Range(1, int.MaxValue)]
-        public int Phases { get; set; }
-
         public EnergyProvider EnergyProvider { get; set; }
 
         public decimal FeePerKilowattHour { get; set; }

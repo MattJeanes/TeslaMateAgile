@@ -23,8 +23,10 @@ namespace TeslaMateAgile.Tests
 {
     public class PriceHelperTests
     {
-        public PriceHelper Setup(List<Price> prices)
+        public PriceHelper Setup(List<Price> prices = null)
         {
+            if (prices == null) { prices = new List<Price>(); }
+
             var priceDataService = new Mock<IPriceDataService>();
             priceDataService
                 .Setup(x => x.GetPriceData(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
@@ -37,7 +39,7 @@ namespace TeslaMateAgile.Tests
                 .BuildServiceProvider()
                 .GetRequiredService<ILogger<PriceHelper>>();
 
-            var teslaMateOptions = Options.Create(new TeslaMateOptions { Phases = 1 });
+            var teslaMateOptions = Options.Create(new TeslaMateOptions());
 
             return new PriceHelper(logger, teslaMateDbContext.Object, priceDataService.Object, teslaMateOptions);
         }
@@ -62,6 +64,26 @@ namespace TeslaMateAgile.Tests
             var (price, energy) = await priceHelper.CalculateChargeCost(charges);
             Assert.AreEqual(expectedPrice, price);
             Assert.AreEqual(expectedEnergy, energy);
+        }
+
+        private static readonly object[][] PriceHelper_CalculateEnergyUsed_Cases = new object[][] {
+            new object[]
+            {
+                "ThreePhase",
+                ImportCharges("threephase_test.csv"),
+                47.65M,
+            }
+        };
+
+        [Test]
+        [TestCaseSource(nameof(PriceHelper_CalculateEnergyUsed_Cases))]
+        public void PriceHelper_CalculateEnergyUsed(string testName, List<Charge> charges, decimal expectedEnergy)
+        {
+            Console.WriteLine($"Running calculate energy used test '{testName}'");
+            var priceHelper = Setup();
+            var phases = priceHelper.DeterminePhases(charges);
+            var energy = priceHelper.CalculateEnergyUsed(charges, phases.Value);
+            Assert.AreEqual(expectedEnergy, Math.Round(energy, 2));
         }
 
         private static List<Price> ImportAgilePrices(string jsonFile)

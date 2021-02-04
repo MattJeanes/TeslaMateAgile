@@ -78,6 +78,12 @@ namespace TeslaMateAgile
             var totalEnergy = 0M;
             Charge lastCharge = null;
             var chargesCalculated = 0;
+            var phases = DeterminePhases(charges);
+            if (!phases.HasValue)
+            {
+                _logger.LogWarning($"Unable to determine phases for charges");
+                return (0, 0);
+            }
             foreach (var price in prices)
             {
                 var chargesForPrice = charges.Where(x => x.Date >= price.ValidFrom && x.Date < price.ValidTo).ToList();
@@ -87,7 +93,7 @@ namespace TeslaMateAgile
                     chargesForPrice.Add(lastCharge);
                 }
                 chargesForPrice = chargesForPrice.OrderBy(x => x.Date).ToList();
-                var energyAddedInDateRange = CalculateEnergyUsed(chargesForPrice);
+                var energyAddedInDateRange = CalculateEnergyUsed(chargesForPrice, phases.Value);
                 var priceForEnergy = (energyAddedInDateRange * price.Value) + (energyAddedInDateRange * _teslaMateOptions.FeePerKilowattHour);
                 totalPrice += priceForEnergy;
                 totalEnergy += energyAddedInDateRange;
@@ -102,13 +108,13 @@ namespace TeslaMateAgile
             return (Math.Round(totalPrice, 2), Math.Round(totalEnergy, 2));
         }
 
-        private decimal CalculateEnergyUsed(IEnumerable<Charge> charges)
+        public decimal CalculateEnergyUsed(IEnumerable<Charge> charges, decimal phases)
         {
             // adapted from https://github.com/adriankumpf/teslamate/blob/0db6d6905ce804b3b8cafc0ab69aa8cd346446a8/lib/teslamate/log.ex#L464-L488
             var power = charges
                 .Select(c => !c.ChargerPhases.HasValue ?
                     c.ChargerPower :
-                     (c.ChargerActualCurrent * c.ChargerVoltage * _teslaMateOptions.Phases / 1000M)
+                     ((c.ChargerActualCurrent ?? 0) * (c.ChargerVoltage ?? 0) * phases / 1000M)
                      * (charges.Any(x => x.Date < c.Date) ?
                         (decimal)(c.Date - charges.OrderByDescending(x => x.Date).FirstOrDefault(x => x.Date < c.Date).Date).TotalHours
                         : (decimal?)null)
@@ -117,6 +123,35 @@ namespace TeslaMateAgile
             return power
                 .Where(x => x.HasValue && x.Value >= 0)
                 .Sum(x => x.Value);
+        }
+
+        public decimal? DeterminePhases(IEnumerable<Charge> charges)
+        {
+            // adapted from https://github.com/adriankumpf/teslamate/blob/0db6d6905ce804b3b8cafc0ab69aa8cd346446a8/lib/teslamate/log.ex#L490-L527
+            var powerAverage = charges.Where(x => x.ChargerActualCurrent.HasValue && x.ChargerVoltage.HasValue)
+                    .Select(x => x.ChargerPower * 1000.0 / (x.ChargerActualCurrent.Value * x.ChargerVoltage.Value))
+                    .Where(x => !double.IsNaN(x))
+                    .Average();
+            var phasesAverage = (int)charges.Where(x => x.ChargerPhases.HasValue).Average(x => x.ChargerPhases.Value);
+            var voltageAverage = charges.Where(x => x.ChargerVoltage.HasValue).Average(x => x.ChargerVoltage.Value);
+            if (powerAverage > 0 && charges.Count() > 15)
+            {
+                if (phasesAverage == Math.Round(powerAverage))
+                {
+                    return phasesAverage;
+                }
+                if (phasesAverage == 3 && Math.Abs(powerAverage / Math.Sqrt(phasesAverage) - 1) <= 0.1)
+                {
+                    _logger.LogInformation($"Voltage correction: {Math.Round(voltageAverage)}V -> {Math.Round(voltageAverage / Math.Sqrt(phasesAverage))}V");
+                    return (decimal)Math.Sqrt(phasesAverage);
+                }
+                if (Math.Abs(Math.Round(powerAverage) - powerAverage) <= 0.3)
+                {
+                    _logger.LogInformation($"Phase correction: {phasesAverage} -> {Math.Round(powerAverage)}");
+                    return (decimal)Math.Round(powerAverage);
+                }
+            }
+            return null;
         }
     }
 }
