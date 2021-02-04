@@ -25,7 +25,6 @@ services:
       - DATABASE_HOST=database
       - TeslaMate__UpdateIntervalSeconds=300
       - TeslaMate__GeofenceId=1
-      - TeslaMate__Phases=1
       - TeslaMate__EnergyProvider=Octopus
       - Octopus__RegionCode=A # Octopus Energy only
       - Tibber__AccessToken=abc123 # Tibber only
@@ -37,7 +36,6 @@ See below for how to configure the environment variables appropriately
 ```yaml
 - TeslaMate__UpdateIntervalSeconds=300 # Check for completed charges without a set cost every x seconds
 - TeslaMate__GeofenceId=1 # You can get this by editing the Geofence inside TeslaMate and getting it from the url 
-- TeslaMate__Phases=1 # How many phases your electricity has, this will usually be 1
 ```
 
 ### Octopus Energy
