@@ -116,6 +116,13 @@ namespace TeslaMateAgile
                             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.AccessToken);
                         });
                     }
+                    else if (energyProvider == EnergyProvider.FixedPrice)
+                    {
+                        services.AddOptions<FixedPriceOptions>()
+                           .Bind(config.GetSection("FixedPrice"))
+                           .ValidateDataAnnotations();
+                        services.AddSingleton<IPriceDataService, FixedPriceService>();
+                    }
                     else
                     {
                         throw new ArgumentException("Invalid energy provider set", nameof(energyProvider));

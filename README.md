@@ -6,6 +6,7 @@ This app will automatically update your cost for charge sessions in TeslaMate wi
 Supported energy providers / tarriffs:
 - [Octopus Energy: Agile Octopus](https://octopus.energy/agile/)
 - [Tibber](https://tibber.com/en)
+- Fixed Price (manually specify prices for different times of the day)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -49,7 +50,19 @@ See below for how to configure the environment variables appropriately
 ```yaml
 - TeslaMate__EnergyProvider=Tibber
 - Tibber__AccessToken=abc123 # See below Tibber Access Token section
-````
+```
+
+### Fixed Price
+
+```yaml
+- TeslaMate__EnergyProvider=FixedPrice
+- FixedPrice__TimeZone="Europe/London" # Sets timezone to resolve the times below in
+- FixedPrice__Prices__0="08:00-13:00=1.5" # You can have as many as these as you need
+- FixedPrice__Prices__1="13:00-20:00=5"
+- FixedPrice__Prices__2="20:00-03:30=4"
+- FixedPrice__Prices__3="03:30-06:00=3.5"
+- FixedPrice__Prices__4="06:00-08:00=2"
+```
 
 ## Optional environment variables
 ```yaml
