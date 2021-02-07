@@ -75,7 +75,14 @@ jobs:
             docker tag $app:$arch $DOCKER_USERNAME/$app:latest-$arch
             docker tag $app:$arch $DOCKER_USERNAME/$app:$VERSION-$arch
           done
-          for ver in $VERSION latest; do
+          versions=($VERSION)
+          if [[ $VERSION =~ "-" ]]; then
+            echo "Pre-release version detected, not setting latest tag"
+          else
+            versions+=("latest")
+            echo "Adding latest tag"
+          fi
+          for ver in "${versions[@]}"; do
             echo "Deploying version $ver"
             for arch in amd64 arm32v7 arm64v8; do
               echo "Pushing docker tag $ver-arch"
