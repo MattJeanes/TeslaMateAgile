@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services.Interfaces;
+using TimeZoneConverter;
 
 namespace TeslaMateAgile.Services
 {
@@ -19,6 +20,10 @@ namespace TeslaMateAgile.Services
             )
         {
             _fixedPrices = GetFixedPrices(options.Value);
+            if (!TZConvert.TryGetTimeZoneInfo(options.Value.TimeZone, out _timeZone))
+            {
+                throw new ArgumentException(nameof(options.Value.TimeZone), $"Invalid TimeZone {options.Value.TimeZone}");
+            }
         }
 
         public Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
@@ -29,13 +34,13 @@ namespace TeslaMateAgile.Services
             FixedPrice lastFixedPriceAdded = null;
             for (var i = 0; i <= days; i++)
             {
-                var date = from.Date;
+                var date = from.Add(-_timeZone.BaseUtcOffset).Date;
                 if (!_fixedPrices.Any(x => x.FromHour < from.Hour) && (lastPrice != lastFixedPriceAdded))
                 {
                     var price = new Price
                     {
-                        ValidFrom = date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute),
-                        ValidTo = date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute),
+                        ValidFrom = date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute).Add(-_timeZone.BaseUtcOffset),
+                        ValidTo = date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute).Add(-_timeZone.BaseUtcOffset),
                         Value = lastPrice.Value
                     };
                     if (price.ValidFrom < to && price.ValidTo > from)
@@ -48,8 +53,8 @@ namespace TeslaMateAgile.Services
                 {
                     var price = new Price
                     {
-                        ValidFrom = date.AddDays(i).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute),
-                        ValidTo = date.AddDays(i).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute),
+                        ValidFrom = date.AddDays(i).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute).Add(-_timeZone.BaseUtcOffset),
+                        ValidTo = date.AddDays(i).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute).Add(-_timeZone.BaseUtcOffset),
                         Value = fixedPrice.Value
                     };
                     if (price.ValidFrom < to && price.ValidTo > from)
@@ -73,6 +78,8 @@ namespace TeslaMateAgile.Services
         }
 
         private static readonly Regex FixedPriceRegex = new Regex("(\\d\\d):(\\d\\d)-(\\d\\d):(\\d\\d)=(.+)");
+        private readonly TimeZoneInfo _timeZone;
+
         private List<FixedPrice> GetFixedPrices(FixedPriceOptions options)
         {
             var fixedPrices = new List<FixedPrice>();
