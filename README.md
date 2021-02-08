@@ -56,7 +56,7 @@ See below for how to configure the environment variables appropriately
 
 ```yaml
 - TeslaMate__EnergyProvider=FixedPrice
-- FixedPrice__TimeZone="Europe/London" # Sets timezone to resolve the times below in
+- FixedPrice__TimeZone="Europe/London" # IANA (tz database) time zone code, used for below times 
 - FixedPrice__Prices__0="08:00-13:00=1.5" # You can have as many as these as you need
 - FixedPrice__Prices__1="13:00-20:00=5"
 - FixedPrice__Prices__2="20:00-03:30=4"
