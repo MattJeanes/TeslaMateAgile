@@ -258,6 +258,35 @@ namespace TeslaMateAgile.Tests.Services
                         Value = 5M
                     }
                 }
+            },
+            new object[]
+            {
+                "CrossDay_TimeZone",
+                "Europe/Paris",
+                new List<string>
+                {
+                    "08:00-23:00=0.1799",
+                    "23:00-02:00=0.1346",
+                    "02:00-06:00=0.1095",
+                    "06:00-08:00=0.1346"
+                },
+                DateTimeOffset.Parse("2021-01-26T00:39:45Z"),
+                DateTimeOffset.Parse("2021-01-26T04:14:30Z"),
+                new List<Price>
+                {
+                    new Price
+                    {
+                        ValidFrom = DateTimeOffset.Parse("2021-01-25T22:00:00+00:00"),
+                        ValidTo = DateTimeOffset.Parse("2021-01-26T01:00:00+00:00"),
+                        Value = 0.1346M
+                    },
+                    new Price
+                    {
+                        ValidFrom = DateTimeOffset.Parse("2021-01-26T01:00:00+00:00"),
+                        ValidTo = DateTimeOffset.Parse("2021-01-26T05:00:00+00:00"),
+                        Value = 0.1095M
+                    }
+                }
             }
         };
 
