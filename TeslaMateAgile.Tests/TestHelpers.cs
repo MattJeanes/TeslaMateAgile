@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,10 +29,8 @@ namespace TeslaMateAgile.Tests
         public static List<Charge> ImportCharges(string csvFile)
         {
             using var reader = new StreamReader(Path.Combine("Import", csvFile));
-            using var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
+            using var parser = new CsvParser(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true });
             using var csvReader = new CsvReader(parser);
-
-            csvReader.Configuration.HasHeaderRecord = true;
             csvReader.Read();
             csvReader.ReadHeader();
 
