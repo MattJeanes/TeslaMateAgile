@@ -287,6 +287,27 @@ namespace TeslaMateAgile.Tests.Services
                         Value = 0.1095M
                     }
                 }
+            },
+            new object[]
+            {
+                "DaylightSavingsTime",
+                "Europe/London",
+                new List<string>
+                {
+                    "23:30-20:30=13.8",
+                    "20:30-23:30=4.5"
+                },
+                DateTimeOffset.Parse("2021-04-13T19:46:13Z"),
+                DateTimeOffset.Parse("2021-04-13T22:02:46Z"),
+                new List<Price>
+                {
+                    new Price
+                    {
+                        ValidFrom = DateTimeOffset.Parse("2021-04-13T20:30:00+01:00"),
+                        ValidTo = DateTimeOffset.Parse("2021-04-13T23:30:00+01:00"),
+                        Value = 4.5M
+                    }
+                }
             }
         };
 

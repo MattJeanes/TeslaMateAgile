@@ -37,8 +37,8 @@ namespace TeslaMateAgile.Services
                 var date = from.Add(-_timeZone.GetUtcOffset(from)).Date;
                 if (!_fixedPrices.Any(x => x.FromHour < from.Hour) && (lastPrice != lastFixedPriceAdded))
                 {
-                    var validFrom = date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute);
-                    var validTo = date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute);
+                    var validFrom = DateTime.SpecifyKind(date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute), DateTimeKind.Utc);
+                    var validTo = DateTime.SpecifyKind(date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute), DateTimeKind.Utc);
                     var price = new Price
                     {
                         ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
@@ -53,8 +53,8 @@ namespace TeslaMateAgile.Services
                 }
                 foreach (var fixedPrice in _fixedPrices)
                 {
-                    var validFrom = date.AddDays(i).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute);
-                    var validTo = date.AddDays(i).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute);
+                    var validFrom = DateTime.SpecifyKind(date.AddDays(i).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute), DateTimeKind.Utc);
+                    var validTo = DateTime.SpecifyKind(date.AddDays(i).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute), DateTimeKind.Utc);
                     var price = new Price
                     {
                         ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
