@@ -37,10 +37,12 @@ namespace TeslaMateAgile.Services
                 var date = from.Add(-_timeZone.GetUtcOffset(from)).Date;
                 if (!_fixedPrices.Any(x => x.FromHour < from.Hour) && (lastPrice != lastFixedPriceAdded))
                 {
+                    var validFrom = date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute);
+                    var validTo = date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute);
                     var price = new Price
                     {
-                        ValidFrom = date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute).Add(-_timeZone.GetUtcOffset(date)),
-                        ValidTo = date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute).Add(-_timeZone.GetUtcOffset(date)),
+                        ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
+                        ValidTo = validTo.Add(-_timeZone.GetUtcOffset(validTo)),
                         Value = lastPrice.Value
                     };
                     if (price.ValidFrom < to && price.ValidTo > from)
@@ -51,10 +53,12 @@ namespace TeslaMateAgile.Services
                 }
                 foreach (var fixedPrice in _fixedPrices)
                 {
+                    var validFrom = date.AddDays(i).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute);
+                    var validTo = date.AddDays(i).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute);
                     var price = new Price
                     {
-                        ValidFrom = date.AddDays(i).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute).Add(-_timeZone.GetUtcOffset(date)),
-                        ValidTo = date.AddDays(i).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute).Add(-_timeZone.GetUtcOffset(date)),
+                        ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
+                        ValidTo = validTo.Add(-_timeZone.GetUtcOffset(validTo)),
                         Value = fixedPrice.Value
                     };
                     if (price.ValidFrom < to && price.ValidTo > from)
