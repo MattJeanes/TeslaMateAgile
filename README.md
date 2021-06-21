@@ -7,6 +7,7 @@ Supported energy providers / tarriffs:
 - [Octopus Energy: Agile Octopus](https://octopus.energy/agile/)
 - [Tibber](https://tibber.com/en)
 - Fixed Price (manually specify prices for different times of the day)
+- [aWATTar](https://www.awattar.de/) (pre-release only at this time)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -62,6 +63,12 @@ See below for how to configure the environment variables appropriately
 - FixedPrice__Prices__2=20:00-03:30=4
 - FixedPrice__Prices__3=03:30-06:00=3.5
 - FixedPrice__Prices__4=06:00-08:00=2
+```
+
+### aWATTar
+
+```yaml
+- TeslaMate__EnergyProvider=Awattar
 ```
 
 ## Optional environment variables
