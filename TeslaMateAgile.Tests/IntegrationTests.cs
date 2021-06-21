@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services;
@@ -37,7 +38,14 @@ namespace TeslaMateAgile.Tests
             });
 
             var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
-            var priceData = await priceDataService.GetPriceData(DateTimeOffset.Parse("2020-01-01T00:25:00+00:00"), DateTimeOffset.Parse("2020-01-01T15:00:00+00:00"));
+
+            var from = DateTimeOffset.Parse("2020-01-01T00:25:00+00:00");
+            var to = DateTimeOffset.Parse("2020-01-01T15:00:00+00:00");
+
+            var priceData = await priceDataService.GetPriceData(from, to);
+
+            Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
+            Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
         }
 
         [Ignore(IntegrationTest)]
@@ -64,7 +72,14 @@ namespace TeslaMateAgile.Tests
             });
 
             var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
-            var priceData = await priceDataService.GetPriceData(DateTimeOffset.Parse("2020-01-01T00:25:00+00:00"), DateTimeOffset.Parse("2020-01-01T15:00:00+00:00"));
+
+            var from = DateTimeOffset.Parse("2020-01-01T00:25:00+00:00");
+            var to = DateTimeOffset.Parse("2020-01-01T15:55:00+00:00");
+
+            var priceData = await priceDataService.GetPriceData(from, to);
+
+            Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
+            Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
         }
     }
 }

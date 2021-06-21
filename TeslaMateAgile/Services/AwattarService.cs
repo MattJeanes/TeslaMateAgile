@@ -21,7 +21,7 @@ namespace TeslaMateAgile.Services
 
         public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
-            var url = $"marketdata?start={from.UtcDateTime:o}&end={to.UtcDateTime:o}";
+            var url = $"marketdata?start={from.UtcDateTime.AddHours(-1):o}&end={to.UtcDateTime.AddHours(1):o}";
             var resp = await _client.GetAsync(url);
             resp.EnsureSuccessStatusCode();
             var agileResponse = await JsonSerializer.DeserializeAsync<AwattarResponse>(await resp.Content.ReadAsStreamAsync());
