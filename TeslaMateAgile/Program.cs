@@ -123,6 +123,19 @@ namespace TeslaMateAgile
                            .ValidateDataAnnotations();
                         services.AddSingleton<IPriceDataService, FixedPriceService>();
                     }
+                    else if (energyProvider == EnergyProvider.Awattar)
+                    {
+                        services.AddOptions<AwattarOptions>()
+                            .Bind(config.GetSection("Awattar"))
+                            .ValidateDataAnnotations();
+                        services.AddHttpClient<IPriceDataService, AwattarService>((serviceProvider, client) =>
+                        {
+                            var options = serviceProvider.GetRequiredService<IOptions<AwattarOptions>>().Value;
+                            var baseUrl = options.BaseUrl;
+                            if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+                            client.BaseAddress = new Uri(baseUrl);
+                        });
+                    }
                     else
                     {
                         throw new ArgumentException("Invalid energy provider set", nameof(energyProvider));

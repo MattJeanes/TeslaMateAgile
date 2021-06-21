@@ -39,5 +39,32 @@ namespace TeslaMateAgile.Tests
             var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
             var priceData = await priceDataService.GetPriceData(DateTimeOffset.Parse("2020-01-01T00:25:00+00:00"), DateTimeOffset.Parse("2020-01-01T15:00:00+00:00"));
         }
+
+        [Ignore(IntegrationTest)]
+        [Test]
+        public async Task IntegrationTests_Awattar()
+        {
+            var configBuilder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddUserSecrets<Program>();
+
+            var config = configBuilder.Build();
+
+            var services = new ServiceCollection();
+            services.AddHttpClient();
+            services.AddOptions<AwattarOptions>()
+                            .Bind(config.GetSection("Awattar"))
+                            .ValidateDataAnnotations();
+            services.AddHttpClient<IPriceDataService, AwattarService>((serviceProvider, client) =>
+            {
+                var options = serviceProvider.GetRequiredService<IOptions<AwattarOptions>>().Value;
+                var baseUrl = options.BaseUrl;
+                if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+                client.BaseAddress = new Uri(baseUrl);
+            });
+
+            var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
+            var priceData = await priceDataService.GetPriceData(DateTimeOffset.Parse("2020-01-01T00:25:00+00:00"), DateTimeOffset.Parse("2020-01-01T15:00:00+00:00"));
+        }
     }
 }
