@@ -7,7 +7,7 @@ Supported energy providers / tarriffs:
 - [Octopus Energy: Agile Octopus](https://octopus.energy/agile/)
 - [Tibber](https://tibber.com/en)
 - Fixed Price (manually specify prices for different times of the day)
-- [aWATTar](https://www.awattar.de/)
+- [aWATTar](https://www.awattar.de/) (pre-release only at this time)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
