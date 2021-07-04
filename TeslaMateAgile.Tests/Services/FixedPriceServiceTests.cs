@@ -25,11 +25,11 @@ namespace TeslaMateAgile.Tests.Services
                 "Etc/UTC",
                 new List<string>
                 {
-                    "08:00-13:00=1.5",
-                    "13:00-20:00=5",
-                    "20:00-03:30=4",
-                    "03:30-06:00=3.5",
-                    "06:00-08:00=2",
+                    "08:00-13:00=0.015",
+                    "13:00-20:00=0.05",
+                    "20:00-03:30=0.04",
+                    "03:30-06:00=0.035",
+                    "06:00-08:00=0.02",
                 },
                 DateTimeOffset.Parse("2021-02-01T03:00:00Z"),
                 DateTimeOffset.Parse("2021-02-01T18:00:00Z"),
@@ -39,31 +39,31 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-01-31T20:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T03:30:00Z"),
-                        Value = 4M
+                        Value = 0.04M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T03:30:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T06:00:00Z"),
-                        Value = 3.5M
+                        Value = 0.035M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T06:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T08:00:00Z"),
-                        Value = 2M
+                        Value = 0.02M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T08:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T13:00:00Z"),
-                        Value = 1.5M
+                        Value = 0.015M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T13:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T20:00:00Z"),
-                        Value = 5M
+                        Value = 0.05M
                     }
                 }
             },
@@ -73,11 +73,11 @@ namespace TeslaMateAgile.Tests.Services
                 "Etc/UTC",
                 new List<string>
                 {
-                    "08:00-13:00=1.5",
-                    "13:00-20:00=5",
-                    "20:00-03:30=4",
-                    "03:30-06:00=3.5",
-                    "06:00-08:00=2",
+                    "08:00-13:00=0.015",
+                    "13:00-20:00=0.05",
+                    "20:00-03:30=0.04",
+                    "03:30-06:00=0.035",
+                    "06:00-08:00=0.02",
                 },
                 DateTimeOffset.Parse("2021-02-01T08:00:00Z"),
                 DateTimeOffset.Parse("2021-02-01T18:00:00Z"),
@@ -87,13 +87,13 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T08:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T13:00:00Z"),
-                        Value = 1.5M
+                        Value = 0.015M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T13:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T20:00:00Z"),
-                        Value = 5M
+                        Value = 0.05M
                     }
                 }
             },
@@ -103,11 +103,11 @@ namespace TeslaMateAgile.Tests.Services
                 "Etc/UTC",
                 new List<string>
                 {
-                    "08:00-13:00=1.5",
-                    "13:00-20:00=5",
-                    "20:00-03:30=4",
-                    "03:30-06:00=3.5",
-                    "06:00-08:00=2",
+                    "08:00-13:00=0.015",
+                    "13:00-20:00=0.05",
+                    "20:00-03:30=0.04",
+                    "03:30-06:00=0.035",
+                    "06:00-08:00=0.02",
                 },
                 DateTimeOffset.Parse("2021-02-01T15:00:00Z"),
                 DateTimeOffset.Parse("2021-02-01T20:00:00Z"),
@@ -117,7 +117,7 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T13:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T20:00:00Z"),
-                        Value = 5M
+                        Value = 0.05M
                     }
                 }
             },
@@ -127,11 +127,11 @@ namespace TeslaMateAgile.Tests.Services
                 "Etc/UTC",
                 new List<string>
                 {
-                    "08:00-13:00=1.5",
-                    "13:00-20:00=5",
-                    "20:00-03:30=4",
-                    "03:30-06:00=3.5",
-                    "06:00-08:00=2",
+                    "08:00-13:00=0.015",
+                    "13:00-20:00=0.05",
+                    "20:00-03:30=0.04",
+                    "03:30-06:00=0.035",
+                    "06:00-08:00=0.02",
                 },
                 DateTimeOffset.Parse("2021-02-01T15:00:00Z"),
                 DateTimeOffset.Parse("2021-02-02T07:00:00Z"),
@@ -141,25 +141,25 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T13:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T20:00:00Z"),
-                        Value = 5M
+                        Value = 0.05M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T20:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-02T03:30:00Z"),
-                        Value = 4M
+                        Value = 0.04M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-02T03:30:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-02T06:00:00Z"),
-                        Value = 3.5M
+                        Value = 0.035M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-02T06:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-02T08:00:00Z"),
-                        Value = 2M
+                        Value = 0.02M
                     }
                 }
             },
@@ -169,11 +169,11 @@ namespace TeslaMateAgile.Tests.Services
                 "America/New_York",
                 new List<string>
                 {
-                    "08:00-13:00=1.5",
-                    "13:00-20:00=5",
-                    "20:00-03:30=4",
-                    "03:30-06:00=3.5",
-                    "06:00-08:00=2",
+                    "08:00-13:00=0.015",
+                    "13:00-20:00=0.05",
+                    "20:00-03:30=0.04",
+                    "03:30-06:00=0.035",
+                    "06:00-08:00=0.02",
                 },
                 DateTimeOffset.Parse("2021-02-01T15:00:00Z"),
                 DateTimeOffset.Parse("2021-02-02T07:00:00Z"),
@@ -183,19 +183,19 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T13:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T18:00:00Z"),
-                        Value = 1.5M
+                        Value = 0.015M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T18:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-02T01:00:00Z"),
-                        Value = 5M
+                        Value = 0.05M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-02T01:00:00Z"),
                         ValidTo = DateTimeOffset.Parse("2021-02-02T08:30:00Z"),
-                        Value = 4M
+                        Value = 0.04M
                     }
                 }
             },
@@ -205,11 +205,11 @@ namespace TeslaMateAgile.Tests.Services
                 "America/New_York",
                 new List<string>
                 {
-                    "08:00-13:00=1.5",
-                    "13:00-20:00=5",
-                    "20:00-03:30=4",
-                    "03:30-06:00=3.5",
-                    "06:00-08:00=2",
+                    "08:00-13:00=0.015",
+                    "13:00-20:00=0.05",
+                    "20:00-03:30=0.04",
+                    "03:30-06:00=0.035",
+                    "06:00-08:00=0.02",
                 },
                 DateTimeOffset.Parse("2021-02-01T03:00:00Z"),
                 DateTimeOffset.Parse("2021-02-01T10:00:00Z"),
@@ -219,13 +219,13 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-01-31T20:00:00-05:00"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T03:30:00-05:00"),
-                        Value = 4M
+                        Value = 0.04M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T03:30:00-05:00"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T06:00:00-05:00"),
-                        Value = 3.5M
+                        Value = 0.035M
                     }
                 }
             },
@@ -235,11 +235,11 @@ namespace TeslaMateAgile.Tests.Services
                 "America/New_York",
                 new List<string>
                 {
-                    "08:00-13:00=1.5",
-                    "13:00-20:00=5",
-                    "20:00-03:30=4",
-                    "03:30-06:00=3.5",
-                    "06:00-08:00=2",
+                    "08:00-13:00=0.015",
+                    "13:00-20:00=0.05",
+                    "20:00-03:30=0.04",
+                    "03:30-06:00=0.035",
+                    "06:00-08:00=0.02",
                 },
                 DateTimeOffset.Parse("2021-02-01T15:00:00Z"),
                 DateTimeOffset.Parse("2021-02-01T23:00:00Z"),
@@ -249,13 +249,13 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T08:00:00-05:00"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T13:00:00-05:00"),
-                        Value = 1.5M
+                        Value = 0.015M
                     },
                     new Price
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-02-01T13:00:00-05:00"),
                         ValidTo = DateTimeOffset.Parse("2021-02-01T20:00:00-05:00"),
-                        Value = 5M
+                        Value = 0.05M
                     }
                 }
             },
@@ -294,8 +294,8 @@ namespace TeslaMateAgile.Tests.Services
                 "Europe/London",
                 new List<string>
                 {
-                    "23:30-20:30=13.8",
-                    "20:30-23:30=4.5"
+                    "23:30-20:30=0.138",
+                    "20:30-23:30=0.045"
                 },
                 DateTimeOffset.Parse("2021-04-13T19:46:13Z"),
                 DateTimeOffset.Parse("2021-04-13T22:02:46Z"),
@@ -305,7 +305,55 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         ValidFrom = DateTimeOffset.Parse("2021-04-13T20:30:00+01:00"),
                         ValidTo = DateTimeOffset.Parse("2021-04-13T23:30:00+01:00"),
-                        Value = 4.5M
+                        Value = 0.045M
+                    }
+                }
+            },
+            new object[]
+            {
+                "TimeZone_DSTEdge",
+                "Europe/London",
+                new List<string>
+                {
+                    "00:30-04:30=0.0556",
+                    "04:30-00:30=0.15"
+                },
+                DateTimeOffset.Parse("2021-06-16T23:00:51Z"),
+                DateTimeOffset.Parse("2021-06-17T00:19:15Z"),
+                new List<Price>
+                {
+                    new Price
+                    {
+                        ValidFrom = DateTimeOffset.Parse("2021-06-16T03:30:00Z"),
+                        ValidTo = DateTimeOffset.Parse("2021-06-16T23:30:00Z"),
+                        Value = 0.15M
+                    },
+                    new Price
+                    {
+                        ValidFrom = DateTimeOffset.Parse("2021-06-16T23:30:00Z"),
+                        ValidTo = DateTimeOffset.Parse("2021-06-17T03:30:00Z"),
+                        Value = 0.0556M
+                    }
+                }
+            },
+            new object[]
+            {
+                "TimeZone_SameDayEdge",
+                "Europe/London",
+                new List<string>
+                {
+                    "00:30-04:30=0.05",
+                    "04:30-00:30=0.15"
+                },
+                DateTimeOffset.Parse("2021-07-01T00:09:14Z"),
+                DateTimeOffset.Parse("2021-07-01T00:46:17Z"),
+                new List<Price>
+                {
+                    new Price
+                    {
+                        ValidFrom = DateTimeOffset.Parse("2021-06-30T23:30:00Z"),
+                        ValidTo = DateTimeOffset.Parse("2021-07-01T03:30:00Z"),
+                        Value = 0.05M
                     }
                 }
             }

@@ -58,8 +58,8 @@ See below for how to configure the environment variables appropriately
 ```yaml
 - TeslaMate__EnergyProvider=FixedPrice
 - FixedPrice__TimeZone=Europe/London # IANA (tz database) time zone code, used for below times 
-- FixedPrice__Prices__0=08:00-13:00=1.5 # You can have as many as these as you need
-- FixedPrice__Prices__1=13:00-20:00=5
+- FixedPrice__Prices__0=08:00-13:00=0.1559 # Cost is in your currency e.g. pounds, euros, dollars (not pennies, cents, etc)
+- FixedPrice__Prices__1=13:00-20:00=0.05 # You can have as many as these as you need
 - FixedPrice__Prices__2=20:00-03:30=4
 - FixedPrice__Prices__3=03:30-06:00=3.5
 - FixedPrice__Prices__4=06:00-08:00=2

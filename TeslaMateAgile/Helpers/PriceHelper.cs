@@ -34,8 +34,6 @@ namespace TeslaMateAgile
         }
         public async Task Update()
         {
-            _logger.LogInformation("Updating prices");
-
             var chargingProcesses = await _context.ChargingProcesses
                 .Where(x => x.GeofenceId == _teslaMateOptions.GeofenceId && x.EndDate.HasValue && !x.Cost.HasValue)
                 .Include(x => x.Charges)

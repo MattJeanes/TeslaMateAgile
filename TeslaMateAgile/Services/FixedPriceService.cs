@@ -29,13 +29,13 @@ namespace TeslaMateAgile.Services
         public Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
             var prices = new List<Price>();
-            var days = (to.Add(-_timeZone.GetUtcOffset(to)).Date - from.Add(-_timeZone.GetUtcOffset(from)).Date).Days;
+            var days = (to.Date - from.Date).Days;
             var lastPrice = _fixedPrices.Last();
             FixedPrice lastFixedPriceAdded = null;
             for (var i = 0; i <= days; i++)
             {
-                var date = from.Add(-_timeZone.GetUtcOffset(from)).Date;
-                if (!_fixedPrices.Any(x => x.FromHour < from.Hour) && (lastPrice != lastFixedPriceAdded))
+                var date = from.Date;
+                if (lastPrice != lastFixedPriceAdded)
                 {
                     var validFrom = DateTime.SpecifyKind(date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute), DateTimeKind.Utc);
                     var validTo = DateTime.SpecifyKind(date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute), DateTimeKind.Utc);
