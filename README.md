@@ -76,7 +76,7 @@ See below for how to configure the environment variables appropriately
 ```yaml
 - Logging__LogLevel__Default=Debug # Enables debug logging, useful for seeing exactly how a charge was calculated
 - Logging__Console__FormatterName=simple # This and the below env var will prepend a timestamp to every log message the same way TeslaMate does
-- "Logging__Console__FormatterOptions__TimestampFormat=yyyy-MM-dd hh:mm:ss.fff " # See above env var
+- "Logging__Console__FormatterOptions__TimestampFormat=yyyy-MM-dd HH:mm:ss.fff " # See above env var
 - TeslaMate__FeePerKilowattHour=0.25 # Adds a flat fee per kWh, useful for certain arrangements (default: 0)
 ```
 
