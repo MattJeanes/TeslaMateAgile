@@ -6,5 +6,6 @@ namespace TeslaMateAgile.Data.Options
     {
         [Required]
         public string BaseUrl { get; set; }
+        public decimal VATMultiplier { get; set; }
     }
 }

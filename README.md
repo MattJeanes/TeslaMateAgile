@@ -69,6 +69,7 @@ See below for how to configure the environment variables appropriately
 
 ```yaml
 - TeslaMate__EnergyProvider=Awattar
+- Awattar_VATMultiplier=1.00 # Optional (default: 1.19), you should not need to set this unless your VAT differs from the default
 ```
 
 ## Optional environment variables

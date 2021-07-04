@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -6,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using TeslaMateAgile.Data;
+using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile.Services
@@ -13,10 +15,12 @@ namespace TeslaMateAgile.Services
     public class AwattarService : IPriceDataService
     {
         private readonly HttpClient _client;
+        private readonly AwattarOptions _options;
 
-        public AwattarService(HttpClient client)
+        public AwattarService(HttpClient client, IOptions<AwattarOptions> options)
         {
             _client = client;
+            _options = options.Value;
         }
 
         public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
@@ -31,7 +35,7 @@ namespace TeslaMateAgile.Services
             }
             return agileResponse.Results.Select(x => new Price
             {
-                Value = x.MarketPrice / 1000,
+                Value = (x.MarketPrice / 1000) * _options.VATMultiplier,
                 ValidFrom = DateTimeOffset.FromUnixTimeSeconds(x.StartTimestamp / 1000),
                 ValidTo = DateTimeOffset.FromUnixTimeSeconds(x.EndTimestamp / 1000)
             });
