@@ -29,45 +29,37 @@ namespace TeslaMateAgile.Services
         public Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
             var prices = new List<Price>();
-            var days = (to.Date - from.Date).Days;
-            var lastPrice = _fixedPrices.Last();
-            FixedPrice lastFixedPriceAdded = null;
-            for (var i = 0; i <= days; i++)
+            var dayIndex = -1;
+            bool started = false;
+            int fpIndex = 0;
+            var date = from.Date;
+            do
             {
-                var date = from.Date;
-                if (lastPrice != lastFixedPriceAdded)
+                var fixedPrice = _fixedPrices[fpIndex];
+                var validFrom = DateTime.SpecifyKind(date.AddDays(dayIndex).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute), DateTimeKind.Utc);
+                var validTo = DateTime.SpecifyKind(date.AddDays(dayIndex).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute), DateTimeKind.Utc);
+                var price = new Price
                 {
-                    var validFrom = DateTime.SpecifyKind(date.AddDays(i).AddHours(lastPrice.FromHour - 24).AddMinutes(lastPrice.FromMinute), DateTimeKind.Utc);
-                    var validTo = DateTime.SpecifyKind(date.AddDays(i).AddHours(lastPrice.ToHour - 24).AddMinutes(lastPrice.ToMinute), DateTimeKind.Utc);
-                    var price = new Price
-                    {
-                        ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
-                        ValidTo = validTo.Add(-_timeZone.GetUtcOffset(validTo)),
-                        Value = lastPrice.Value
-                    };
-                    if (price.ValidFrom < to && price.ValidTo > from)
-                    {
-                        prices.Add(price);
-                        lastFixedPriceAdded = lastPrice;
-                    }
-                }
-                foreach (var fixedPrice in _fixedPrices)
+                    ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
+                    ValidTo = validTo.Add(-_timeZone.GetUtcOffset(validTo)),
+                    Value = fixedPrice.Value
+                };
+                if (price.ValidFrom < to && price.ValidTo > from)
                 {
-                    var validFrom = DateTime.SpecifyKind(date.AddDays(i).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute), DateTimeKind.Utc);
-                    var validTo = DateTime.SpecifyKind(date.AddDays(i).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute), DateTimeKind.Utc);
-                    var price = new Price
-                    {
-                        ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
-                        ValidTo = validTo.Add(-_timeZone.GetUtcOffset(validTo)),
-                        Value = fixedPrice.Value
-                    };
-                    if (price.ValidFrom < to && price.ValidTo > from)
-                    {
-                        prices.Add(price);
-                        lastFixedPriceAdded = lastPrice;
-                    }
+                    prices.Add(price);
+                    started = true;
                 }
-            }
+                else if (started)
+                {
+                    break;
+                }
+                fpIndex++;
+                if (fpIndex >= _fixedPrices.Count)
+                {
+                    fpIndex = 0;
+                    dayIndex++;
+                }
+            } while (true);
 
             return Task.FromResult(prices.AsEnumerable());
         }
