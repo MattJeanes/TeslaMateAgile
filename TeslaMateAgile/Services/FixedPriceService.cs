@@ -29,15 +29,15 @@ namespace TeslaMateAgile.Services
         public Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
             var prices = new List<Price>();
+            var started = false;
             var dayIndex = -1;
-            bool started = false;
             int fpIndex = 0;
-            var date = from.Date;
-            do
+            var maxIterations = 100; // fail-safe against infinite loop
+            for (var i = 0; i <= maxIterations; i++)
             {
                 var fixedPrice = _fixedPrices[fpIndex];
-                var validFrom = DateTime.SpecifyKind(date.AddDays(dayIndex).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute), DateTimeKind.Utc);
-                var validTo = DateTime.SpecifyKind(date.AddDays(dayIndex).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute), DateTimeKind.Utc);
+                var validFrom = DateTime.SpecifyKind(from.Date.AddDays(dayIndex).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute), DateTimeKind.Utc);
+                var validTo = DateTime.SpecifyKind(from.Date.AddDays(dayIndex).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute), DateTimeKind.Utc);
                 var price = new Price
                 {
                     ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
@@ -59,7 +59,11 @@ namespace TeslaMateAgile.Services
                     fpIndex = 0;
                     dayIndex++;
                 }
-            } while (true);
+                if (i == maxIterations)
+                {
+                    throw new Exception("Infinite loop detected within FixedPrice provider");
+                }
+            }
 
             return Task.FromResult(prices.AsEnumerable());
         }

@@ -404,5 +404,20 @@ namespace TeslaMateAgile.Tests.Services
                 Assert.AreEqual(expectedPrice.Value, actualPrice.Value);
             }
         }
+
+        [Test]
+        public void FixedPriceService_GetPriceData_InfiniteLoopProtection()
+        {
+            var from = DateTimeOffset.Parse("2021-04-01T00:00:00Z");
+            var to = DateTimeOffset.Parse("2021-06-01T00:00:00Z");
+            var fixedPrices = new List<string>
+            {
+                "00:30-20:30=0.159",
+                "20:30-00:30=0.05"
+            };
+            var fixedPriceService = Setup("Europe/London", fixedPrices);
+            var exception = Assert.ThrowsAsync<Exception>(async () => { await fixedPriceService.GetPriceData(from, to); });
+            Assert.AreEqual(exception.Message, "Infinite loop detected within FixedPrice provider");
+        }
     }
 }
