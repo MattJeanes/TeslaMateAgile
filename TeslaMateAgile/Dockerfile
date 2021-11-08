@@ -1,9 +1,9 @@
-ARG arch=buster-slim
+ARG arch=bullseye-slim
 
 FROM mcr.microsoft.com/dotnet/runtime:5.0-${arch} AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build
 WORKDIR /src
 COPY ["TeslaMateAgile/TeslaMateAgile.csproj", "TeslaMateAgile/"]
 RUN dotnet restore "TeslaMateAgile/TeslaMateAgile.csproj"
