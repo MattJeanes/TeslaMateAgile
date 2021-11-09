@@ -1,18 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31903.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeslaMateAgile", "TeslaMateAgile\TeslaMateAgile.csproj", "{051F58EE-D0C3-4D8A-92CD-7B8A3D5B05B5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2A3CD4EB-A93A-4D8F-9492-6C2140B3F1C6}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.github\workflows\build.yml = .github\workflows\build.yml
 		kube-deploy.yml = kube-deploy.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeslaMateAgile.Tests", "TeslaMateAgile.Tests\TeslaMateAgile.Tests.csproj", "{39487E85-962C-44E4-8EA8-FA033D771991}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeslaMateAgile.Tests", "TeslaMateAgile.Tests\TeslaMateAgile.Tests.csproj", "{39487E85-962C-44E4-8EA8-FA033D771991}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

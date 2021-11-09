@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace TeslaMateAgile.Data.Options
+namespace TeslaMateAgile.Data.Options;
+
+public class FixedPriceOptions
 {
-    public class FixedPriceOptions
-    {
-        [Required]
-        public string TimeZone { get; set; }
+    [Required]
+    public string TimeZone { get; set; }
 
-        [Required]
-        public List<string> Prices { get; set; }
-    }
+    [Required]
+    public List<string> Prices { get; set; }
 }

@@ -8,17 +8,17 @@ using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services;
 
-namespace TeslaMateAgile.Tests.Services
-{
-    public class FixedPriceServiceTests
-    {
-        public FixedPriceService Setup(string timeZone, List<string> prices)
-        {
-            var options = Options.Create(new FixedPriceOptions { TimeZone = timeZone, Prices = prices });
-            return new FixedPriceService(options);
-        }
+namespace TeslaMateAgile.Tests.Services;
 
-        private static readonly object[][] FixedPriceService_GetPriceData_Cases = new object[][] {
+public class FixedPriceServiceTests
+{
+    public FixedPriceService Setup(string timeZone, List<string> prices)
+    {
+        var options = Options.Create(new FixedPriceOptions { TimeZone = timeZone, Prices = prices });
+        return new FixedPriceService(options);
+    }
+
+    private static readonly object[][] FixedPriceService_GetPriceData_Cases = new object[][] {
             new object[]
             {
                 "PreviousNight",
@@ -386,38 +386,37 @@ namespace TeslaMateAgile.Tests.Services
             }
         };
 
-        [Test, TestCaseSource(nameof(FixedPriceService_GetPriceData_Cases))]
-        public async Task FixedPriceService_GetPriceData(string testName, string timeZone, List<string> fixedPrices, DateTimeOffset from, DateTimeOffset to, List<Price> expectedPrices)
+    [Test, TestCaseSource(nameof(FixedPriceService_GetPriceData_Cases))]
+    public async Task FixedPriceService_GetPriceData(string testName, string timeZone, List<string> fixedPrices, DateTimeOffset from, DateTimeOffset to, List<Price> expectedPrices)
+    {
+        Console.WriteLine($"Running get price data test '{testName}'");
+        var fixedPriceService = Setup(timeZone, fixedPrices);
+        var result = await fixedPriceService.GetPriceData(from, to);
+        var actualPrices = result.OrderBy(x => x.ValidFrom).ToList();
+        Assert.AreEqual(expectedPrices.Count, actualPrices.Count());
+        for (var i = 0; i < actualPrices.Count(); i++)
         {
-            Console.WriteLine($"Running get price data test '{testName}'");
-            var fixedPriceService = Setup(timeZone, fixedPrices);
-            var result = await fixedPriceService.GetPriceData(from, to);
-            var actualPrices = result.OrderBy(x => x.ValidFrom).ToList();
-            Assert.AreEqual(expectedPrices.Count, actualPrices.Count());
-            for (var i = 0; i < actualPrices.Count(); i++)
-            {
-                var actualPrice = actualPrices[i];
-                var expectedPrice = expectedPrices[i];
+            var actualPrice = actualPrices[i];
+            var expectedPrice = expectedPrices[i];
 
-                Assert.AreEqual(expectedPrice.ValidFrom, actualPrice.ValidFrom);
-                Assert.AreEqual(expectedPrice.ValidTo, actualPrice.ValidTo);
-                Assert.AreEqual(expectedPrice.Value, actualPrice.Value);
-            }
+            Assert.AreEqual(expectedPrice.ValidFrom, actualPrice.ValidFrom);
+            Assert.AreEqual(expectedPrice.ValidTo, actualPrice.ValidTo);
+            Assert.AreEqual(expectedPrice.Value, actualPrice.Value);
         }
+    }
 
-        [Test]
-        public void FixedPriceService_GetPriceData_InfiniteLoopProtection()
-        {
-            var from = DateTimeOffset.Parse("2021-04-01T00:00:00Z");
-            var to = DateTimeOffset.Parse("2021-06-01T00:00:00Z");
-            var fixedPrices = new List<string>
+    [Test]
+    public void FixedPriceService_GetPriceData_InfiniteLoopProtection()
+    {
+        var from = DateTimeOffset.Parse("2021-04-01T00:00:00Z");
+        var to = DateTimeOffset.Parse("2021-06-01T00:00:00Z");
+        var fixedPrices = new List<string>
             {
                 "00:30-20:30=0.159",
                 "20:30-00:30=0.05"
             };
-            var fixedPriceService = Setup("Europe/London", fixedPrices);
-            var exception = Assert.ThrowsAsync<Exception>(async () => { await fixedPriceService.GetPriceData(from, to); });
-            Assert.AreEqual(exception.Message, "Infinite loop detected within FixedPrice provider");
-        }
+        var fixedPriceService = Setup("Europe/London", fixedPrices);
+        var exception = Assert.ThrowsAsync<Exception>(async () => { await fixedPriceService.GetPriceData(from, to); });
+        Assert.AreEqual(exception.Message, "Infinite loop detected within FixedPrice provider");
     }
 }

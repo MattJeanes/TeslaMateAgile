@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using TeslaMateAgile.Data.TeslaMate.Entities;
+﻿using TeslaMateAgile.Data.TeslaMate.Entities;
 
-namespace TeslaMateAgile.Helpers.Interfaces
+namespace TeslaMateAgile.Helpers.Interfaces;
+
+public interface IPriceHelper
 {
-    public interface IPriceHelper
-    {
-        Task<(decimal Price, decimal Energy)> CalculateChargeCost(IEnumerable<Charge> charges);
-        decimal CalculateEnergyUsed(IEnumerable<Charge> charges, decimal phases);
-        Task Update();
-    }
+    Task<(decimal Price, decimal Energy)> CalculateChargeCost(IEnumerable<Charge> charges);
+    decimal CalculateEnergyUsed(IEnumerable<Charge> charges, decimal phases);
+    Task Update();
 }

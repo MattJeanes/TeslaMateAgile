@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using TeslaMateAgile.Data;
+﻿using TeslaMateAgile.Data;
 
-namespace TeslaMateAgile.Services.Interfaces
+namespace TeslaMateAgile.Services.Interfaces;
+
+public interface IPriceDataService
 {
-    public interface IPriceDataService
-    {
-        Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to);
-    }
+    Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to);
 }

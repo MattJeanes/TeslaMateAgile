@@ -1,19 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TeslaMateAgile.Data.Options
+namespace TeslaMateAgile.Data.Options;
+
+public class OctopusOptions
 {
-    public class OctopusOptions
-    {
-        [Required]
-        public string BaseUrl { get; set; }
+    [Required]
+    public string BaseUrl { get; set; }
 
-        [Required]
-        public string ProductCode { get; set; }
+    [Required]
+    public string ProductCode { get; set; }
 
-        [Required]
-        public string TariffCode { get; set; }
+    [Required]
+    public string TariffCode { get; set; }
 
-        [Required]
-        public string RegionCode { get; set; }
-    }
+    [Required]
+    public string RegionCode { get; set; }
 }
