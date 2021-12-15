@@ -30,6 +30,21 @@ public class PriceHelper : IPriceHelper
     }
     public async Task Update()
     {
+        var geofence = await _context.Geofences.FirstOrDefaultAsync(x => x.Id == _teslaMateOptions.GeofenceId);
+
+        if (geofence == null)
+        {
+            _logger.LogWarning($"Configured geofence id does not exist in the TeslaMate database, make sure you have entered the correct id");
+            return;
+        }
+        else if (geofence.CostPerUnit.HasValue)
+        {
+            _logger.LogWarning($"Configured geofence '{geofence.Name}' (id: {geofence.Id}) has a cost per unit set which will prevent TeslaMateAgile from working properly");
+            return;
+        }
+
+        _logger.LogInformation($"Looking for finished charging processes with no cost set in the '{geofence.Name}' geofence (id: {geofence.Id})");
+
         var chargingProcesses = await _context.ChargingProcesses
             .Where(x => x.GeofenceId == _teslaMateOptions.GeofenceId && x.EndDate.HasValue && !x.Cost.HasValue)
             .Include(x => x.Charges)
