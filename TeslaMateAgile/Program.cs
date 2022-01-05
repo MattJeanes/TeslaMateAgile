@@ -134,6 +134,17 @@ public class Program
                         client.BaseAddress = new Uri(baseUrl);
                     });
                 }
+                else if (energyProvider == EnergyProvider.Barry)
+                {
+                    services.AddOptions<BarryOptions>()
+                        .Bind(config.GetSection("Barry"))
+                        .ValidateDataAnnotations();
+                    services.AddHttpClient<IPriceDataService, BarryService>((serviceProvider, client) =>
+                    {
+                        var options = serviceProvider.GetRequiredService<IOptions<BarryOptions>>().Value;
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.BarryApiKey);
+                    });
+                }
                 else
                 {
                     throw new ArgumentException("Invalid energy provider set", nameof(energyProvider));

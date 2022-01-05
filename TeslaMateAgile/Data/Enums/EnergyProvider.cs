@@ -6,4 +6,5 @@ public enum EnergyProvider
     Tibber = 1,
     FixedPrice = 2,
     Awattar = 3,
+    Barry = 4,
 }
