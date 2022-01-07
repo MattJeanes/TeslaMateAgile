@@ -8,6 +8,7 @@ Supported energy providers / tarriffs:
 - [Tibber](https://tibber.com/en)
 - Fixed Price (manually specify prices for different times of the day)
 - [aWATTar](https://www.awattar.de/)
+- [Barry](https://barry.energy/dk)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.

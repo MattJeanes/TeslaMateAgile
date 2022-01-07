@@ -20,8 +20,8 @@ public class BarryService : IPriceDataService
 
     public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
     {
-        BarryRequest request = new BarryRequest {
-            Params = new String[] { _options.BarryMPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o")}.ToList()
+        var request = new BarryRequest {
+            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o")}.ToList()
         };
         var objAsJson = System.Text.Json.JsonSerializer.Serialize<BarryRequest>(request);
         var content = new StringContent(objAsJson, System.Text.Encoding.UTF8, "application/json");
@@ -29,13 +29,13 @@ public class BarryService : IPriceDataService
         var resp = await _client.PostAsync(_options.BaseUrl, content);
         resp.EnsureSuccessStatusCode();
 
-        var agileResponse = await System.Text.Json.JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
+        var barryResponse = await System.Text.Json.JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
         
-        return agileResponse.Results.Select(x => new Price
+        return barryResponse.Results.Select(x => new Price
         {
             Value = x.Value,
-            ValidFrom = BarryService.ParseIso8601(x.Start),
-            ValidTo = BarryService.ParseIso8601(x.End)
+            ValidFrom = ParseIso8601(x.Start),
+            ValidTo = ParseIso8601(x.End)
         });
     }
 

@@ -6,6 +6,10 @@ public class BarryOptions
 {
     [Required]
     public string BaseUrl { get; set; }
-    public string BarryApiKey { get; set; }
-    public string BarryMPID { get; set; }
+    
+    [Required]
+    public string ApiKey { get; set; }
+
+    [Required]
+    public string MPID { get; set; }
 }

@@ -142,7 +142,7 @@ public class Program
                     services.AddHttpClient<IPriceDataService, BarryService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<BarryOptions>>().Value;
-                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.BarryApiKey);
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
                     });
                 }
                 else
