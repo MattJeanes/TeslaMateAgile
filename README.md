@@ -76,7 +76,6 @@ See below for how to configure the environment variables appropriately
 
 ```yaml
 - TeslaMate__EnergyProvider=Barry
-- Awattar__VATMultiplier=1.00 # Optional (default: 1.19), you should not need to set this unless your VAT differs from the default
 - Barry__BarryApiKey=XXXXX # Required - API key can be optained through their mobile app
 - Barry__BarryMPID=YYYYY # Required - metering point ID (MPID) can be obtained through their mobile app
 ```
