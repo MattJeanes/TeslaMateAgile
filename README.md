@@ -77,8 +77,8 @@ See below for how to configure the environment variables appropriately
 
 ```yaml
 - TeslaMate__EnergyProvider=Barry
-- Barry__BarryApiKey=XXXXX # Required - API key can be optained through their mobile app
-- Barry__BarryMPID=YYYYY # Required - metering point ID (MPID) can be obtained through their mobile app
+- Barry__ApiKey=XXXXX # Required - API key can be optained through their mobile app
+- Barry__MPID=YYYYY # Required - metering point ID (MPID) can be obtained through their mobile app
 ```
 
 
