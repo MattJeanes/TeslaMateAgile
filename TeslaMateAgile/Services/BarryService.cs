@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
@@ -23,13 +24,13 @@ public class BarryService : IPriceDataService
         var request = new BarryRequest {
             Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o")}.ToList()
         };
-        var objAsJson = System.Text.Json.JsonSerializer.Serialize<BarryRequest>(request);
+        var objAsJson = JsonSerializer.Serialize<BarryRequest>(request);
         var content = new StringContent(objAsJson, System.Text.Encoding.UTF8, "application/json");
 
         var resp = await _client.PostAsync(_options.BaseUrl, content);
         resp.EnsureSuccessStatusCode();
 
-        var barryResponse = await System.Text.Json.JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
+        var barryResponse = await JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
         
         return barryResponse.Results.Select(x => new Price
         {
