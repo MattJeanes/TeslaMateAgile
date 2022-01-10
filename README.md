@@ -77,15 +77,9 @@ See below for how to configure the environment variables appropriately
 
 ```yaml
 - TeslaMate__EnergyProvider=Barry
-- Barry__ApiKey=XXXXX # Required - API key can be optained through their mobile app
-- Barry__MPID=YYYYY # Required - metering point ID (MPID) can be obtained through their mobile app
+- Barry__ApiKey=XXXXX # See below Barry Access Token section
+- Barry__MPID=YYYYY # See below Barry MPID section
 ```
-
-#Throttling
-- *Short Time Throttle* - The current limit is set to 10 calls every minute.
-- *Long Time Throttle* - The current limit is set to 500 calls every 24 hours.
-
-If you have a lot of charges that needs to be updated make sure that you set the interval to something bigger than 60 seconds and it will update 10 charges per minute (maximum 500 a day). Afterwards the interval could be increased to something like once an hour.
 
 
 ## Optional environment variables
@@ -133,6 +127,20 @@ Or if you're familar with curl / postman / etc
 Tibber requires users to supply their access token to provide pricing information for their tarriff. It is only used to query tarriff information and at no point does TeslaMateAgile request or access any data related to consumption or any account details. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/master/TeslaMateAgile/Services/TibberService.cs).
 
 You can acquire this token here: https://developer.tibber.com/settings/accesstoken
+
+### Barry
+
+#### Barry Access Token
+Can be obtained from the app. Add-Ons -> barry API (BETA) -> Create a new token (green button at the bottom)
+
+#### Barry MPID
+Can be obtained from the app. Home & meter info -> Consumption metering point -> Metering point ID.
+
+#### Throttling
+- *Short Time Throttle* - The current limit is set to 10 calls every minute.
+- *Long Time Throttle* - The current limit is set to 500 calls every 24 hours.
+
+If you have a lot of charges that needs to be updated make sure that you set the interval to something bigger than 60 seconds and it will update 10 charges per minute (maximum 500 a day). Afterwards the interval could be increased to something like once an hour.
 
 ## Troubleshooting
 
