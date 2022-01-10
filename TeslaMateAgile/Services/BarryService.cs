@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -21,17 +22,23 @@ public class BarryService : IPriceDataService
 
     public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
     {
-        var request = new BarryRequest {
-            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o")}.ToList()
+        var request = new BarryRequest
+        {
+            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o") }.ToList()
         };
-        var objAsJson = JsonSerializer.Serialize<BarryRequest>(request);
+        var objAsJson = JsonSerializer.Serialize(request);
         var content = new StringContent(objAsJson, System.Text.Encoding.UTF8, "application/json");
 
         var resp = await _client.PostAsync(_options.BaseUrl, content);
         resp.EnsureSuccessStatusCode();
 
         var barryResponse = await JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
-        
+
+        if (barryResponse == null)
+        {
+            throw new Exception($"Deserialization of Barry API response failed");
+        }
+
         return barryResponse.Results.Select(x => new Price
         {
             Value = x.Value,
@@ -55,19 +62,23 @@ public class BarryService : IPriceDataService
         public decimal Value { get; set; }
 
         [JsonPropertyName("currency")]
-        public string Currency { get; set; }
+        [NotNull]
+        public string? Currency { get; set; }
 
         [JsonPropertyName("start")]
-        public string Start { get; set; }
+        [NotNull]
+        public string? Start { get; set; }
 
         [JsonPropertyName("end")]
-        public string End { get; set; }
+        [NotNull]
+        public string? End { get; set; }
     }
 
     public class BarryResponse
     {
         [JsonPropertyName("result")]
-        public List<BarryPrice> Results { get; set; }
+        [NotNull]
+        public List<BarryPrice>? Results { get; set; }
     }
 
     public class BarryRequest
@@ -83,6 +94,7 @@ public class BarryService : IPriceDataService
 
 
         [JsonPropertyName("params")]
-        public List<string> Params { get; set; }
+        [NotNull]
+        public List<string>? Params { get; set; }
     }
 }

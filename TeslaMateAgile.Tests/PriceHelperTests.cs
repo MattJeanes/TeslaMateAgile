@@ -4,10 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Data.TeslaMate;
@@ -18,7 +14,7 @@ namespace TeslaMateAgile.Tests;
 
 public class PriceHelperTests
 {
-    public PriceHelper Setup(List<Price> prices = null)
+    public PriceHelper Setup(List<Price>? prices = null)
     {
         if (prices == null) { prices = new List<Price>(); }
 
@@ -93,6 +89,7 @@ public class PriceHelperTests
         Console.WriteLine($"Running calculate energy used test '{testName}'");
         var priceHelper = Setup();
         var phases = priceHelper.DeterminePhases(charges);
+        if (!phases.HasValue) { throw new Exception("Phases has no value"); }
         var energy = priceHelper.CalculateEnergyUsed(charges, phases.Value);
         Assert.AreEqual(expectedEnergy, Math.Round(energy, 2));
     }

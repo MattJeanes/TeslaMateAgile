@@ -1,15 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeslaMateAgile.Data.Options;
 
 public class BarryOptions
 {
     [Required]
-    public string BaseUrl { get; set; }
-    
-    [Required]
-    public string ApiKey { get; set; }
+    [NotNull]
+    public string? BaseUrl { get; set; }
 
     [Required]
-    public string MPID { get; set; }
+    [NotNull]
+    public string? ApiKey { get; set; }
+
+    [Required]
+    [NotNull]
+    public string? MPID { get; set; }
 }

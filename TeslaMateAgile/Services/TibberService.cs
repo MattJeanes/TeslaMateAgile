@@ -2,6 +2,7 @@
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using TeslaMateAgile.Data;
@@ -116,6 +117,10 @@ query PriceData($after: String, $first: Int) {
         if (httpResponseMessage.IsSuccessStatusCode)
         {
             var graphQLResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<ResponseType>>(contentStream, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            if (graphQLResponse == null)
+            {
+                throw new Exception($"Deserialization of Tibber API response failed");
+            }
             var graphQLHttpResponse = graphQLResponse.ToGraphQLHttpResponse(httpResponseMessage.Headers, httpResponseMessage.StatusCode);
             if (graphQLHttpResponse.Errors?.Any() ?? false)
             {
@@ -125,7 +130,7 @@ query PriceData($after: String, $first: Int) {
             return graphQLHttpResponse;
         }
 
-        string content = null;
+        string? content = null;
         if (contentStream != null)
         {
             using var sr = new StreamReader(contentStream);
@@ -137,33 +142,40 @@ query PriceData($after: String, $first: Int) {
 
     private class ResponseType
     {
-        public Viewer Viewer { get; set; }
+        [NotNull]
+        public Viewer? Viewer { get; set; }
     }
 
     private class Viewer
     {
-        public List<Home> Homes { get; set; }
+        [NotNull]
+        public List<Home>? Homes { get; set; }
     }
 
     private class Home
     {
-        public Subscription CurrentSubscription { get; set; }
+        [NotNull]
+        public Subscription? CurrentSubscription { get; set; }
     }
 
     private class Subscription
     {
-        public PriceInfo PriceInfo { get; set; }
+        [NotNull]
+        public PriceInfo? PriceInfo { get; set; }
     }
 
     private class PriceInfo
     {
-        public RangeInfo Range { get; set; }
-        public Node Current { get; set; }
+        [NotNull]
+        public RangeInfo? Range { get; set; }
+        [NotNull]
+        public Node? Current { get; set; }
     }
 
     private class RangeInfo
     {
-        public List<Node> Nodes { get; set; }
+        [NotNull]
+        public List<Node>? Nodes { get; set; }
     }
 
     private class Node

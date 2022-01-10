@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TeslaMateAgile.Data;
@@ -27,6 +28,10 @@ public class OctopusService : IPriceDataService
             var resp = await _client.GetAsync(url);
             resp.EnsureSuccessStatusCode();
             var agileResponse = await JsonSerializer.DeserializeAsync<AgileResponse>(await resp.Content.ReadAsStreamAsync());
+            if (agileResponse == null)
+            {
+                throw new Exception($"Deserialization of Octopus Agile API response failed");
+            }
             list.AddRange(agileResponse.Results);
             url = agileResponse.Next;
             if (string.IsNullOrEmpty(url))
@@ -69,12 +74,15 @@ public class OctopusService : IPriceDataService
         public int Count { get; set; }
 
         [JsonPropertyName("next")]
-        public string Next { get; set; }
+        [NotNull]
+        public string? Next { get; set; }
 
         [JsonPropertyName("previous")]
-        public string Previous { get; set; }
+        [NotNull]
+        public string? Previous { get; set; }
 
         [JsonPropertyName("results")]
-        public List<AgilePrice> Results { get; set; }
+        [NotNull]
+        public List<AgilePrice>? Results { get; set; }
     }
 }

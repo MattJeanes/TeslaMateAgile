@@ -60,6 +60,7 @@ public class PriceHelper : IPriceHelper
         {
             try
             {
+                if (chargingProcess.Charges == null) { _logger.LogError($"Could not find charges on charging process {chargingProcess.Id}"); continue; }
                 var (cost, energy) = await CalculateChargeCost(chargingProcess.Charges);
                 _logger.LogInformation($"Calculated cost {cost} and energy {energy} kWh for charging process {chargingProcess.Id}");
                 if (chargingProcess.ChargeEnergyUsed.HasValue && chargingProcess.ChargeEnergyUsed.Value != energy)
@@ -85,7 +86,7 @@ public class PriceHelper : IPriceHelper
         var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
         var totalPrice = 0M;
         var totalEnergy = 0M;
-        Charge lastCharge = null;
+        Charge? lastCharge = null;
         var chargesCalculated = 0;
         var phases = DeterminePhases(charges);
         if (!phases.HasValue)
@@ -125,24 +126,24 @@ public class PriceHelper : IPriceHelper
                 c.ChargerPower :
                  ((c.ChargerActualCurrent ?? 0) * (c.ChargerVoltage ?? 0) * phases / 1000M)
                  * (charges.Any(x => x.Date < c.Date) ?
-                    (decimal)(c.Date - charges.OrderByDescending(x => x.Date).FirstOrDefault(x => x.Date < c.Date).Date).TotalHours
+                    (decimal)(c.Date - charges.OrderByDescending(x => x.Date).First(x => x.Date < c.Date).Date).TotalHours
                     : (decimal?)null)
                 );
 
         return power
             .Where(x => x.HasValue && x.Value >= 0)
-            .Sum(x => x.Value);
+            .Sum(x => x!.Value);
     }
 
     public decimal? DeterminePhases(IEnumerable<Charge> charges)
     {
         // adapted from https://github.com/adriankumpf/teslamate/blob/0db6d6905ce804b3b8cafc0ab69aa8cd346446a8/lib/teslamate/log.ex#L490-L527
         var powerAverage = charges.Where(x => x.ChargerActualCurrent.HasValue && x.ChargerVoltage.HasValue)
-                .Select(x => x.ChargerPower * 1000.0 / (x.ChargerActualCurrent.Value * x.ChargerVoltage.Value))
+                .Select(x => x.ChargerPower * 1000.0 / (x.ChargerActualCurrent!.Value * x.ChargerVoltage!.Value))
                 .Where(x => !double.IsNaN(x))
                 .Average();
-        var phasesAverage = (int)charges.Where(x => x.ChargerPhases.HasValue).Average(x => x.ChargerPhases.Value);
-        var voltageAverage = charges.Where(x => x.ChargerVoltage.HasValue).Average(x => x.ChargerVoltage.Value);
+        var phasesAverage = (int)charges.Where(x => x.ChargerPhases.HasValue).Average(x => x.ChargerPhases!.Value);
+        var voltageAverage = charges.Where(x => x.ChargerVoltage.HasValue).Average(x => x.ChargerVoltage!.Value);
         if (powerAverage > 0 && charges.Count() > 15)
         {
             if (phasesAverage == Math.Round(powerAverage))

@@ -12,7 +12,7 @@ public class PriceService : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly TeslaMateOptions _options;
     private readonly IServiceProvider _serviceProvider;
-    private Timer _timer;
+    private Timer? _timer;
 
     public PriceService(ILogger<PriceService> logger, IOptions<TeslaMateOptions> options, IServiceProvider serviceProvider)
     {

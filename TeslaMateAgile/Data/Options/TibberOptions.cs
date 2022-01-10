@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeslaMateAgile.Data.Options;
 
 public class TibberOptions
 {
     [Required]
-    public string BaseUrl { get; set; }
+    [NotNull]
+    public string? BaseUrl { get; set; }
 
     [Required]
-    public string AccessToken { get; set; }
+    [NotNull]
+    public string? AccessToken { get; set; }
 }

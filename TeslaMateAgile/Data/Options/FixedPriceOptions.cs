@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeslaMateAgile.Data.Options;
 
 public class FixedPriceOptions
 {
     [Required]
-    public string TimeZone { get; set; }
+    [NotNull]
+    public string? TimeZone { get; set; }
 
     [Required]
-    public List<string> Prices { get; set; }
+    [NotNull]
+    public List<string>? Prices { get; set; }
 }

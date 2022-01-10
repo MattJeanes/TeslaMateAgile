@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TeslaMateAgile.Data;
@@ -24,6 +25,10 @@ public class AwattarService : IPriceDataService
         var resp = await _client.GetAsync(url);
         resp.EnsureSuccessStatusCode();
         var agileResponse = await JsonSerializer.DeserializeAsync<AwattarResponse>(await resp.Content.ReadAsStreamAsync());
+        if (agileResponse == null)
+        {
+            throw new Exception($"Deserialization of aWATTar API response failed");
+        }
         if (agileResponse.Results.Any(x => x.Unit != "Eur/MWh"))
         {
             throw new Exception($"Unknown price unit(s) detected from aWATTar API: {string.Join(", ", agileResponse.Results.Select(x => x.Unit).Distinct())}");
@@ -42,7 +47,8 @@ public class AwattarService : IPriceDataService
         public decimal MarketPrice { get; set; }
 
         [JsonPropertyName("unit")]
-        public string Unit { get; set; }
+        [NotNull]
+        public string? Unit { get; set; }
 
         [JsonPropertyName("start_timestamp")]
         public long StartTimestamp { get; set; }
@@ -54,6 +60,7 @@ public class AwattarService : IPriceDataService
     public class AwattarResponse
     {
         [JsonPropertyName("data")]
-        public List<AwattarPrice> Results { get; set; }
+        [NotNull]
+        public List<AwattarPrice>? Results { get; set; }
     }
 }
