@@ -81,6 +81,12 @@ See below for how to configure the environment variables appropriately
 - Barry__MPID=YYYYY # Required - metering point ID (MPID) can be obtained through their mobile app
 ```
 
+#Throttling
+- *Short Time Throttle* - The current limit is set to 10 calls every minute.
+- *Long Time Throttle* - The current limit is set to 500 calls every 24 hours.
+
+If you have a lot of charges that needs to be updated make sure that you set the interval to something bigger than 60 seconds and it will update 10 charges per minute (maximum 500 a day). Afterwards the interval could be increased to something like once an hour.
+
 
 ## Optional environment variables
 ```yaml
