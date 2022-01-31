@@ -39,7 +39,7 @@ public class PriceHelper : IPriceHelper
         }
         else if (geofence.CostPerUnit.HasValue)
         {
-            _logger.LogWarning($"Configured geofence '{geofence.Name}' (id: {geofence.Id}) has a cost per unit set which will prevent TeslaMateAgile from working properly");
+            _logger.LogWarning($"Configured geofence '{geofence.Name}' (id: {geofence.Id}) should not have a cost set in TeslaMate as this may override TeslaMateAgile calculation");
             return;
         }
 
