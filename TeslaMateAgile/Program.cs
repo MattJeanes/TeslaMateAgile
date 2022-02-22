@@ -145,6 +145,17 @@ public class Program
                         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
                     });
                 }
+                else if (energyProvider == EnergyProvider.Nordpool)
+                {
+                    services.AddOptions<NordpoolOptions>()
+                        .Bind(config.GetSection("Nordpool"))
+                        .ValidateDataAnnotations();
+                    services.AddHttpClient<IPriceDataService, NordpoolService>((serviceProvider, client) =>
+                    {
+                        var options = serviceProvider.GetRequiredService<IOptions<NordpoolOptions>>().Value;
+
+                    });
+                }
                 else
                 {
                     throw new ArgumentException("Invalid energy provider set", nameof(energyProvider));

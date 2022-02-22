@@ -9,6 +9,7 @@ Supported energy providers / tarriffs:
 - Fixed Price (manually specify prices for different times of the day)
 - [aWATTar](https://www.awattar.de/)
 - [Barry](https://barry.energy/dk)
+- [Nordpool](https://www.nordpoolgroup.com/)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -80,6 +81,13 @@ See below for how to configure the environment variables appropriately
 - Barry__ApiKey=XXXXX # See below Barry Access Token section
 - Barry__MPID=YYYYY # See below Barry MPID section
 ```
+### Nordpool
+
+```yaml
+- TeslaMate__EnergyProvider=Nordpool
+- Nordpool__Currency=XXXXX # See below allowed currency codes by Nordpool
+- Nordpool__Region=YYYYY # See below a list of all Nordpool regions
+```
 
 
 ## Optional environment variables
@@ -141,6 +149,14 @@ Can be obtained from the app. Home & meter info -> Consumption metering point ->
 - *Long Time Throttle* - The current limit is set to 500 calls every 24 hours.
 
 If you have a lot of charges that needs to be updated make sure that you set the interval to something bigger than 60 seconds and it will update 10 charges per minute (maximum 500 a day). Afterwards the interval could be increased to something like once an hour.
+
+### Nordpool
+
+#### Nordpool currency codes
+Allowed is one of the following currency codes: `DKK`, `EUR`, `NOK` or `SEK`.  Strings are case sensitive.
+
+#### Nordpool regions
+Currently available areas are `Bergen, DK1, DK2, FI, Kr.sand, Molde, OSLO, SE1, SE2, SE3, SE4, SYS, Tr.heim, Tromsø`
 
 ## Troubleshooting
 
