@@ -14,7 +14,7 @@ namespace TeslaMateAgile.Tests;
 
 public class PriceHelperTests
 {
-    public PriceHelper Setup(List<Price>? prices = null)
+    public PriceHelper Setup(List<Price> prices = null)
     {
         if (prices == null) { prices = new List<Price>(); }
 

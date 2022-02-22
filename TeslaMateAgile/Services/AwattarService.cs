@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TeslaMateAgile.Data;
@@ -47,8 +46,7 @@ public class AwattarService : IPriceDataService
         public decimal MarketPrice { get; set; }
 
         [JsonPropertyName("unit")]
-        [NotNull]
-        public string? Unit { get; set; }
+        public string Unit { get; set; }
 
         [JsonPropertyName("start_timestamp")]
         public long StartTimestamp { get; set; }
@@ -60,7 +58,6 @@ public class AwattarService : IPriceDataService
     public class AwattarResponse
     {
         [JsonPropertyName("data")]
-        [NotNull]
-        public List<AwattarPrice>? Results { get; set; }
+        public List<AwattarPrice> Results { get; set; }
     }
 }

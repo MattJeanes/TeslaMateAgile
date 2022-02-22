@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -62,23 +61,19 @@ public class BarryService : IPriceDataService
         public decimal Value { get; set; }
 
         [JsonPropertyName("currency")]
-        [NotNull]
-        public string? Currency { get; set; }
+        public string Currency { get; set; }
 
         [JsonPropertyName("start")]
-        [NotNull]
-        public string? Start { get; set; }
+        public string Start { get; set; }
 
         [JsonPropertyName("end")]
-        [NotNull]
-        public string? End { get; set; }
+        public string End { get; set; }
     }
 
     public class BarryResponse
     {
         [JsonPropertyName("result")]
-        [NotNull]
-        public List<BarryPrice>? Results { get; set; }
+        public List<BarryPrice> Results { get; set; }
     }
 
     public class BarryRequest
@@ -94,7 +89,6 @@ public class BarryService : IPriceDataService
 
 
         [JsonPropertyName("params")]
-        [NotNull]
-        public List<string>? Params { get; set; }
+        public List<string> Params { get; set; }
     }
 }

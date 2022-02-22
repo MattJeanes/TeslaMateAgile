@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace TeslaMateAgile.Data.TeslaMate.Entities;
 
@@ -12,8 +11,7 @@ public class Geofence
     public int Id { get; set; }
 
     [Column("name")]
-    [NotNull]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     [Column("cost_per_unit")]
     public decimal? CostPerUnit { get; set; }

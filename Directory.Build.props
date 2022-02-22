@@ -1,0 +1,6 @@
+<Project>
+ <PropertyGroup>
+	 <ImplicitUsings>enable</ImplicitUsings>
+	 <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+ </PropertyGroup>
+</Project>

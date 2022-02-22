@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace TeslaMateAgile.Data.TeslaMate.Entities;
 
@@ -37,6 +36,5 @@ public class Charge
     public int? ChargerVoltage { get; set; }
 
     [ForeignKey("charging_process_id")]
-    [NotNull]
-    public ChargingProcess? ChargingProcess { get; set; }
+    public ChargingProcess ChargingProcess { get; set; }
 }

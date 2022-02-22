@@ -25,5 +25,5 @@ public class ChargingProcess
     [Column("charge_energy_used")]
     public decimal? ChargeEnergyUsed { get; set; }
 
-    public ICollection<Charge>? Charges { get; set; }
+    public ICollection<Charge> Charges { get; set; }
 }

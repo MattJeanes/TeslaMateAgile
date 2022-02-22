@@ -80,7 +80,7 @@ public class FixedPriceService : IPriceDataService
     {
         var fixedPrices = new List<FixedPrice>();
         var totalHours = 0M;
-        FixedPrice? lastFixedPrice = null;
+        FixedPrice lastFixedPrice = null;
 
         foreach (var price in options.Prices.OrderBy(x => x))
         {

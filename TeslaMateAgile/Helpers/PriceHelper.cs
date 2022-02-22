@@ -86,7 +86,7 @@ public class PriceHelper : IPriceHelper
         var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
         var totalPrice = 0M;
         var totalEnergy = 0M;
-        Charge? lastCharge = null;
+        Charge lastCharge = null;
         var chargesCalculated = 0;
         var phases = DeterminePhases(charges);
         if (!phases.HasValue)
@@ -132,18 +132,18 @@ public class PriceHelper : IPriceHelper
 
         return power
             .Where(x => x.HasValue && x.Value >= 0)
-            .Sum(x => x!.Value);
+            .Sum(x => x.Value);
     }
 
     public decimal? DeterminePhases(IEnumerable<Charge> charges)
     {
         // adapted from https://github.com/adriankumpf/teslamate/blob/0db6d6905ce804b3b8cafc0ab69aa8cd346446a8/lib/teslamate/log.ex#L490-L527
         var powerAverage = charges.Where(x => x.ChargerActualCurrent.HasValue && x.ChargerVoltage.HasValue)
-                .Select(x => x.ChargerPower * 1000.0 / (x.ChargerActualCurrent!.Value * x.ChargerVoltage!.Value))
+                .Select(x => x.ChargerPower * 1000.0 / (x.ChargerActualCurrent.Value * x.ChargerVoltage.Value))
                 .Where(x => !double.IsNaN(x))
                 .Average();
-        var phasesAverage = (int)charges.Where(x => x.ChargerPhases.HasValue).Average(x => x.ChargerPhases!.Value);
-        var voltageAverage = charges.Where(x => x.ChargerVoltage.HasValue).Average(x => x.ChargerVoltage!.Value);
+        var phasesAverage = (int)charges.Where(x => x.ChargerPhases.HasValue).Average(x => x.ChargerPhases.Value);
+        var voltageAverage = charges.Where(x => x.ChargerVoltage.HasValue).Average(x => x.ChargerVoltage.Value);
         if (powerAverage > 0 && charges.Count() > 15)
         {
             if (phasesAverage == Math.Round(powerAverage))

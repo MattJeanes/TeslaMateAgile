@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TeslaMateAgile.Data;
@@ -74,15 +73,12 @@ public class OctopusService : IPriceDataService
         public int Count { get; set; }
 
         [JsonPropertyName("next")]
-        [NotNull]
-        public string? Next { get; set; }
+        public string Next { get; set; }
 
         [JsonPropertyName("previous")]
-        [NotNull]
-        public string? Previous { get; set; }
+        public string Previous { get; set; }
 
         [JsonPropertyName("results")]
-        [NotNull]
-        public List<AgilePrice>? Results { get; set; }
+        public List<AgilePrice> Results { get; set; }
     }
 }

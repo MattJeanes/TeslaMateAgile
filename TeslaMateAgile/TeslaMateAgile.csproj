@@ -5,9 +5,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>3017e2b5-95b2-4dba-ab30-ac3546e8c9e4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

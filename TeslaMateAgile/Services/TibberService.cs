@@ -2,7 +2,6 @@
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using TeslaMateAgile.Data;
@@ -130,7 +129,7 @@ query PriceData($after: String, $first: Int) {
             return graphQLHttpResponse;
         }
 
-        string? content = null;
+        string content = null;
         if (contentStream != null)
         {
             using var sr = new StreamReader(contentStream);
@@ -142,40 +141,33 @@ query PriceData($after: String, $first: Int) {
 
     private class ResponseType
     {
-        [NotNull]
-        public Viewer? Viewer { get; set; }
+        public Viewer Viewer { get; set; }
     }
 
     private class Viewer
     {
-        [NotNull]
-        public List<Home>? Homes { get; set; }
+        public List<Home> Homes { get; set; }
     }
 
     private class Home
     {
-        [NotNull]
-        public Subscription? CurrentSubscription { get; set; }
+        public Subscription CurrentSubscription { get; set; }
     }
 
     private class Subscription
     {
-        [NotNull]
-        public PriceInfo? PriceInfo { get; set; }
+        public PriceInfo PriceInfo { get; set; }
     }
 
     private class PriceInfo
     {
-        [NotNull]
-        public RangeInfo? Range { get; set; }
-        [NotNull]
-        public Node? Current { get; set; }
+        public RangeInfo Range { get; set; }
+        public Node Current { get; set; }
     }
 
     private class RangeInfo
     {
-        [NotNull]
-        public List<Node>? Nodes { get; set; }
+        public List<Node> Nodes { get; set; }
     }
 
     private class Node
