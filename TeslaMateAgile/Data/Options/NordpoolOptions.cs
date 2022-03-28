@@ -12,6 +12,9 @@ public class NordpoolOptions
 
     [Required]
     public string Region { get; set; }
+
+    [Required]
+    public decimal VAT { get; set; }
 }
 
 public enum NordpoolCurrency

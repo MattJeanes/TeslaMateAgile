@@ -32,7 +32,7 @@ public class BarryService : IPriceDataService
 
         var barryResponse = await JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
         var barryStr = await resp.Content.ReadAsStringAsync();
-        Console.WriteLine(barryStr);
+
         return barryResponse.Results.Select(x => new Price
         {
             Value = x.Value,

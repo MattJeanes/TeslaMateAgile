@@ -57,7 +57,7 @@ public class NordpoolService : IPriceDataService
                         {
                             ValidFrom = row.StartTime,
                             ValidTo = row.EndTime,
-                            Value = (value / 1000)
+                            Value = (value / 1000) * _options.VAT
                         });
                     }
                 }
