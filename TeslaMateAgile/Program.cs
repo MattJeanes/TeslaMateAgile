@@ -155,6 +155,11 @@ public class Program
                         var options = serviceProvider.GetRequiredService<IOptions<NordpoolOptions>>().Value;
 
                     });
+
+                    services.AddOptions<FixedPriceOptions>()
+                       .Bind(config.GetSection("FixedPrice"))
+                       .ValidateDataAnnotations();
+                    services.AddSingleton<IPriceDataService, FixedPriceService>();
                 }
                 else
                 {

@@ -22,7 +22,7 @@ public class BarryService : IPriceDataService
     public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
     {
         var request = new BarryRequest {
-            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o")}.ToList()
+            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("s")+"Z", to.UtcDateTime.ToString("s") + "Z" }.ToList()
         };
         var objAsJson = JsonSerializer.Serialize<BarryRequest>(request);
         var content = new StringContent(objAsJson, System.Text.Encoding.UTF8, "application/json");
@@ -31,7 +31,8 @@ public class BarryService : IPriceDataService
         resp.EnsureSuccessStatusCode();
 
         var barryResponse = await JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
-        
+        var barryStr = await resp.Content.ReadAsStringAsync();
+        Console.WriteLine(barryStr);
         return barryResponse.Results.Select(x => new Price
         {
             Value = x.Value,
@@ -73,7 +74,7 @@ public class BarryService : IPriceDataService
     public class BarryRequest
     {
         [JsonPropertyName("method")]
-        public string Method { get; set; } = "co.getbarry.api.v1.OpenApiController.getTotalKwHourlyPrice";
+        public string Method { get; set; } = "co.getbarry.api.v1.OpenApiController.getPrice";//"co.getbarry.api.v1.OpenApiController.getTotalKwHourlyPrice";
 
         [JsonPropertyName("id")]
         public string Id { get; set; } = "0";
