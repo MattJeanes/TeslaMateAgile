@@ -116,6 +116,10 @@ query PriceData($after: String, $first: Int) {
         if (httpResponseMessage.IsSuccessStatusCode)
         {
             var graphQLResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<ResponseType>>(contentStream, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            if (graphQLResponse == null)
+            {
+                throw new Exception($"Deserialization of Tibber API response failed");
+            }
             var graphQLHttpResponse = graphQLResponse.ToGraphQLHttpResponse(httpResponseMessage.Headers, httpResponseMessage.StatusCode);
             if (graphQLHttpResponse.Errors?.Any() ?? false)
             {

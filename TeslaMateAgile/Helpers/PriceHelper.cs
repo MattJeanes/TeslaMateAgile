@@ -41,7 +41,7 @@ public class PriceHelper : IPriceHelper
         }
         else if (geofence.CostPerUnit.HasValue)
         {
-            _logger.LogWarning($"Configured geofence '{geofence.Name}' (id: {geofence.Id}) has a cost per unit set which will prevent TeslaMateAgile from working properly");
+            _logger.LogWarning($"Configured geofence '{geofence.Name}' (id: {geofence.Id}) should not have a cost set in TeslaMate as this may override TeslaMateAgile calculation");
             return;
         }
 
@@ -62,6 +62,7 @@ public class PriceHelper : IPriceHelper
         {
             try
             {
+                if (chargingProcess.Charges == null) { _logger.LogError($"Could not find charges on charging process {chargingProcess.Id}"); continue; }
                 var (cost, energy) = await CalculateChargeCost(chargingProcess.Charges);
                 _logger.LogInformation($"Calculated cost {cost} and energy {energy} kWh for charging process {chargingProcess.Id}");
                 if (chargingProcess.ChargeEnergyUsed.HasValue && chargingProcess.ChargeEnergyUsed.Value != energy)
@@ -132,7 +133,7 @@ public class PriceHelper : IPriceHelper
                 c.ChargerPower :
                  ((c.ChargerActualCurrent ?? 0) * (c.ChargerVoltage ?? 0) * phases / 1000M)
                  * (charges.Any(x => x.Date < c.Date) ?
-                    (decimal)(c.Date - charges.OrderByDescending(x => x.Date).FirstOrDefault(x => x.Date < c.Date).Date).TotalHours
+                    (decimal)(c.Date - charges.OrderByDescending(x => x.Date).First(x => x.Date < c.Date).Date).TotalHours
                     : (decimal?)null)
                 );
 

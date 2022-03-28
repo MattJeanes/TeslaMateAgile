@@ -24,14 +24,18 @@ public class BarryService : IPriceDataService
         var request = new BarryRequest {
             Params = new string[] { _options.MPID, from.UtcDateTime.ToString("s")+"Z", to.UtcDateTime.ToString("s") + "Z" }.ToList()
         };
-        var objAsJson = JsonSerializer.Serialize<BarryRequest>(request);
+        var objAsJson = JsonSerializer.Serialize(request);
         var content = new StringContent(objAsJson, System.Text.Encoding.UTF8, "application/json");
 
         var resp = await _client.PostAsync(_options.BaseUrl, content);
         resp.EnsureSuccessStatusCode();
 
         var barryResponse = await JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
-        var barryStr = await resp.Content.ReadAsStringAsync();
+
+        if (barryResponse == null)
+        {
+            throw new Exception($"Deserialization of Barry API response failed");
+        }
 
         return barryResponse.Results.Select(x => new Price
         {
