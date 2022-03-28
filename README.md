@@ -87,6 +87,7 @@ See below for how to configure the environment variables appropriately
 - TeslaMate__EnergyProvider=Nordpool
 - Nordpool__Currency=XXXXX # See below allowed currency codes by Nordpool
 - Nordpool__Region=YYYYY # See below a list of all Nordpool regions
+- Nordpool__VAT=1.25 # VAT multiplier. In this example 25%
 ```
 
 
@@ -157,6 +158,9 @@ Allowed is one of the following currency codes: `DKK`, `EUR`, `NOK` or `SEK`.  S
 
 #### Nordpool regions
 Currently available areas are `Bergen, DK1, DK2, FI, Kr.sand, Molde, OSLO, SE1, SE2, SE3, SE4, SYS, Tr.heim, Tromsø`
+
+### VAT
+Prices on Nordpool apear to be without VAT so this defines a multiplier to be applied befor using the price for further calculations.
 
 ## Troubleshooting
 
