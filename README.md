@@ -157,10 +157,10 @@ If you have a lot of charges that needs to be updated make sure that you set the
 Allowed is one of the following currency codes: `DKK`, `EUR`, `NOK` or `SEK`.  Strings are case sensitive.
 
 #### Nordpool regions
-Currently available areas are `Bergen, DK1, DK2, FI, Kr.sand, Molde, OSLO, SE1, SE2, SE3, SE4, SYS, Tr.heim, Tromsø`
+Currently available areas are `Bergen`, `DK1`, `DK2`, `FI`, `Kr.sand`, `Molde`, `OSLO`, `SE1`, `SE2`, `SE3`, `SE4`, `SYS`, `Tr.heim`, `Tromsø`
 
 ### VAT
-Prices on Nordpool apear to be without VAT so this defines a multiplier to be applied befor using the price for further calculations.
+Prices on Nordpool appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
 
 ## Troubleshooting
 

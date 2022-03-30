@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
-using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Data.TeslaMate;
 using TeslaMateAgile.Data.TeslaMate.Entities;
@@ -87,9 +85,11 @@ public class PriceHelper : IPriceHelper
         _logger.LogInformation($"Calculating cost for charges {minDate.UtcDateTime} UTC - {maxDate.UtcDateTime} UTC");
         var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
 
-        var opt = new JsonSerializerOptions() { WriteIndented = true };
-        string strJson = JsonSerializer.Serialize<IEnumerable<Price>>(prices, opt);
-        Console.WriteLine(strJson);
+        _logger.LogDebug($"Retrieved {prices.Count()} prices:");
+        foreach (var price in prices)
+        {
+            _logger.LogDebug($"{price.ValidFrom.UtcDateTime} UTC - {price.ValidTo.UtcDateTime} UTC: {price.Value}");
+        }
 
         var totalPrice = 0M;
         var totalEnergy = 0M;

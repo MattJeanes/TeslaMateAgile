@@ -153,7 +153,9 @@ public class Program
                     services.AddHttpClient<IPriceDataService, NordpoolService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<NordpoolOptions>>().Value;
-
+                        var baseUrl = options.BaseUrl;
+                        if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+                        client.BaseAddress = new Uri(baseUrl);
                     });
                 }
                 else
