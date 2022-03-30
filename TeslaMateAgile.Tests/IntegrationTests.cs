@@ -110,8 +110,6 @@ public class IntegrationTests
         var from = new DateTimeOffset(2022, 2, 20, 0, 0, 0, new TimeSpan(1, 0, 0));
         var to = new DateTimeOffset(2022, 2, 20, 23, 59, 0, new TimeSpan(1, 0, 0));
 
-        var url = options.BaseUrl + "?currency=," + options.Currency + "&endDate=" + to.UtcDateTime.ToString("dd-MM-yyyy");
-
         var priceData = await priceDataService.GetPriceData(from, to);
 
         foreach (var price in priceData)
