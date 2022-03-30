@@ -78,4 +78,48 @@ public class IntegrationTests
         Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
         Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
     }
+
+    [Ignore(IntegrationTest)]
+    [Test]
+    public async Task IntegrationTests_Nordpool()
+    {
+        var configBuilder = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["Nordpool:BaseUrl"] = "http://www.nordpoolspot.com/api/marketdata/page/10",
+                ["Nordpool:Currency"] = "DKK",
+                ["Nordpool:Region"] = "DK1"
+            });
+
+        var config = configBuilder.Build();
+
+        var services = new ServiceCollection();
+        services.AddHttpClient();
+        services.AddOptions<NordpoolOptions>()
+                        .Bind(config.GetSection("Nordpool"))
+                        .ValidateDataAnnotations();
+        services.AddHttpClient<IPriceDataService, NordpoolService>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<NordpoolOptions>>().Value;
+            var baseUrl = options.BaseUrl;
+            if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+            client.BaseAddress = new Uri(baseUrl);
+        });
+        var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
+
+        var from = new DateTimeOffset(2022, 2, 20, 0, 0, 0, new TimeSpan(1, 0, 0));
+        var to = new DateTimeOffset(2022, 2, 20, 23, 59, 0, new TimeSpan(1, 0, 0));
+
+        var url = options.BaseUrl + "?currency=," + options.Currency + "&endDate=" + to.UtcDateTime.ToString("dd-MM-yyyy");
+
+        var priceData = await priceDataService.GetPriceData(from, to);
+
+        foreach (var price in priceData)
+        {
+            Console.WriteLine($"{price.ValidFrom} - {price.ValidTo} - {price.Value}");
+        }
+
+        Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
+        Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
+    }
 }
