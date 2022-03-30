@@ -45,7 +45,7 @@ public class IntegrationTests
         Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
     }
 
-    //[Ignore(IntegrationTest)]
+    [Ignore(IntegrationTest)]
     [Test]
     public async Task IntegrationTests_Awattar()
     {
@@ -79,7 +79,7 @@ public class IntegrationTests
         Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
     }
 
-    //[Ignore(IntegrationTest)]
+    [Ignore(IntegrationTest)]
     [Test]
     public async Task IntegrationTests_Nordpool()
     {
