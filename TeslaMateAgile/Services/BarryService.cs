@@ -87,7 +87,6 @@ public class BarryService : IPriceDataService
         [JsonPropertyName("jsonrpc")]
         public string JsonRPC { get; set; } = "2.0";
 
-
         [JsonPropertyName("params")]
         public List<string> Params { get; set; }
     }
