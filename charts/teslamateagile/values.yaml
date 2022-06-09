@@ -26,7 +26,10 @@ octopus: {}
 tibber: {}
   # accessToken: abc123
 fixedPrice: {}
-  # timeZone: Europe/London 
+  # timeZone: Europe/London
+  # prices:
+  # - 00:30-04:30=0.05
+  # - 04:30-00:30=0.15
 awattar: {}
   # vatMultiplier: abc123 
 barry: {}

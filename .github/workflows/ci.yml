@@ -1,4 +1,4 @@
-name: Build
+name: CI
 on:
   push:
     branches: [ main ]
@@ -6,8 +6,10 @@ on:
       - 'v*'
   pull_request:
     branches: [ main ]
+  workflow_dispatch: {}
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -175,3 +177,30 @@ jobs:
         asset_name: TeslaMateAgile-win-x64.zip
         asset_content_type: application/zip
       if: startsWith(github.ref, 'refs/tags/')
+  deploy:
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Azure Login
+      uses: Azure/login@v1.4.3
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Login to Kubernetes
+      uses: Azure/aks-set-context@v2.1
+      with:
+        resource-group: abyss
+        cluster-name: abyss
+
+    - run: echo "${{ secrets.ABYSS_VALUES_FILE }}" | base64 --decode > abyss.values.yaml
+        
+    - name: Install TeslaMateAgile
+      run: |
+        helm upgrade --install --wait --atomic --debug \
+          teslamateagile ./charts/teslamateagile \
+          --namespace default \
+          --values abyss.values.yaml
