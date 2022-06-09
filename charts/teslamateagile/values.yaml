@@ -7,7 +7,6 @@ resources:
     cpu: 15m
     memory: 128Mi
   limits:
-    cpu: null
     memory: 128Mi
 database: {}
   # host: database
