@@ -200,7 +200,7 @@ jobs:
         
     - name: Install TeslaMateAgile
       run: |
-        helm upgrade --install --wait --atomic --debug \
+        helm upgrade --install --wait --atomic \
           teslamateagile ./charts/teslamateagile \
           --namespace default \
           --values abyss.values.yaml
