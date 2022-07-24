@@ -138,10 +138,20 @@ public class PriceHelper : IPriceHelper
     public decimal? DeterminePhases(IEnumerable<Charge> charges)
     {
         // adapted from https://github.com/adriankumpf/teslamate/blob/0db6d6905ce804b3b8cafc0ab69aa8cd346446a8/lib/teslamate/log.ex#L490-L527
-        var powerAverage = charges.Where(x => x.ChargerActualCurrent.HasValue && x.ChargerVoltage.HasValue)
+        var powerAverages = charges.Where(x => x.ChargerActualCurrent.HasValue && x.ChargerVoltage.HasValue)
                 .Select(x => x.ChargerPower * 1000.0 / (x.ChargerActualCurrent.Value * x.ChargerVoltage.Value))
-                .Where(x => !double.IsNaN(x))
-                .Average();
+                .Where(x => !double.IsNaN(x));
+        if (!powerAverages.Any())
+        {
+            _logger.LogWarning($"No charges with power data");
+            return null;
+        }
+        var powerAverage = powerAverages.Average();
+        if (!charges.Any(x => x.ChargerPhases.HasValue))
+        {
+            _logger.LogWarning($"No charges with phase data");
+            return null;
+        }
         var phasesAverage = (int)charges.Where(x => x.ChargerPhases.HasValue).Average(x => x.ChargerPhases.Value);
         var voltageAverage = charges.Where(x => x.ChargerVoltage.HasValue).Average(x => x.ChargerVoltage.Value);
         if (powerAverage > 0 && charges.Count() > 15)

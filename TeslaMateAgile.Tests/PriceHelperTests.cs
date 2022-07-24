@@ -93,4 +93,14 @@ public class PriceHelperTests
         var energy = priceHelper.CalculateEnergyUsed(charges, phases.Value);
         Assert.AreEqual(expectedEnergy, Math.Round(energy, 2));
     }
+
+    [Test]
+    public async Task PriceHelper_NoPhaseData()
+    {
+        var charges = TestHelpers.ImportCharges("shortcharge_test.csv");
+        var priceHelper = Setup();
+        var (price, energy) = await priceHelper.CalculateChargeCost(charges);
+        Assert.AreEqual(0, price);
+        Assert.AreEqual(0, energy);
+    }
 }
