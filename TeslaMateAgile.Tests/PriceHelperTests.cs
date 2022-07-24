@@ -97,7 +97,7 @@ public class PriceHelperTests
     [Test]
     public async Task PriceHelper_NoPhaseData()
     {
-        var charges = TestHelpers.ImportCharges("shortcharge_test.csv");
+        var charges = TestHelpers.ImportCharges("nophasedata_test.csv");
         var priceHelper = Setup();
         var (price, energy) = await priceHelper.CalculateChargeCost(charges);
         Assert.AreEqual(0, price);
