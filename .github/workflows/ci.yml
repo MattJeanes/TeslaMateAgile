@@ -23,7 +23,7 @@ jobs:
       id: variables
       run: |
         VERSION=${GITHUB_REF#refs/tags/}
-        echo ::set-output name=VERSION::$VERSION
+        echo VERSION=$VERSION >> $GITHUB_OUTPUT
         
     - name: Test project
       run: |
