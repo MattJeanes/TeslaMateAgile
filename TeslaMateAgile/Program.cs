@@ -145,14 +145,14 @@ public class Program
                         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
                     });
                 }
-                else if (energyProvider == EnergyProvider.Nordpool)
+                else if (energyProvider == EnergyProvider.Energinet)
                 {
-                    services.AddOptions<NordpoolOptions>()
-                        .Bind(config.GetSection("Nordpool"))
+                    services.AddOptions<EnerginetOptions>()
+                        .Bind(config.GetSection("Energinet"))
                         .ValidateDataAnnotations();
-                    services.AddHttpClient<IPriceDataService, NordpoolService>((serviceProvider, client) =>
+                    services.AddHttpClient<IPriceDataService, EnerginetService>((serviceProvider, client) =>
                     {
-                        var options = serviceProvider.GetRequiredService<IOptions<NordpoolOptions>>().Value;
+                        var options = serviceProvider.GetRequiredService<IOptions<EnerginetOptions>>().Value;
                         var baseUrl = options.BaseUrl;
                         if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
                         client.BaseAddress = new Uri(baseUrl);

@@ -2,26 +2,26 @@
 
 namespace TeslaMateAgile.Data.Options;
 
-public class NordpoolOptions
+public class EnerginetOptions
 {
     [Required]
     public string BaseUrl { get; set; }
-    
-    [Required]
-    public NordpoolCurrency Currency { get; set; }
 
     [Required]
-    public string Region { get; set; }
+    public EnerginetRegion Region { get; set; }
 
     [Required]
     public decimal VAT { get; set; }
+
+    public FixedPriceOptions FixedPrices { get; set; }
 }
 
-public enum NordpoolCurrency
+public enum EnerginetRegion
 {
-    DKK,
-    EUR,
-    NOK,
-    SEK
+    DK1,
+    DK2,
+    NO2,
+    SE3,
+    SE4
 }
 

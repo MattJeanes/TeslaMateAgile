@@ -7,5 +7,5 @@ public enum EnergyProvider
     FixedPrice = 2,
     Awattar = 3,
     Barry = 4,
-    Nordpool = 5,
+    Energinet = 5,
 }
