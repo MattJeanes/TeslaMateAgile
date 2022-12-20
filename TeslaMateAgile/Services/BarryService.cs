@@ -21,17 +21,23 @@ public class BarryService : IPriceDataService
 
     public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
     {
-        var request = new BarryRequest {
-            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o")}.ToList()
+        var request = new BarryRequest
+        {
+            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o") }.ToList()
         };
-        var objAsJson = JsonSerializer.Serialize<BarryRequest>(request);
+        var objAsJson = JsonSerializer.Serialize(request);
         var content = new StringContent(objAsJson, System.Text.Encoding.UTF8, "application/json");
 
         var resp = await _client.PostAsync(_options.BaseUrl, content);
         resp.EnsureSuccessStatusCode();
 
         var barryResponse = await JsonSerializer.DeserializeAsync<BarryResponse>(await resp.Content.ReadAsStreamAsync());
-        
+
+        if (barryResponse == null)
+        {
+            throw new Exception($"Deserialization of Barry API response failed");
+        }
+
         return barryResponse.Results.Select(x => new Price
         {
             Value = x.Value,

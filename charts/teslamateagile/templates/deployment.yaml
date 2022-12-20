@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: teslamateagile
+  name: teslamateagile
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: teslamateagile
+  template: 
+    metadata: 
+      labels: 
+        app: teslamateagile
+        {{- if eq .Values.image.tag "latest" }}
+        date: "{{ now | unixEpoch }}"
+        {{- end }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - image: {{ .Values.image.repository }}:{{ required "image.tag is required" .Values.image.tag }}
+        name: teslamateagile
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources: {{ toYaml .Values.resources | nindent 10 }}
+        env:
+        - name: DATABASE_HOST
+          value: {{ required "database.host is required" .Values.database.host }}
+        - name: DATABASE_NAME
+          value: {{ required "database.name is required" .Values.database.name }}
+        - name: DATABASE_USER
+          value: {{ required "database.user is required" .Values.database.user }}
+        - name: DATABASE_PASS
+          valueFrom:
+            secretKeyRef:
+              name: teslamateagile
+              key: DATABASE_PASS
+        {{- if .Values.database.port }}
+        - name: DATABASE_PORT
+          value: {{ .Values.database.port }}
+        {{- end }}
+        - name: TeslaMate__UpdateIntervalSeconds
+          value: {{ .Values.updateIntervalSeconds | quote }}
+        - name: TeslaMate__GeofenceId
+          value: {{ required "geofenceId is required" .Values.geofenceId | quote }}
+        - name: TeslaMate__EnergyProvider
+          value: {{ required "energyProvider is required" .Values.energyProvider | quote }}
+        {{- if .Values.debug.enabled }}
+        - name: Logging__LogLevel__Default
+          value: "Debug"
+        - name: Logging__Console__FormatterName
+          value: "simple"
+        - name: Logging__Console__FormatterOptions__TimestampFormat
+          value: "yyyy-MM-dd HH:mm:ss.fff "
+        {{- end }}
+        {{- if .Values.feePerKilowattHour }}
+        - name: TeslaMate__FeePerKilowattHour
+          value: {{ .Values.feePerKilowattHour | quote }}
+        {{- end }}
+        {{- if eq .Values.energyProvider "Octopus" }}
+        - name: Octopus__RegionCode
+          value: {{ required "octopus.regionCode is required" .Values.octopus.regionCode | quote }}
+        {{- end }}
+        {{- if eq .Values.energyProvider "Tibber" }}
+        - name: Tibber__AccessToken
+          valueFrom:
+            secretKeyRef:
+              name: teslamateagile
+              key: Tibber__AccessToken
+        {{- end }}
+        {{- if eq .Values.energyProvider "FixedPrice" }}
+        - name: FixedPrice__TimeZone
+          value: {{ required "fixedPrice.timeZone is required" .Values.fixedPrice.timeZone | quote }}
+        {{- range $index, $price := .Values.fixedPrice.prices }}
+        - name: FixedPrice__Prices__{{ $index }}
+          value: {{ $price | quote }}
+        {{- end }}
+        {{- end }}
+        {{- if eq .Values.energyProvider "Awattar" }}
+        {{- if .Values.awattar.vatMultiplier }}
+        - name: Awattar__VATMultiplier
+          value: {{ .Values.awattar.vatMultiplier | quote }}
+        {{- end }}
+        {{- end }}
+        {{- if eq .Values.energyProvider "Barry" }}
+        - name: Barry__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: teslamateagile
+              key: Barry__ApiKey
+        - name: Barry__MPID
+          valueFrom:
+            secretKeyRef:
+              name: teslamateagile
+              key: Barry__MPID
+        {{- end }}

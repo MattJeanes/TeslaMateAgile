@@ -1,10 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.TeslaMate.Entities;
@@ -42,7 +38,7 @@ public class TestHelpers
                 Id = csvReader.GetField<int>("id"),
                 ChargeEnergyAdded = csvReader.GetField<decimal>("charge_energy_added"),
                 ChargerActualCurrent = csvReader.GetField<int>("charger_actual_current"),
-                ChargerPhases = csvReader.GetField<int>("charger_phases"),
+                ChargerPhases = csvReader.GetField<int?>("charger_phases"),
                 ChargerPower = csvReader.GetField<int>("charger_power"),
                 ChargerVoltage = csvReader.GetField<int>("charger_voltage"),
 #pragma warning disable CS0618 // Type or member is obsolete

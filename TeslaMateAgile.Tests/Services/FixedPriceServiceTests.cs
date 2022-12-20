@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services;
@@ -417,6 +413,6 @@ public class FixedPriceServiceTests
             };
         var fixedPriceService = Setup("Europe/London", fixedPrices);
         var exception = Assert.ThrowsAsync<Exception>(async () => { await fixedPriceService.GetPriceData(from, to); });
-        Assert.AreEqual(exception.Message, "Infinite loop detected within FixedPrice provider");
+        Assert.AreEqual(exception?.Message, "Infinite loop detected within FixedPrice provider");
     }
 }
