@@ -27,7 +27,7 @@ public class EnerginetService : IPriceDataService
 
     public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
     {
-        var url = "Elspotprices?offset=0&start=" + from.UtcDateTime.ToString("yyyy-MM-ddTHH:mm") + "&end=" + to.UtcDateTime.ToString("yyyy-MM-ddTHH:mm") + "&filter={\"PriceArea\":[\"" + _options.Region + "\"]}&sort=HourUTC ASC&timezone=dk".Replace(@"\", string.Empty); ;
+        var url = "Elspotprices?offset=0&start=" + from.AddHours(-2).UtcDateTime.ToString("yyyy-MM-ddTHH:mm") + "&end=" + to.AddHours(2).UtcDateTime.ToString("yyyy-MM-ddTHH:mm") + "&filter={\"PriceArea\":[\"" + _options.Region + "\"]}&sort=HourUTC ASC&timezone=dk".Replace(@"\", string.Empty); ;
         var resp = await _client.GetAsync(url);
 
         resp.EnsureSuccessStatusCode();
