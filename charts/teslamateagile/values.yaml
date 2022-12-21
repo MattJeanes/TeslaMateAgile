@@ -1,0 +1,36 @@
+image:
+  repository: mattjeanes/teslamateagile
+  tag: v1.9.1
+  pullPolicy: IfNotPresent
+resources:
+  requests:
+    cpu: 15m
+    memory: 128Mi
+  limits:
+    memory: 128Mi
+database: {}
+  # host: database
+  # name: teslamate
+  # user: teslamate
+  # pass: teslamate
+  # port: 5432
+updateIntervalSeconds: 300
+# geofenceId: 1
+energyProvider: changeme
+debug:
+  enabled: false
+# feePerKilowattHour: 0.25
+octopus: {}
+  # regionCode: A
+tibber: {}
+  # accessToken: abc123
+fixedPrice: {}
+  # timeZone: Europe/London
+  # prices:
+  # - 00:30-04:30=0.05
+  # - 04:30-00:30=0.15
+awattar: {}
+  # vatMultiplier: abc123 
+barry: {}
+  # apiKey: XXXXX
+  # mpid: YYYYY
