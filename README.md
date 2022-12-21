@@ -81,13 +81,16 @@ See below for how to configure the environment variables appropriately
 - Barry__ApiKey=XXXXX # See below Barry Access Token section
 - Barry__MPID=YYYYY # See below Barry MPID section
 ```
-### Nordpool
+### Energinet
 
 ```yaml
-- TeslaMate__EnergyProvider=Nordpool
-- Nordpool__Currency=XXXXX # See below allowed currency codes by Nordpool
-- Nordpool__Region=YYYYY # See below a list of all Nordpool regions
-- Nordpool__VAT=1.25 # VAT multiplier. In this example 25%
+- TeslaMate__EnergyProvider=Energinet
+- Energinet__Region=YYYYY # See below a list of all Energinet regions
+- Energinet__VAT=1.25 # VAT multiplier. In this example 25%
+- Energinet__FixedPrice__TimeZone=Europe/Copenhagen # IANA (tz database) time zone code, used for below times 
+- Energinet__FixedPrices__Prices__0=00:00-17:00=0.1432 # You can have as many as these as you need
+- Energinet__FixedPrices__Prices__1=17:00-20:00=0.3983
+- Energinet__FixedPrices__Prices__2=20:00-00:00=0.1432
 ```
 
 
@@ -151,16 +154,16 @@ Can be obtained from the app. Home & meter info -> Consumption metering point ->
 
 If you have a lot of charges that needs to be updated make sure that you set the interval to something bigger than 60 seconds and it will update 10 charges per minute (maximum 500 a day). Afterwards the interval could be increased to something like once an hour.
 
-### Nordpool
+### Energinet
 
-#### Nordpool currency codes
-Allowed is one of the following currency codes: `DKK`, `EUR`, `NOK` or `SEK`.  Strings are case sensitive.
-
-#### Nordpool regions
-Currently available areas are `Bergen`, `DK1`, `DK2`, `FI`, `Kr.sand`, `Molde`, `OSLO`, `SE1`, `SE2`, `SE3`, `SE4`, `SYS`, `Tr.heim`, `Tromsø`
+#### Energinet regions
+Currently available areas are `DK1`, `DK2`, `NO2`, `SE3`, `SE4`
 
 ### VAT
-Prices on Nordpool appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
+Prices on Energinet appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
+
+### Fixed prices
+Support for this is added for accommodating different transmission charges, taxes, etc.
 
 ## Troubleshooting
 
