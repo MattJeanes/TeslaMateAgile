@@ -81,26 +81,25 @@ public class IntegrationTests
 
     [Ignore(IntegrationTest)]
     [Test]
-    public async Task IntegrationTests_Nordpool()
+    public async Task IntegrationTests_Energinet()
     {
         var configBuilder = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
             {
-                ["Nordpool:BaseUrl"] = "http://www.nordpoolspot.com/api/marketdata/page/10",
-                ["Nordpool:Currency"] = "DKK",
-                ["Nordpool:Region"] = "DK1"
+                ["Energinet:BaseUrl"] = "https://api.energidataservice.dk/dataset/",
+                ["Energinet:Region"] = "DK1"
             });
 
         var config = configBuilder.Build();
 
         var services = new ServiceCollection();
         services.AddHttpClient();
-        services.AddOptions<NordpoolOptions>()
+        services.AddOptions<EnerginetOptions>()
                         .Bind(config.GetSection("Nordpool"))
                         .ValidateDataAnnotations();
-        services.AddHttpClient<IPriceDataService, NordpoolService>((serviceProvider, client) =>
+        services.AddHttpClient<IPriceDataService, EnerginetService>((serviceProvider, client) =>
         {
-            var options = serviceProvider.GetRequiredService<IOptions<NordpoolOptions>>().Value;
+            var options = serviceProvider.GetRequiredService<IOptions<EnerginetOptions>>().Value;
             var baseUrl = options.BaseUrl;
             if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
             client.BaseAddress = new Uri(baseUrl);
