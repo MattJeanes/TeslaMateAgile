@@ -87,7 +87,8 @@ public class IntegrationTests
             .AddInMemoryCollection(new Dictionary<string, string>
             {
                 ["Energinet:BaseUrl"] = "https://api.energidataservice.dk/dataset/",
-                ["Energinet:Region"] = "DK1"
+                ["Energinet:Region"] = "DK1",
+                ["Energinet:VAT"] = 1.25
             });
 
         var config = configBuilder.Build();
