@@ -88,7 +88,7 @@ public class IntegrationTests
             {
                 ["Energinet:BaseUrl"] = "https://api.energidataservice.dk/dataset/",
                 ["Energinet:Region"] = "DK1",
-                ["Energinet:VAT"] = 1.25
+                ["Energinet:VAT"] = "1.25"
             });
 
         var config = configBuilder.Build();
