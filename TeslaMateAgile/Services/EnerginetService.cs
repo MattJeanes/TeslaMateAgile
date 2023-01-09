@@ -22,7 +22,11 @@ public class EnerginetService : IPriceDataService
         _options = options.Value;
 
         _fixedPricesOptions = _options.FixedPrices;
-        _fixedPriceService = new FixedPriceService(Options.Create(_fixedPricesOptions));
+
+        if (_fixedPriceService != null)
+        {
+            _fixedPriceService = new FixedPriceService(Options.Create(_fixedPricesOptions));
+        }
     }
 
     public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
@@ -39,8 +43,14 @@ public class EnerginetService : IPriceDataService
         {
             foreach (var record in EnerginetResponse.records)
             {
-                var fixedPrices = await _fixedPriceService.GetPriceData(record.HourUTC, record.HourUTC.AddHours(1));
-                var fixedPrice = fixedPrices.Sum(p => p.Value);
+                if(_fixedPriceService != null)
+                {
+                    var fixedPrices = await _fixedPriceService.GetPriceData(record.HourUTC, record.HourUTC.AddHours(1));
+                    var fixedPrice = fixedPrices.Sum(p => p.Value);
+                } else
+                {
+                    var fixedPrice = 0;
+                }
                 
                 prices.Add(new Price
                 {
