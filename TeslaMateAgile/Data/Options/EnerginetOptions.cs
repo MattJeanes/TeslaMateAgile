@@ -11,6 +11,7 @@ public class EnerginetOptions
     public EnerginetRegion Region { get; set; }
 
     [Required]
+    [Range(1, 2)]
     public decimal VAT { get; set; }
 
     public FixedPriceOptions FixedPrices { get; set; }
