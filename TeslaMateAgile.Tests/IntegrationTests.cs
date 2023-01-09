@@ -96,7 +96,7 @@ public class IntegrationTests
         var services = new ServiceCollection();
         services.AddHttpClient();
         services.AddOptions<EnerginetOptions>()
-                        .Bind(config.GetSection("Nordpool"))
+                        .Bind(config.GetSection("Energinet"))
                         .ValidateDataAnnotations();
         services.AddHttpClient<IPriceDataService, EnerginetService>((serviceProvider, client) =>
         {
