@@ -39,17 +39,15 @@ public class EnerginetService : IPriceDataService
         var prices = new List<Price>();
         var EnerginetResponse = await JsonSerializer.DeserializeAsync<EnerginetResponse>(await resp.Content.ReadAsStreamAsync());
 
-        if (EnerginetResponse.records.Count > 0)
+        if (EnerginetResponse.Records.Count > 0)
         {
-            foreach (var record in EnerginetResponse.records)
+            foreach (var record in EnerginetResponse.Records)
             {
+                decimal fixedPrice = 0;
                 if(_fixedPriceService != null)
                 {
                     var fixedPrices = await _fixedPriceService.GetPriceData(record.HourUTC, record.HourUTC.AddHours(1));
-                    var fixedPrice = fixedPrices.Sum(p => p.Value);
-                } else
-                {
-                    var fixedPrice = 0;
+                    fixedPrice = fixedPrices.Sum(p => p.Value);
                 }
                 
                 prices.Add(new Price
@@ -67,7 +65,7 @@ public class EnerginetService : IPriceDataService
     private class EnerginetResponse
     {
         [JsonPropertyName("records")]
-        public List<EnerginetResponseRow> records { get; set; }
+        public List<EnerginetResponseRow> Records { get; set; }
     }
 
     private class EnerginetResponseRow
