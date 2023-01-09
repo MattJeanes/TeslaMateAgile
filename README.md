@@ -9,7 +9,7 @@ Supported energy providers / tarriffs:
 - Fixed Price (manually specify prices for different times of the day)
 - [aWATTar](https://www.awattar.de/)
 - [Barry](https://barry.energy/dk)
-- [Nordpool](https://www.nordpoolgroup.com/)
+- [Energinet](https://www.energidataservice.dk/tso-electricity/Elspotprices)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -163,7 +163,7 @@ Currently available areas are `DK1`, `DK2`, `NO2`, `SE3`, `SE4`
 Prices on Energinet appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
 
 ### Fixed prices
-Support for this is added for accommodating different transmission charges, taxes, etc.
+Support for this is added for accommodating different transmission charges, taxes, etc. This would be added to the price reported from Energinet's API.
 
 ## Troubleshooting
 
