@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using System;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TeslaMateAgile.Data;
@@ -13,7 +11,6 @@ public class EnerginetService : IPriceDataService
 {
     private readonly HttpClient _client;
     private readonly EnerginetOptions _options;
-    private readonly FixedPriceOptions _fixedPricesOptions;
     private readonly FixedPriceService _fixedPriceService;
 
     public EnerginetService(HttpClient client, IOptions<EnerginetOptions> options)
@@ -21,11 +18,9 @@ public class EnerginetService : IPriceDataService
         _client = client;
         _options = options.Value;
 
-        _fixedPricesOptions = _options.FixedPrices;
-
-        if (_fixedPriceService != null)
+        if (_options.FixedPrices != null)
         {
-            _fixedPriceService = new FixedPriceService(Options.Create(_fixedPricesOptions));
+            _fixedPriceService = new FixedPriceService(Options.Create(_options.FixedPrices));
         }
     }
 
@@ -44,12 +39,12 @@ public class EnerginetService : IPriceDataService
             foreach (var record in EnerginetResponse.Records)
             {
                 decimal fixedPrice = 0;
-                if(_fixedPriceService != null)
+                if (_fixedPriceService != null)
                 {
                     var fixedPrices = await _fixedPriceService.GetPriceData(record.HourUTC, record.HourUTC.AddHours(1));
                     fixedPrice = fixedPrices.Sum(p => p.Value);
                 }
-                
+
                 prices.Add(new Price
                 {
                     ValidFrom = record.HourUTC.AddHours(1),
