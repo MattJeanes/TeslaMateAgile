@@ -86,9 +86,9 @@ See below for how to configure the environment variables appropriately
 ```yaml
 - TeslaMate__EnergyProvider=Energinet
 - Energinet__Region=YYYYY # See below a list of all Energinet regions
-- Energinet__VAT=1.25 # VAT multiplier. In this example 25%
-- Energinet__FixedPrices__TimeZone=Europe/Copenhagen # IANA (tz database) time zone code, used for below times 
-- Energinet__FixedPrices__Prices__0=00:00-17:00=0.1432 # You can have as many as these as you need
+- Energinet__VAT=1.25 # Optional: VAT multiplier. In this example 25%
+- Energinet__FixedPrices__TimeZone=Europe/Copenhagen # Optional: IANA (tz database) time zone code, used for below times 
+- Energinet__FixedPrices__Prices__0=00:00-17:00=0.1432 # Optional: You can have as many as these as you need
 - Energinet__FixedPrices__Prices__1=17:00-20:00=0.3983
 - Energinet__FixedPrices__Prices__2=20:00-00:00=0.1432
 ```
@@ -163,7 +163,7 @@ Currently available areas are `DK1`, `DK2`, `NO2`, `SE3`, `SE4`
 Prices on Energinet appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
 
 ### Fixed prices
-Support for this is added for accommodating different transmission charges, taxes, etc. This would be added to the price reported from Energinet's API.
+Support for this is added for accommodating different transmission charges, taxes, etc. This will be added to the price reported from Energinet's API.
 
 ## Troubleshooting
 
