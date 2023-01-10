@@ -1,4 +1,4 @@
 apiVersion: v2
 name: teslamateagile
 version: 1.0.0
-appVersion: v1.9.1
+appVersion: v1.11.0
