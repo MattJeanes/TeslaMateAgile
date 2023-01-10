@@ -78,4 +78,46 @@ public class IntegrationTests
         Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
         Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
     }
+
+    [Ignore(IntegrationTest)]
+    [Test]
+    public async Task IntegrationTests_Energinet()
+    {
+        var configBuilder = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["Energinet:BaseUrl"] = "https://api.energidataservice.dk/dataset/",
+                ["Energinet:Region"] = "DK1",
+                ["Energinet:VAT"] = "1.25"
+            });
+
+        var config = configBuilder.Build();
+
+        var services = new ServiceCollection();
+        services.AddHttpClient();
+        services.AddOptions<EnerginetOptions>()
+                        .Bind(config.GetSection("Energinet"))
+                        .ValidateDataAnnotations();
+        services.AddHttpClient<IPriceDataService, EnerginetService>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<EnerginetOptions>>().Value;
+            var baseUrl = options.BaseUrl;
+            if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+            client.BaseAddress = new Uri(baseUrl);
+        });
+        var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
+
+        var from = new DateTimeOffset(2022, 2, 20, 0, 0, 0, new TimeSpan(1, 0, 0));
+        var to = new DateTimeOffset(2022, 2, 20, 23, 59, 0, new TimeSpan(1, 0, 0));
+
+        var priceData = await priceDataService.GetPriceData(from, to);
+
+        foreach (var price in priceData)
+        {
+            Console.WriteLine($"{price.ValidFrom} - {price.ValidTo} - {price.Value}");
+        }
+
+        Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
+        Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
+    }
 }

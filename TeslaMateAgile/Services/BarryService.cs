@@ -23,7 +23,7 @@ public class BarryService : IPriceDataService
     {
         var request = new BarryRequest
         {
-            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("o"), to.UtcDateTime.ToString("o") }.ToList()
+            Params = new string[] { _options.MPID, from.UtcDateTime.ToString("s") + "Z", to.UtcDateTime.ToString("s") + "Z" }.ToList()
         };
         var objAsJson = JsonSerializer.Serialize(request);
         var content = new StringContent(objAsJson, System.Text.Encoding.UTF8, "application/json");
@@ -79,14 +79,13 @@ public class BarryService : IPriceDataService
     public class BarryRequest
     {
         [JsonPropertyName("method")]
-        public string Method { get; set; } = "co.getbarry.api.v1.OpenApiController.getTotalKwHourlyPrice";
+        public string Method { get; set; } = "co.getbarry.api.v1.OpenApiController.getPrice";
 
         [JsonPropertyName("id")]
         public string Id { get; set; } = "0";
 
         [JsonPropertyName("jsonrpc")]
         public string JsonRPC { get; set; } = "2.0";
-
 
         [JsonPropertyName("params")]
         public List<string> Params { get; set; }

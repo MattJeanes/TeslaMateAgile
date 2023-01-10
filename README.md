@@ -9,6 +9,7 @@ Supported energy providers / tarriffs:
 - Fixed Price (manually specify prices for different times of the day)
 - [aWATTar](https://www.awattar.de/)
 - [Barry](https://barry.energy/dk)
+- [Energinet](https://www.energidataservice.dk/tso-electricity/Elspotprices)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -80,6 +81,17 @@ See below for how to configure the environment variables appropriately
 - Barry__ApiKey=XXXXX # See below Barry Access Token section
 - Barry__MPID=YYYYY # See below Barry MPID section
 ```
+### Energinet
+
+```yaml
+- TeslaMate__EnergyProvider=Energinet
+- Energinet__Region=YYYYY # See below a list of all Energinet regions
+- Energinet__VAT=1.25 # VAT multiplier. In this example 25%
+- Energinet__FixedPrices__TimeZone=Europe/Copenhagen # IANA (tz database) time zone code, used for below times 
+- Energinet__FixedPrices__Prices__0=00:00-17:00=0.1432 # You can have as many as these as you need
+- Energinet__FixedPrices__Prices__1=17:00-20:00=0.3983
+- Energinet__FixedPrices__Prices__2=20:00-00:00=0.1432
+```
 
 
 ## Optional environment variables
@@ -141,6 +153,17 @@ Can be obtained from the app. Home & meter info -> Consumption metering point ->
 - *Long Time Throttle* - The current limit is set to 500 calls every 24 hours.
 
 If you have a lot of charges that needs to be updated make sure that you set the interval to something bigger than 60 seconds and it will update 10 charges per minute (maximum 500 a day). Afterwards the interval could be increased to something like once an hour.
+
+### Energinet
+
+#### Energinet regions
+Currently available areas are `DK1`, `DK2`, `NO2`, `SE3`, `SE4`
+
+### VAT
+Prices on Energinet appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
+
+### Fixed prices
+Support for this is added for accommodating different transmission charges, taxes, etc. This would be added to the price reported from Energinet's API.
 
 ## Troubleshooting
 

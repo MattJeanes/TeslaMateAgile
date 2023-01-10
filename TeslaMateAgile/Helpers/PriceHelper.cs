@@ -84,6 +84,13 @@ public class PriceHelper : IPriceHelper
         var maxDate = charges.Max(x => x.Date);
         _logger.LogInformation($"Calculating cost for charges {minDate.UtcDateTime} UTC - {maxDate.UtcDateTime} UTC");
         var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
+
+        _logger.LogDebug($"Retrieved {prices.Count()} prices:");
+        foreach (var price in prices)
+        {
+            _logger.LogDebug($"{price.ValidFrom.UtcDateTime} UTC - {price.ValidTo.UtcDateTime} UTC: {price.Value}");
+        }
+
         var totalPrice = 0M;
         var totalEnergy = 0M;
         Charge lastCharge = null;
@@ -97,6 +104,10 @@ public class PriceHelper : IPriceHelper
         foreach (var price in prices)
         {
             var chargesForPrice = charges.Where(x => x.Date >= price.ValidFrom && x.Date < price.ValidTo).ToList();
+            if (chargesForPrice.Count == 0)
+            {
+                continue;
+            }
             chargesCalculated += chargesForPrice.Count;
             if (lastCharge != null)
             {
