@@ -45,11 +45,23 @@ public class EnerginetService : IPriceDataService
                     fixedPrice = fixedPrices.Sum(p => p.Value);
                 }
 
+                var spotPrice = _options.Currency switch
+                {
+                    EnerginetCurrency.DKK => record.SpotPriceDKK,
+                    EnerginetCurrency.EUR => record.SpotPriceEUR,
+                    _ => throw new ArgumentOutOfRangeException(nameof(_options.Currency)),
+                };
+
+                var price = ((spotPrice / 1000) + fixedPrice);
+                if (_options.VAT.HasValue)
+                {
+                    price *= _options.VAT.Value;
+                }
                 prices.Add(new Price
                 {
-                    ValidFrom = record.HourUTC.AddHours(1),
-                    ValidTo = record.HourUTC.AddHours(2),
-                    Value = ((record.SpotPriceDKK / 1000) + fixedPrice) * _options.VAT
+                    ValidFrom = record.HourUTC,
+                    ValidTo = record.HourUTC.AddHours(1),
+                    Value = price
                 });
             }
         }
@@ -65,10 +77,15 @@ public class EnerginetService : IPriceDataService
 
     private class EnerginetResponseRow
     {
+        private DateTime _hourUTC;
 
-        [JsonPropertyName("HourDK")]
-        public DateTime HourUTC { get; set; }
+        [JsonPropertyName("HourUTC")]
+        public DateTime HourUTC { get => _hourUTC; set => _hourUTC = DateTime.SpecifyKind(value, DateTimeKind.Utc); }
+
         [JsonPropertyName("SpotPriceDKK")]
         public decimal SpotPriceDKK { get; set; }
+
+        [JsonPropertyName("SpotPriceEUR")]
+        public decimal SpotPriceEUR { get; set; }
     }
 }

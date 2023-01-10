@@ -11,8 +11,9 @@ public class EnerginetOptions
     public EnerginetRegion Region { get; set; }
 
     [Required]
-    [Range(1, 2)]
-    public decimal VAT { get; set; }
+    public EnerginetCurrency Currency { get; set; }
+
+    public decimal? VAT { get; set; }
 
     public FixedPriceOptions FixedPrices { get; set; }
 }
@@ -26,3 +27,8 @@ public enum EnerginetRegion
     SE4
 }
 
+public enum EnerginetCurrency
+{
+    DKK,
+    EUR
+}

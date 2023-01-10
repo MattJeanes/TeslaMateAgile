@@ -88,6 +88,7 @@ public class IntegrationTests
             {
                 ["Energinet:BaseUrl"] = "https://api.energidataservice.dk/dataset/",
                 ["Energinet:Region"] = "DK1",
+                ["Energinet:Currency"] = "DKK",
                 ["Energinet:VAT"] = "1.25",
                 ["Energinet:FixedPrices:TimeZone"] = "Europe/London",
                 ["Energinet:FixedPrices:Prices:0"] = "00:00-12:00=0.25",

@@ -77,7 +77,8 @@ See below for how to configure the environment variables appropriately
 
 ```yaml
 - TeslaMate__EnergyProvider=Energinet
-- Energinet__Region=YYYYY # See below a list of all Energinet regions
+- Energinet__Region=YYYYY # See below Energinet regions section
+- Energinet__Currency=DKK # See below Energinet currencies section
 - Energinet__VAT=1.25 # Optional: VAT multiplier. In this example 25%
 - Energinet__FixedPrices__TimeZone=Europe/Copenhagen # Optional: IANA (tz database) time zone code, used for below times 
 - Energinet__FixedPrices__Prices__0=00:00-17:00=0.1432 # Optional: You can have as many as these as you need
@@ -136,6 +137,9 @@ You can acquire this token here: https://developer.tibber.com/settings/accesstok
 
 #### Energinet regions
 Currently available areas are `DK1`, `DK2`, `NO2`, `SE3`, `SE4`
+
+#### Energinet currencies
+Valid currency options are DKK (Danish Krone) or EUR (Euro)
 
 ### VAT
 Prices on Energinet appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
