@@ -139,7 +139,7 @@ You can acquire this token here: https://developer.tibber.com/settings/accesstok
 Currently available areas are `DK1`, `DK2`, `NO2`, `SE3`, `SE4`
 
 #### Energinet currencies
-Valid currency options are DKK (Danish Krone) or EUR (Euro)
+Valid currency options are `DKK` (Danish Krone) or `EUR` (Euro)
 
 ### VAT
 Prices on Energinet appear to be without VAT so this defines a multiplier to be applied before using the price for further calculations.
