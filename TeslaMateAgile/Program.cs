@@ -134,17 +134,6 @@ public class Program
                         client.BaseAddress = new Uri(baseUrl);
                     });
                 }
-                else if (energyProvider == EnergyProvider.Barry)
-                {
-                    services.AddOptions<BarryOptions>()
-                        .Bind(config.GetSection("Barry"))
-                        .ValidateDataAnnotations();
-                    services.AddHttpClient<IPriceDataService, BarryService>((serviceProvider, client) =>
-                    {
-                        var options = serviceProvider.GetRequiredService<IOptions<BarryOptions>>().Value;
-                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
-                    });
-                }
                 else if (energyProvider == EnergyProvider.Energinet)
                 {
                     services.AddOptions<EnerginetOptions>()
