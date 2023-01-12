@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1.8.2
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '7.0.x'
     
@@ -49,25 +49,25 @@ jobs:
         done
       
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: TeslaMateAgile-linux-x64
         path: ./output/TeslaMateAgile-linux-x64
     
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: TeslaMateAgile-linux-arm64
         path: ./output/TeslaMateAgile-linux-arm64
         
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: TeslaMateAgile-linux-arm
         path: ./output/TeslaMateAgile-linux-arm
         
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: TeslaMateAgile-win-x64
         path: ./output/TeslaMateAgile-win-x64
@@ -123,60 +123,14 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        name: Release ${{ github.ref }}
         draft: true
         prerelease: false
+        files: output/*.zip
       if: startsWith(github.ref, 'refs/tags/')
       
-    - name: Upload a Release Asset
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./output/TeslaMateAgile-linux-x64.zip
-        asset_name: TeslaMateAgile-linux-x64.zip
-        asset_content_type: application/zip
-      if: startsWith(github.ref, 'refs/tags/')
-    
-    - name: Upload a Release Asset
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./output/TeslaMateAgile-linux-arm64.zip
-        asset_name: TeslaMateAgile-linux-arm64.zip
-        asset_content_type: application/zip
-      if: startsWith(github.ref, 'refs/tags/')
-    
-    - name: Upload a Release Asset
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./output/TeslaMateAgile-linux-arm.zip
-        asset_name: TeslaMateAgile-linux-arm.zip
-        asset_content_type: application/zip
-      if: startsWith(github.ref, 'refs/tags/')
-    
-    - name: Upload a Release Asset
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./output/TeslaMateAgile-win-x64.zip
-        asset_name: TeslaMateAgile-win-x64.zip
-        asset_content_type: application/zip
-      if: startsWith(github.ref, 'refs/tags/')
   deploy:
     if: github.event_name != 'pull_request'
     name: Deploy
@@ -186,12 +140,12 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Azure Login
-      uses: Azure/login@v1.4.3
+      uses: Azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Login to Kubernetes
-      uses: Azure/aks-set-context@v2.1
+      uses: Azure/aks-set-context@v3
       with:
         resource-group: abyss
         cluster-name: abyss
