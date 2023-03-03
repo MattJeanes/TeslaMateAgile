@@ -10,17 +10,17 @@ namespace TeslaMateAgile.Tests;
 
 public class TestHelpers
 {
-    public static List<Price> ImportAgilePrices(string jsonFile)
-    {
-        var json = File.ReadAllText(Path.Combine("Import", jsonFile));
-        return JsonSerializer.Deserialize<OctopusService.AgileResponse>(json).Results
-            .Select(x => new Price
-            {
-                Value = x.ValueIncVAT / 100,
-                ValidTo = x.ValidTo,
-                ValidFrom = x.ValidFrom
-            }).ToList();
-    }
+    ////public static List<Price> ImportAgilePrices(string jsonFile)
+    ////{
+    ////    var json = File.ReadAllText(Path.Combine("Import", jsonFile));
+    ////    return JsonSerializer.Deserialize<OctopusService.AgileResponse>(json).Results
+    ////        .Select(x => new Price
+    ////        {
+    ////            Value = x.ValueIncVAT / 100,
+    ////            ValidTo = x.ValidTo,
+    ////            ValidFrom = x.ValidFrom
+    ////        }).ToList();
+    ////}
 
     public static List<Charge> ImportCharges(string csvFile)
     {

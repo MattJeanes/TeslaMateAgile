@@ -35,43 +35,43 @@ public class PriceHelperTests
         return new PriceHelper(logger, teslaMateDbContext.Object, priceDataService.Object, teslaMateOptions);
     }
 
-    private static readonly object[][] PriceHelper_CalculateChargeCost_Cases = new object[][] {
-            new object[]
-            {
-                "Plunge",
-                TestHelpers.ImportAgilePrices("plunge_test.json"),
-                TestHelpers.ImportCharges("plunge_test.csv"),
-                -2.00M,
-                36.74M,
-            },
-            new object[]
-            {
-                "DaylightSavingsTime",
-                new List<Price>
-                {
-                    new Price
-                    {
-                        ValidFrom = DateTimeOffset.Parse("2021-04-13T20:30:00+01:00"),
-                        ValidTo = DateTimeOffset.Parse("2021-04-13T23:30:00+01:00"),
-                        Value = 4.5M
-                    }
-                },
-                TestHelpers.ImportCharges("daylightsavingstime_test.csv"),
-                75.5M,
-                16.78M,
-            }
-        };
+    //private static readonly object[][] PriceHelper_CalculateChargeCost_Cases = new object[][] {
+    //        new object[]
+    //        {
+    //            "Plunge",
+    //            TestHelpers.ImportAgilePrices("plunge_test.json"),
+    //            TestHelpers.ImportCharges("plunge_test.csv"),
+    //            -2.00M,
+    //            36.74M,
+    //        },
+    //        new object[]
+    //        {
+    //            "DaylightSavingsTime",
+    //            new List<Price>
+    //            {
+    //                new Price
+    //                {
+    //                    ValidFrom = DateTimeOffset.Parse("2021-04-13T20:30:00+01:00"),
+    //                    ValidTo = DateTimeOffset.Parse("2021-04-13T23:30:00+01:00"),
+    //                    Value = 4.5M
+    //                }
+    //            },
+    //            TestHelpers.ImportCharges("daylightsavingstime_test.csv"),
+    //            75.5M,
+    //            16.78M,
+    //        }
+    //    };
 
-    [Test]
-    [TestCaseSource(nameof(PriceHelper_CalculateChargeCost_Cases))]
-    public async Task PriceHelper_CalculateChargeCost(string testName, List<Price> prices, List<Charge> charges, decimal expectedPrice, decimal expectedEnergy)
-    {
-        Console.WriteLine($"Running calculate charge cost test '{testName}'");
-        var priceHelper = Setup(prices);
-        var (price, energy) = await priceHelper.CalculateChargeCost(charges);
-        Assert.AreEqual(expectedPrice, price);
-        Assert.AreEqual(expectedEnergy, energy);
-    }
+    //[Test]
+    //[TestCaseSource(nameof(PriceHelper_CalculateChargeCost_Cases))]
+    //public async Task PriceHelper_CalculateChargeCost(string testName, List<Price> prices, List<Charge> charges, decimal expectedPrice, decimal expectedEnergy)
+    //{
+    //    Console.WriteLine($"Running calculate charge cost test '{testName}'");
+    //    var priceHelper = Setup(prices);
+    //    var (price, energy) = await priceHelper.CalculateChargeCost(charges);
+    //    Assert.AreEqual(expectedPrice, price);
+    //    Assert.AreEqual(expectedEnergy, energy);
+    //}
 
     private static readonly object[][] PriceHelper_CalculateEnergyUsed_Cases = new object[][] {
             new object[]

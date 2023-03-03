@@ -89,52 +89,8 @@ public class Program
                 services.AddHttpClient();
 
                 var energyProvider = config.GetValue("TeslaMate:EnergyProvider", EnergyProvider.Octopus);
-                if (energyProvider == EnergyProvider.Octopus)
-                {
-                    services.AddOptions<OctopusOptions>()
-                        .Bind(config.GetSection("Octopus"))
-                        .ValidateDataAnnotations();
-                    services.AddHttpClient<IPriceDataService, OctopusService>((serviceProvider, client) =>
-                    {
-                        var options = serviceProvider.GetRequiredService<IOptions<OctopusOptions>>().Value;
-                        var baseUrl = options.BaseUrl;
-                        if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
-                        client.BaseAddress = new Uri(baseUrl);
-                    });
-                }
-                else if (energyProvider == EnergyProvider.Tibber)
-                {
-                    services.AddOptions<TibberOptions>()
-                        .Bind(config.GetSection("Tibber"))
-                        .ValidateDataAnnotations();
-                    services.AddTransient<IGraphQLJsonSerializer, SystemTextJsonSerializer>();
-                    services.AddHttpClient<IPriceDataService, TibberService>((serviceProvider, client) =>
-                    {
-                        var options = serviceProvider.GetRequiredService<IOptions<TibberOptions>>().Value;
-                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.AccessToken);
-                    });
-                }
-                else if (energyProvider == EnergyProvider.FixedPrice)
-                {
-                    services.AddOptions<FixedPriceOptions>()
-                       .Bind(config.GetSection("FixedPrice"))
-                       .ValidateDataAnnotations();
-                    services.AddSingleton<IPriceDataService, FixedPriceService>();
-                }
-                else if (energyProvider == EnergyProvider.Awattar)
-                {
-                    services.AddOptions<AwattarOptions>()
-                        .Bind(config.GetSection("Awattar"))
-                        .ValidateDataAnnotations();
-                    services.AddHttpClient<IPriceDataService, AwattarService>((serviceProvider, client) =>
-                    {
-                        var options = serviceProvider.GetRequiredService<IOptions<AwattarOptions>>().Value;
-                        var baseUrl = options.BaseUrl;
-                        if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
-                        client.BaseAddress = new Uri(baseUrl);
-                    });
-                }
-                else if (energyProvider == EnergyProvider.Energinet)
+               
+                if (energyProvider == EnergyProvider.Energinet)
                 {
                     services.AddOptions<EnerginetOptions>()
                         .Bind(config.GetSection("Energinet"))
