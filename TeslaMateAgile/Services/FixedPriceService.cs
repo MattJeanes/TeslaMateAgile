@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
@@ -90,7 +91,7 @@ public class FixedPriceService : IPriceDataService
             var fromMinute = int.Parse(match.Groups[2].Value);
             var toHour = int.Parse(match.Groups[3].Value);
             var toMinute = int.Parse(match.Groups[4].Value);
-            if (!decimal.TryParse(match.Groups[5].Value, out var value))
+            if (!decimal.TryParse(match.Groups[5].Value, CultureInfo.InvariantCulture, out var value))
             {
                 throw new ArgumentException(nameof(value), $"Failed to parse fixed price value: {match.Groups[5].Value}");
             }
