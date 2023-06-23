@@ -157,4 +157,5 @@ jobs:
         helm upgrade --install --wait --atomic \
           teslamateagile ./charts/teslamateagile \
           --namespace default \
-          --values abyss.values.yaml
+          --values abyss.values.yaml \
+          --set resources.limits.memory=null
