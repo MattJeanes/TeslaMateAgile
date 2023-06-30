@@ -1,0 +1,29 @@
+name: Deploy
+on:
+  workflow_dispatch: {}
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Azure Login
+      uses: Azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Login to Kubernetes
+      uses: Azure/aks-set-context@v3
+      with:
+        resource-group: abyss
+        cluster-name: abyss
+
+    - run: echo "${{ secrets.ABYSS_VALUES_FILE }}" | base64 --decode > abyss.values.yaml
+        
+    - name: Install TeslaMateAgile
+      run: |
+        helm upgrade --install --wait --atomic \
+          teslamateagile ./charts/teslamateagile \
+          --namespace default \
+          --values abyss.values.yaml
