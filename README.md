@@ -159,9 +159,23 @@ Prices on Energinet appear to be without VAT so this defines a multiplier to be 
 ### Fixed prices
 Support for this is added for accommodating different transmission charges, taxes, etc. This will be added to the price reported from Energinet's API.
 
-## Troubleshooting
+### Home Assistant
 
-### Recalculating charge costs
+#### Base Url
+This is the URL to your Home Assistant instance, it should include the protocol (http or https) and the port if it's not the default (8123). If you are hosting TeslaMateAgile outside of your home network you will need to ensure that your Home Assistant instance is accessible from the internet.
+
+#### Access Token
+This is a long-lived access token for Home Assistant, you can create one by going to your profile in Home Assistant and clicking "Create Token" under "Long-Lived Access Tokens". This token is only used to query the entity you specify and at no point does TeslaMateAgile request or access any other data.
+
+#### Entity Id
+This is the ID of the number-based entity containing price data in Home Assistant, it should be in the format `input_number.energy_price` and should be updated by Home Assistant with the price for the current time period. The price should be in your currency e.g. pounds, euros, dollars (not pennies, cents, etc).
+
+#### Lookback Days
+Home Assistant by default only keeps 10 days of history and will fail to calculate charges if the data is missing. It is highly recommended to set this to a value lower than the number of days of history you have in Home Assistant. A good value is 7 days if you have the default 10 days of history.
+
+## FAQ
+
+### How do I recalculate a charge?
 
 In some cases you may want to tell TeslaMateAgile to recalculate a particular charge, to do this you need to set the `cost` column in the `charging_processes` table in the TeslaMate PostgreSQL database to `NULL` for the charges you want to recalculate.
 
@@ -174,6 +188,16 @@ Recalculate charge costs for a particular charge: `UPDATE charging_processes SET
 Recalculate charge costs for all charges at your GeofenceId: `UPDATE charging_processes SET cost=NULL WHERE geofence_id={GeofenceId}`
 
 Please be careful when running SQL queries against your TeslaMate database as they may result in permanent data loss. Take a backup of your database before if you're not sure.
+
+### How do I use a more complex time-of-use tariff or one that isn't supported?
+
+If you've got an advanced use case or a tariff that isn't supported and you the `FixedPrice` provider is too limited for you (e.g. summer / winter pricing), you can use Home Assistant to provide the pricing data to TeslaMateAgile using the `HomeAssistant` provider.
+
+This way you can use any number of integrations, sensors, automations, etc to provide a number-based entity to TeslaMateAgile which will be used as the price for the charge.
+
+As an example, you can effectively create an Intelligent Octopus integration by using the [octopus_intelligent](https://github.com/megakid/ha_octopus_intelligent/tree/main) integration along with a couple of automations to update the price entity when the off-peak / peak activates.
+
+If you don't use Home Assistant, unfortunately you will need to wait for your use case to be supported, submit a PR to add support for it or install Home Assistant for this purpose.
 
 ## Docker support
 This project is available on Docker
