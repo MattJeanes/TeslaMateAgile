@@ -64,6 +64,14 @@ spec:
         - name: TeslaMate__FeePerKilowattHour
           value: {{ .Values.feePerKilowattHour | quote }}
         {{- end }}
+        {{- if .Values.lookbackDays }}
+        - name: TeslaMate__LookbackDays
+          value: {{ .Values.lookbackDays | quote }}
+        {{- end }}
+        {{- if .Values.phases }}
+        - name: TeslaMate__Phases
+          value: {{ .Values.phases | quote }}
+        {{- end }}
         {{- if eq .Values.energyProvider "Octopus" }}
         - name: Octopus__RegionCode
           value: {{ required "octopus.regionCode is required" .Values.octopus.regionCode | quote }}
@@ -89,15 +97,32 @@ spec:
           value: {{ .Values.awattar.vatMultiplier | quote }}
         {{- end }}
         {{- end }}
-        {{- if eq .Values.energyProvider "Barry" }}
-        - name: Barry__ApiKey
+        {{- if eq .Values.energyProvider "Energinet" }}
+        - name: Energinet__Region
+          value: {{ required "energinet.region is required" .Values.energinet.region | quote }}
+        - name: Energinet__Currency
+          value: {{ required "energinet.currency is required" .Values.energinet.currency | quote }}
+        {{- if .Values.energinet.vat }}
+        - name: Energinet__VAT
+          value: {{ .Values.energinet.vat | quote }}
+        {{- end }}
+        {{- if .Values.energinet.fixedPrices }}
+        - name: Energinet__FixedPrices__TimeZone
+          value: {{ required "energinet.fixedPrices.timeZone is required" .Values.energinet.fixedPrices.timeZone | quote }}
+        {{- range $index, $price := .Values.energinet.fixedPrices.prices }}
+        - name: Energinet__FixedPrices__Prices__{{ $index }}
+          value: {{ $price | quote }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if eq .Values.energyProvider "HomeAssistant" }}
+        - name: HomeAssistant__BaseUrl
+          value: {{ required "homeAssistant.baseUrl is required" .Values.homeAssistant.baseUrl | quote }}
+        - name: HomeAssistant__AccessToken
           valueFrom:
             secretKeyRef:
               name: teslamateagile
-              key: Barry__ApiKey
-        - name: Barry__MPID
-          valueFrom:
-            secretKeyRef:
-              name: teslamateagile
-              key: Barry__MPID
+              key: HomeAssistant__AccessToken
+        - name: HomeAssistant__EntityId
+          value: {{ required "homeAssistant.entityId is required" .Values.homeAssistant.entityId | quote }}
         {{- end }}
