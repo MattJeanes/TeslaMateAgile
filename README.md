@@ -199,6 +199,17 @@ As an example, you can effectively create an Intelligent Octopus integration by 
 
 If you don't use Home Assistant, unfortunately you will need to wait for your use case to be supported, submit a PR to add support for it or install Home Assistant for this purpose.
 
+### Why do short charges sometimes have no cost?
+
+Due to how TeslaMate calculates your electricity phases (TeslaMateAgile uses the same logic), short charges sometimes do not have enough data to determine the phases and this will result in a zero cost. You will see a warning in the logs when this happens that looks like this:
+
+```
+warn: TeslaMateAgile.PriceHelper[0] Unable to determine phases for charges
+info: TeslaMateAgile.PriceHelper[0] Calculated cost 0 and energy 0 kWh for charging process 26
+```
+
+To workaround this issue, you can set the `TeslaMate__Phases` environment variable to override the auto-detection, this will allow short charges to be calculated correctly as long as you set the correct number of phases.
+
 ## Docker support
 This project is available on Docker
 
