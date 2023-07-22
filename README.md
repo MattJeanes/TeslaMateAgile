@@ -167,7 +167,7 @@ This is the URL to your Home Assistant instance, it should include the protocol 
 #### Access Token
 This is a long-lived access token for Home Assistant, you can create one by going to your profile in Home Assistant and clicking "Create Token" under "Long-Lived Access Tokens". This token is only used to query the entity you specify and at no point does TeslaMateAgile request or access any other data.
 
-#### Entity Id
+#### Entity ID
 This is the ID of the number-based entity containing price data in Home Assistant, it should be in the format `input_number.energy_price` and should be updated by Home Assistant with the price for the current time period. The price should be in your currency e.g. pounds, euros, dollars (not pennies, cents, etc).
 
 #### Lookback Days
