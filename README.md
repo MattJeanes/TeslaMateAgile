@@ -9,6 +9,7 @@ Supported energy providers / tarriffs:
 - Fixed Price (manually specify prices for different times of the day)
 - [aWATTar](https://www.awattar.de/)
 - [Energinet](https://www.energidataservice.dk/tso-electricity/Elspotprices)
+- [Home Assistant](https://www.home-assistant.io/)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -86,6 +87,15 @@ See below for how to configure the environment variables appropriately
 - Energinet__FixedPrices__Prices__2=20:00-00:00=0.1432
 ```
 
+### Home Assistant
+
+```yaml
+- TeslaMate__EnergyProvider=HomeAssistant
+- TeslaMate__LookbackDays=7 # Optional: Highly recommended, see below Optional environment variables section
+- HomeAssistant__BaseUrl=http://homeassistant.local:8123 # URL to your Home Assistant instance
+- HomeAssistant__AccessToken=abc123 # Long-lived access token for Home Assistant
+- HomeAssistant__EntityId=input_number.energy_price # ID of the number-based entity containing price data in Home Assistant (Cost is in your currency e.g. pounds, euros, dollars (not pennies, cents, etc))
+```
 
 ## Optional environment variables
 ```yaml
@@ -93,6 +103,7 @@ See below for how to configure the environment variables appropriately
 - Logging__Console__FormatterName=simple # This and the below env var will prepend a timestamp to every log message the same way TeslaMate does
 - "Logging__Console__FormatterOptions__TimestampFormat=yyyy-MM-dd HH:mm:ss.fff " # See above env var
 - TeslaMate__FeePerKilowattHour=0.25 # Adds a flat fee per kWh, useful for certain arrangements (default: 0)
+- TeslaMate__LookbackDays=7 # Only calculate charges started in the last x days (default: null, all charges)
 ```
 
 ## Database connection

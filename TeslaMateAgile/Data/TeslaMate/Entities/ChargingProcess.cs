@@ -13,6 +13,12 @@ public class ChargingProcess
     /// <summary>
     /// Do not use this property for date comparisons, it must be converted to a UTC DateTimeOffset first
     /// </summary>
+    [Column("start_date")]
+    public DateTime StartDate { get; set; }
+
+    /// <summary>
+    /// Do not use this property for date comparisons, it must be converted to a UTC DateTimeOffset first
+    /// </summary>
     [Column("end_date")]
     public DateTime? EndDate { get; set; }
 

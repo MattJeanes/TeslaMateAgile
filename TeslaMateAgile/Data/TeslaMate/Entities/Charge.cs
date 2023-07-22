@@ -12,11 +12,11 @@ public class Charge
 
     [NotMapped]
 #pragma warning disable CS0618 // Type or member is obsolete
-    public DateTimeOffset Date { get => new DateTimeOffset(DateInternal, TimeSpan.Zero); set => DateInternal = value.UtcDateTime; }
+    public DateTimeOffset Date { get => new(DateInternal, TimeSpan.Zero); set => DateInternal = value.UtcDateTime; }
 #pragma warning restore CS0618 // Type or member is obsolete
 
     [Column("date")]
-    [Obsolete("Do not use this internal property directly, use Date instead")]
+    [Obsolete($"Do not use this internal property directly, use {nameof(Date)} instead")]
     // This property is UTC but is read out by the database as a local date, so we must force it to be UTC using the getter above
     public DateTime DateInternal { get; set; }
 

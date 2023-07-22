@@ -7,4 +7,5 @@ public enum EnergyProvider
     FixedPrice,
     Awattar,
     Energinet,
+    HomeAssistant,
 }

@@ -19,7 +19,7 @@ namespace TeslaMateAgile;
 
 public class Program
 {
-    public static async Task Main()
+    public async static Task Main()
     {
         var builder = new HostBuilder()
             .ConfigureAppConfiguration(configBuilder =>
@@ -84,7 +84,8 @@ public class Program
                 services.AddHostedService<PriceService>();
                 services.AddOptions<TeslaMateOptions>()
                     .Bind(config.GetSection("TeslaMate"))
-                    .ValidateDataAnnotations();
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
                 services.AddTransient<IPriceHelper, PriceHelper>();
                 services.AddHttpClient();
 
@@ -93,7 +94,8 @@ public class Program
                 {
                     services.AddOptions<OctopusOptions>()
                         .Bind(config.GetSection("Octopus"))
-                        .ValidateDataAnnotations();
+                        .ValidateDataAnnotations()
+                        .ValidateOnStart();
                     services.AddHttpClient<IPriceDataService, OctopusService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<OctopusOptions>>().Value;
@@ -106,7 +108,8 @@ public class Program
                 {
                     services.AddOptions<TibberOptions>()
                         .Bind(config.GetSection("Tibber"))
-                        .ValidateDataAnnotations();
+                        .ValidateDataAnnotations()
+                        .ValidateOnStart();
                     services.AddTransient<IGraphQLJsonSerializer, SystemTextJsonSerializer>();
                     services.AddHttpClient<IPriceDataService, TibberService>((serviceProvider, client) =>
                     {
@@ -118,14 +121,16 @@ public class Program
                 {
                     services.AddOptions<FixedPriceOptions>()
                        .Bind(config.GetSection("FixedPrice"))
-                       .ValidateDataAnnotations();
+                       .ValidateDataAnnotations()
+                       .ValidateOnStart();
                     services.AddSingleton<IPriceDataService, FixedPriceService>();
                 }
                 else if (energyProvider == EnergyProvider.Awattar)
                 {
                     services.AddOptions<AwattarOptions>()
                         .Bind(config.GetSection("Awattar"))
-                        .ValidateDataAnnotations();
+                        .ValidateDataAnnotations()
+                        .ValidateOnStart();
                     services.AddHttpClient<IPriceDataService, AwattarService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<AwattarOptions>>().Value;
@@ -138,13 +143,29 @@ public class Program
                 {
                     services.AddOptions<EnerginetOptions>()
                         .Bind(config.GetSection("Energinet"))
-                        .ValidateDataAnnotations();
+                        .ValidateDataAnnotations()
+                        .ValidateOnStart();
                     services.AddHttpClient<IPriceDataService, EnerginetService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<EnerginetOptions>>().Value;
                         var baseUrl = options.BaseUrl;
                         if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
                         client.BaseAddress = new Uri(baseUrl);
+                    });
+                }
+                else if (energyProvider == EnergyProvider.HomeAssistant)
+                {
+                    services.AddOptions<HomeAssistantOptions>()
+                        .Bind(config.GetSection("HomeAssistant"))
+                        .ValidateDataAnnotations()
+                        .ValidateOnStart();
+                    services.AddHttpClient<IPriceDataService, HomeAssistantService>((serviceProvider, client) =>
+                    {
+                        var options = serviceProvider.GetRequiredService<IOptions<HomeAssistantOptions>>().Value;
+                        var baseUrl = options.BaseUrl;
+                        if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+                        client.BaseAddress = new Uri(baseUrl);
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.AccessToken);
                     });
                 }
                 else

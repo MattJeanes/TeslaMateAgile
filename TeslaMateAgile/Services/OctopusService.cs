@@ -26,11 +26,7 @@ public class OctopusService : IPriceDataService
         {
             var resp = await _client.GetAsync(url);
             resp.EnsureSuccessStatusCode();
-            var agileResponse = await JsonSerializer.DeserializeAsync<AgileResponse>(await resp.Content.ReadAsStreamAsync());
-            if (agileResponse == null)
-            {
-                throw new Exception($"Deserialization of Octopus Agile API response failed");
-            }
+            var agileResponse = await JsonSerializer.DeserializeAsync<AgileResponse>(await resp.Content.ReadAsStreamAsync()) ?? throw new Exception($"Deserialization of Octopus Agile API response failed");
             list.AddRange(agileResponse.Results);
             url = agileResponse.Next;
             if (string.IsNullOrEmpty(url))

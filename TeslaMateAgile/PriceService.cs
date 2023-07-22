@@ -28,7 +28,7 @@ public class PriceService : IHostedService, IDisposable
             throw new ArgumentOutOfRangeException(nameof(_options.UpdateIntervalSeconds), _options.UpdateIntervalSeconds, "Must be greater than 0");
         }
         _logger.LogInformation("Price service is starting");
-        _logger.LogInformation($"Using energy provider {_options.EnergyProvider}");
+        _logger.LogInformation("Using energy provider {EnergyProvider}", _options.EnergyProvider);
 
         _timer = new Timer(async (state) =>
         {
@@ -40,7 +40,7 @@ public class PriceService : IHostedService, IDisposable
             {
                 _logger.LogError(e, $"Failed to run {nameof(DoWork)}");
             }
-            _logger.LogInformation($"Waiting {_options.UpdateIntervalSeconds} seconds until next update");
+            _logger.LogInformation("Waiting {UpdateIntervalSeconds} seconds until next update", _options.UpdateIntervalSeconds);
         }, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.UpdateIntervalSeconds));
 
         return Task.CompletedTask;
@@ -77,5 +77,6 @@ public class PriceService : IHostedService, IDisposable
     public void Dispose()
     {
         _timer?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

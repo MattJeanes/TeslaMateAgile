@@ -34,21 +34,31 @@ public class PriceHelper : IPriceHelper
 
         if (geofence == null)
         {
-            _logger.LogWarning($"Configured geofence id does not exist in the TeslaMate database, make sure you have entered the correct id");
+            _logger.LogWarning("Configured geofence id does not exist in the TeslaMate database, make sure you have entered the correct id");
             return;
         }
         else if (geofence.CostPerUnit.HasValue)
         {
-            _logger.LogWarning($"Configured geofence '{geofence.Name}' (id: {geofence.Id}) should not have a cost set in TeslaMate as this may override TeslaMateAgile calculation");
+            _logger.LogWarning("Configured geofence '{Name}' (id: {Id}) should not have a cost set in TeslaMate as this may override TeslaMateAgile calculation", geofence.Name, geofence.Id);
             return;
         }
 
-        _logger.LogInformation($"Looking for finished charging processes with no cost set in the '{geofence.Name}' geofence (id: {geofence.Id})");
 
-        var chargingProcesses = await _context.ChargingProcesses
-            .Where(x => x.GeofenceId == _teslaMateOptions.GeofenceId && x.EndDate.HasValue && !x.Cost.HasValue)
+        var query = _context.ChargingProcesses
             .Include(x => x.Charges)
-            .ToListAsync();
+            .Where(x => x.GeofenceId == _teslaMateOptions.GeofenceId && x.EndDate.HasValue && !x.Cost.HasValue);
+
+        if (_teslaMateOptions.LookbackDays.HasValue)
+        {
+            _logger.LogInformation("Looking for finished charging processes with no cost set started less than {Days} day(s) ago in the '{Name}' geofence (id: {Id})", _teslaMateOptions.LookbackDays.Value, geofence.Name, geofence.Id);
+            query = query.Where(x => x.StartDate > DateTime.UtcNow.AddDays(-_teslaMateOptions.LookbackDays.Value));
+        }
+        else
+        {
+            _logger.LogInformation("Looking for finished charging processes with no cost set in the '{Name}' geofence (id: {Id})", geofence.Name, geofence.Id);
+        }
+
+        var chargingProcesses = await query.ToListAsync();
 
         if (!chargingProcesses.Any())
         {
@@ -60,18 +70,18 @@ public class PriceHelper : IPriceHelper
         {
             try
             {
-                if (chargingProcess.Charges == null) { _logger.LogError($"Could not find charges on charging process {chargingProcess.Id}"); continue; }
+                if (chargingProcess.Charges == null) { _logger.LogError("Could not find charges on charging process {Id}", chargingProcess.Id); continue; }
                 var (cost, energy) = await CalculateChargeCost(chargingProcess.Charges);
-                _logger.LogInformation($"Calculated cost {cost} and energy {energy} kWh for charging process {chargingProcess.Id}");
+                _logger.LogInformation("Calculated cost {Cost} and energy {Energy} kWh for charging process {Id}", cost, energy, chargingProcess.Id);
                 if (chargingProcess.ChargeEnergyUsed.HasValue && chargingProcess.ChargeEnergyUsed.Value != energy)
                 {
-                    _logger.LogWarning($"Mismatch between TeslaMate calculated energy used of {chargingProcess.ChargeEnergyUsed.Value} and ours of {energy}");
+                    _logger.LogWarning("Mismatch between TeslaMate calculated energy used of {ChargeEnergyUsed} and ours of {Energy}", chargingProcess.ChargeEnergyUsed.Value, energy);
                 }
                 chargingProcess.Cost = cost;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to calculate charging cost / energy for charging process {chargingProcess.Id}");
+                _logger.LogError(e, "Failed to calculate charging cost / energy for charging process {Id}", chargingProcess.Id);
             }
         }
 
@@ -82,13 +92,13 @@ public class PriceHelper : IPriceHelper
     {
         var minDate = charges.Min(x => x.Date);
         var maxDate = charges.Max(x => x.Date);
-        _logger.LogInformation($"Calculating cost for charges {minDate.UtcDateTime} UTC - {maxDate.UtcDateTime} UTC");
+        _logger.LogInformation("Calculating cost for charges {MinDate} UTC - {MaxDate} UTC", minDate.UtcDateTime, maxDate.UtcDateTime);
         var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
 
-        _logger.LogDebug($"Retrieved {prices.Count()} prices:");
+        _logger.LogDebug("Retrieved {Count} prices:", prices.Count());
         foreach (var price in prices)
         {
-            _logger.LogDebug($"{price.ValidFrom.UtcDateTime} UTC - {price.ValidTo.UtcDateTime} UTC: {price.Value}");
+            _logger.LogDebug("{ValidFrom} UTC - {ValidTo} UTC: {Value}", price.ValidFrom.UtcDateTime, price.ValidTo.UtcDateTime, price.Value);
         }
 
         var totalPrice = 0M;
@@ -98,7 +108,7 @@ public class PriceHelper : IPriceHelper
         var phases = DeterminePhases(charges);
         if (!phases.HasValue)
         {
-            _logger.LogWarning($"Unable to determine phases for charges");
+            _logger.LogWarning("Unable to determine phases for charges");
             return (0, 0);
         }
         foreach (var price in prices)
@@ -119,7 +129,8 @@ public class PriceHelper : IPriceHelper
             totalPrice += priceForEnergy;
             totalEnergy += energyAddedInDateRange;
             lastCharge = chargesForPrice.Last();
-            _logger.LogDebug($"Calculated charge cost for {price.ValidFrom.UtcDateTime} UTC - {price.ValidTo.UtcDateTime} UTC (unit cost: {price.Value}, fee per kWh: {_teslaMateOptions.FeePerKilowattHour}): {priceForEnergy} for {energyAddedInDateRange} energy");
+            _logger.LogDebug("Calculated charge cost for {ValidFrom} UTC - {ValidTo} UTC (unit cost: {Cost}, fee per kWh: {FeePerKilowattHour}): {PriceForEnergy} for {EnergyAddedInDateRange} energy",
+                price.ValidFrom.UtcDateTime, price.ValidTo.UtcDateTime, price.Value, _teslaMateOptions.FeePerKilowattHour, priceForEnergy, energyAddedInDateRange);
         }
         var chargesCount = charges.Count();
         if (chargesCalculated != chargesCount)
@@ -173,12 +184,12 @@ public class PriceHelper : IPriceHelper
             }
             if (phasesAverage == 3 && Math.Abs(powerAverage / Math.Sqrt(phasesAverage) - 1) <= 0.1)
             {
-                _logger.LogInformation($"Voltage correction: {Math.Round(voltageAverage)}V -> {Math.Round(voltageAverage / Math.Sqrt(phasesAverage))}V");
+                _logger.LogInformation("Voltage correction: {VoltageAverage}V -> {CorrectedVoltageAverage}V", Math.Round(voltageAverage), Math.Round(voltageAverage / Math.Sqrt(phasesAverage)));
                 return (decimal)Math.Sqrt(phasesAverage);
             }
             if (Math.Abs(Math.Round(powerAverage) - powerAverage) <= 0.3)
             {
-                _logger.LogInformation($"Phase correction: {phasesAverage} -> {Math.Round(powerAverage)}");
+                _logger.LogInformation("Phase correction: {PhasesAverage} -> {CorrectedPhases}", phasesAverage, Math.Round(powerAverage));
                 return (decimal)Math.Round(powerAverage);
             }
         }
