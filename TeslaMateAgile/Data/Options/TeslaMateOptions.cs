@@ -17,4 +17,7 @@ public class TeslaMateOptions
     public EnergyProvider EnergyProvider { get; set; }
 
     public decimal FeePerKilowattHour { get; set; }
+
+    [Range(1, 3)]
+    public int? Phases { get; set; }
 }

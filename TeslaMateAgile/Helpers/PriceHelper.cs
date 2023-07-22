@@ -105,7 +105,7 @@ public class PriceHelper : IPriceHelper
         var totalEnergy = 0M;
         Charge lastCharge = null;
         var chargesCalculated = 0;
-        var phases = DeterminePhases(charges);
+        var phases = ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges);
         if (!phases.HasValue)
         {
             _logger.LogWarning("Unable to determine phases for charges");

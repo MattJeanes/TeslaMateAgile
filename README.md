@@ -104,6 +104,7 @@ See below for how to configure the environment variables appropriately
 - "Logging__Console__FormatterOptions__TimestampFormat=yyyy-MM-dd HH:mm:ss.fff " # See above env var
 - TeslaMate__FeePerKilowattHour=0.25 # Adds a flat fee per kWh, useful for certain arrangements (default: 0)
 - TeslaMate__LookbackDays=7 # Only calculate charges started in the last x days (default: null, all charges)
+- TeslaMate__Phases=1 # Number of phases your charger is connected to (default: null, auto-detect)
 ```
 
 ## Database connection
