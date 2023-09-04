@@ -1,6 +1,6 @@
 image:
   repository: mattjeanes/teslamateagile
-  tag: v1.12.0
+  tag: v1.12.1
   pullPolicy: IfNotPresent
 resources:
   requests:
