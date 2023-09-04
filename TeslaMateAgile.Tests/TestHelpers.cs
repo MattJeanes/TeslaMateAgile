@@ -12,7 +12,7 @@ public class TestHelpers
 {
     public static List<Price> ImportAgilePrices(string jsonFile)
     {
-        var json = File.ReadAllText(Path.Combine("Import", jsonFile));
+        var json = File.ReadAllText(Path.Combine("Prices", jsonFile));
         return JsonSerializer.Deserialize<OctopusService.AgileResponse>(json).Results
             .Select(x => new Price
             {
@@ -24,7 +24,7 @@ public class TestHelpers
 
     public static List<Charge> ImportCharges(string csvFile)
     {
-        using var reader = new StreamReader(Path.Combine("Import", csvFile));
+        using var reader = new StreamReader(Path.Combine("Charges", csvFile));
         using var parser = new CsvParser(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true });
         using var csvReader = new CsvReader(parser);
         csvReader.Read();

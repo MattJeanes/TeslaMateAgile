@@ -1,0 +1,16 @@
+[
+  [
+    {
+      "entity_id": "input_number.re_import_price",
+      "state": "0.2748",
+      "attributes": {
+        "initial": null,
+        "unit_of_measurement": "AUD/kWh",
+        "icon": "mdi:lightning-bolt",
+        "friendly_name": "red_energy_import_price"
+      },
+      "last_changed": "2023-08-24T23:43:53+00:00",
+      "last_updated": "2023-08-24T23:43:53+00:00"
+    }
+  ]
+]

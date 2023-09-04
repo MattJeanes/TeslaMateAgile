@@ -113,7 +113,7 @@ public class PriceHelper : IPriceHelper
         }
         foreach (var price in prices)
         {
-            var chargesForPrice = charges.Where(x => x.Date >= price.ValidFrom && x.Date < price.ValidTo).ToList();
+            var chargesForPrice = charges.Where(x => x.Date >= price.ValidFrom && x.Date <= price.ValidTo).ToList();
             if (chargesForPrice.Count == 0)
             {
                 continue;

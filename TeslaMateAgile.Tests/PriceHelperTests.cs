@@ -26,7 +26,7 @@ public class PriceHelperTests
         var teslaMateDbContext = new Mock<TeslaMateDbContext>(new DbContextOptions<TeslaMateDbContext>());
 
         var logger = new ServiceCollection()
-            .AddLogging(x => x.AddConsole())
+            .AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Debug))
             .BuildServiceProvider()
             .GetRequiredService<ILogger<PriceHelper>>();
 
@@ -59,6 +59,22 @@ public class PriceHelperTests
                 TestHelpers.ImportCharges("daylightsavingstime_test.csv"),
                 75.5M,
                 16.78M,
+            },
+            new object[]
+            {
+                "ExactMillisecond",
+                new List<Price>
+                {
+                    new Price
+                    {
+                        ValidFrom = DateTimeOffset.Parse("2023-08-24T23:43:53.026Z"),
+                        ValidTo =   DateTimeOffset.Parse("2023-08-25T03:19:42.588Z"),
+                        Value = 0.2748M
+                    }
+                },
+                TestHelpers.ImportCharges("exactmillisecond_test.csv"),
+                5.88M,
+                21.41M,
             }
         };
 
