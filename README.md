@@ -38,7 +38,7 @@ See below for how to configure the environment variables appropriately
 
 ## Required environment variables
 ```yaml
-- TeslaMate__UpdateIntervalSeconds=300 # Check for completed charges without a set cost every x seconds
+- TeslaMate__UpdateIntervalSeconds=3600 # Scan interval for finished charges, should not exceed lookback days if set
 - TeslaMate__GeofenceId=1 # You can get this by editing the Geofence inside TeslaMate and getting it from the url 
 ```
 
