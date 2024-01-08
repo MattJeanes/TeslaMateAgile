@@ -1,18 +1,21 @@
-ARG arch=bullseye-slim
+ARG arch=bookworm-slim
 
-FROM mcr.microsoft.com/dotnet/runtime:7.0-${arch} AS base
+FROM mcr.microsoft.com/dotnet/runtime:8.0-${arch} AS base
+USER app
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["TeslaMateAgile/TeslaMateAgile.csproj", "TeslaMateAgile/"]
-RUN dotnet restore "TeslaMateAgile/TeslaMateAgile.csproj"
+RUN dotnet restore "./TeslaMateAgile/TeslaMateAgile.csproj"
 COPY . .
 WORKDIR "/src/TeslaMateAgile"
-RUN dotnet build "TeslaMateAgile.csproj" -c Release -o /app/build
+RUN dotnet build "./TeslaMateAgile.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "TeslaMateAgile.csproj" -c Release -o /app/publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./TeslaMateAgile.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

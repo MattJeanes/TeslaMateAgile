@@ -389,15 +389,15 @@ public class FixedPriceServiceTests
         var fixedPriceService = Setup(timeZone, fixedPrices);
         var result = await fixedPriceService.GetPriceData(from, to);
         var actualPrices = result.OrderBy(x => x.ValidFrom).ToList();
-        Assert.AreEqual(expectedPrices.Count, actualPrices.Count());
+        Assert.That(expectedPrices.Count, Is.EqualTo(actualPrices.Count()));
         for (var i = 0; i < actualPrices.Count(); i++)
         {
             var actualPrice = actualPrices[i];
             var expectedPrice = expectedPrices[i];
 
-            Assert.AreEqual(expectedPrice.ValidFrom, actualPrice.ValidFrom);
-            Assert.AreEqual(expectedPrice.ValidTo, actualPrice.ValidTo);
-            Assert.AreEqual(expectedPrice.Value, actualPrice.Value);
+            Assert.That(expectedPrice.ValidFrom, Is.EqualTo(actualPrice.ValidFrom));
+            Assert.That(expectedPrice.ValidTo, Is.EqualTo(actualPrice.ValidTo));
+            Assert.That(expectedPrice.Value, Is.EqualTo(actualPrice.Value));
         }
     }
 
@@ -413,6 +413,6 @@ public class FixedPriceServiceTests
             };
         var fixedPriceService = Setup("Europe/London", fixedPrices);
         var exception = Assert.ThrowsAsync<Exception>(async () => { await fixedPriceService.GetPriceData(from, to); });
-        Assert.AreEqual(exception?.Message, "Infinite loop detected within FixedPrice provider");
+        Assert.That(exception?.Message, Is.EqualTo("Infinite loop detected within FixedPrice provider"));
     }
 }

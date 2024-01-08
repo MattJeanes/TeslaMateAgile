@@ -85,8 +85,8 @@ public class PriceHelperTests
         Console.WriteLine($"Running calculate charge cost test '{testName}'");
         var priceHelper = Setup(prices);
         var (price, energy) = await priceHelper.CalculateChargeCost(charges);
-        Assert.AreEqual(expectedPrice, price);
-        Assert.AreEqual(expectedEnergy, energy);
+        Assert.That(expectedPrice, Is.EqualTo(price));
+        Assert.That(expectedEnergy, Is.EqualTo(energy));
     }
 
     private static readonly object[][] PriceHelper_CalculateEnergyUsed_Cases = new object[][] {
@@ -107,7 +107,7 @@ public class PriceHelperTests
         var phases = priceHelper.DeterminePhases(charges);
         if (!phases.HasValue) { throw new Exception("Phases has no value"); }
         var energy = priceHelper.CalculateEnergyUsed(charges, phases.Value);
-        Assert.AreEqual(expectedEnergy, Math.Round(energy, 2));
+        Assert.That(expectedEnergy, Is.EqualTo(Math.Round(energy, 2)));
     }
 
     [Test]
@@ -116,7 +116,7 @@ public class PriceHelperTests
         var charges = TestHelpers.ImportCharges("nophasedata_test.csv");
         var priceHelper = Setup();
         var (price, energy) = await priceHelper.CalculateChargeCost(charges);
-        Assert.AreEqual(0, price);
-        Assert.AreEqual(0, energy);
+        Assert.That(0, Is.EqualTo(price));
+        Assert.That(0, Is.EqualTo(energy));
     }
 }

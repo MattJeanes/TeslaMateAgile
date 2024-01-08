@@ -41,8 +41,8 @@ public class IntegrationTests
 
         var priceData = await priceDataService.GetPriceData(from, to);
 
-        Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
-        Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
+        Assert.That(priceData.Min(x => x.ValidFrom), Is.LessThanOrEqualTo(from));
+        Assert.That(priceData.Max(x => x.ValidTo), Is.GreaterThanOrEqualTo(to));
     }
 
     [Ignore(IntegrationTest)]
@@ -75,8 +75,8 @@ public class IntegrationTests
 
         var priceData = await priceDataService.GetPriceData(from, to);
 
-        Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
-        Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
+        Assert.That(priceData.Min(x => x.ValidFrom), Is.LessThanOrEqualTo(from));
+        Assert.That(priceData.Max(x => x.ValidTo), Is.GreaterThanOrEqualTo(to));
     }
 
     [Ignore(IntegrationTest)]
@@ -121,7 +121,7 @@ public class IntegrationTests
             Console.WriteLine($"{price.ValidFrom} - {price.ValidTo} - {price.Value}");
         }
 
-        Assert.LessOrEqual(priceData.Min(x => x.ValidFrom), from);
-        Assert.GreaterOrEqual(priceData.Max(x => x.ValidTo), to);
+        Assert.That(priceData.Min(x => x.ValidFrom), Is.LessThanOrEqualTo(from));
+        Assert.That(priceData.Max(x => x.ValidTo), Is.GreaterThanOrEqualTo(to));
     }
 }

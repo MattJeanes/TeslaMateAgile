@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
     
     - name: Set variables
       id: variables
@@ -41,11 +41,11 @@ jobs:
         for appname in TeslaMateAgile; do
           app=`echo $appname | tr '[:upper:]' '[:lower:]'`
           echo "Building $appname docker amd64"
-          docker build -t $app:amd64 -f "$appname/Dockerfile" . --build-arg arch=bullseye-slim-amd64
+          docker build -t $app:amd64 -f "$appname/Dockerfile" . --build-arg arch=bookworm-slim-amd64
           echo "Building $appname docker arm32v7"
-          docker build -t $app:arm32v7 -f "$appname/Dockerfile" . --build-arg arch=bullseye-slim-arm32v7
+          docker build -t $app:arm32v7 -f "$appname/Dockerfile" . --build-arg arch=bookworm-slim-arm32v7
           echo "Building $appname docker arm64v8"
-          docker build -t $app:arm64v8 -f "$appname/Dockerfile" . --build-arg arch=bullseye-slim-arm64v8
+          docker build -t $app:arm64v8 -f "$appname/Dockerfile" . --build-arg arch=bookworm-slim-arm64v8
         done
       
     - name: Upload a Build Artifact
