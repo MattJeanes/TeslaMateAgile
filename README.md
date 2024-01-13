@@ -14,6 +14,8 @@ Supported energy providers / tarriffs:
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
 
+Alternatively, if you are using Home Assistant OS (or supervised) [@tougher](https://github.com/tougher) has wrapped this project in a Home Assistant Addon: [tougher/hassio-addon-TeslaMateAgile](https://github.com/tougher/hassio-addon-TeslaMateAgile).
+
 If you have used the [TeslaMate Docker install guide](https://docs.teslamate.org/docs/installation/docker) you can simply add this section to the `services:` section of the `docker-compose.yml` file and change the variables as required:
 
 ```yaml
