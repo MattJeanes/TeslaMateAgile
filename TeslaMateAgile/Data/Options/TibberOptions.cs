@@ -9,4 +9,6 @@ public class TibberOptions
 
     [Required]
     public string AccessToken { get; set; }
+
+    public Guid HomeId { get; set; }
 }

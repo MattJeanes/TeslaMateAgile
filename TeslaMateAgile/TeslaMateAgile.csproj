@@ -28,7 +28,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="GraphQL.Client" Version="6.0.2" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.0.2" />
-	<PackageReference Include="TimeZoneConverter" Version="6.1.0" />
+    <PackageReference Include="TimeZoneConverter" Version="6.1.0" />
   </ItemGroup>
 
 </Project>

@@ -53,6 +53,7 @@ See below for how to configure the environment variables appropriately
 ```yaml
 - TeslaMate__EnergyProvider=Tibber
 - Tibber__AccessToken=abc123 # See below Tibber Access Token section
+- Tibber__HomeId=c0693acc-567d-49d4-87d9-71a66d10f5c7 # Optional: If you have multiple homes, you can specify the home ID here
 ```
 
 ### Fixed Price
@@ -144,6 +145,24 @@ Or if you're familar with curl / postman / etc
 Tibber requires users to supply their access token to provide pricing information for their tarriff. It is only used to query tarriff information and at no point does TeslaMateAgile request or access any data related to consumption or any account details. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/master/TeslaMateAgile/Services/TibberService.cs).
 
 You can acquire this token here: https://developer.tibber.com/settings/accesstoken
+
+If you have multiple homes, you can specify `Tibber__HomeId` to select the home you want to use. To find it, you can use the [Tibber GraphQL Explorer](https://developer.tibber.com/explorer) and run the following query:
+
+```graphql
+{
+  viewer {
+    homes {
+      id
+      address {
+        address1
+        postalCode
+        city
+        country
+      }
+    }
+  }
+}
+```
 
 ### Energinet
 

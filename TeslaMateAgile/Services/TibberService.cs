@@ -38,6 +38,7 @@ public class TibberService : IPriceDataService
 query PriceData($after: String, $first: Int) {
     viewer {
         homes {
+            id,
             currentSubscription {
                 priceInfo {
                     range(resolution: HOURLY, after: $after, first: $first) {
@@ -65,11 +66,27 @@ query PriceData($after: String, $first: Int) {
             }
         };
         var graphQLHttpResponse = await SendRequest(request);
-        var priceInfo = graphQLHttpResponse
+
+        var homes = graphQLHttpResponse
             .Data
             .Viewer
-            .Homes
-            .First()
+            .Homes;
+
+        Home home;
+        if (_options.HomeId != Guid.Empty)
+        {
+            home = homes.FirstOrDefault(x => x.Id == _options.HomeId);
+            if (home == null)
+            {
+                throw new Exception($"Home with id {_options.HomeId} not found");
+            }
+        }
+        else
+        {
+            home = homes.First();
+        }
+
+        var priceInfo = home
             .CurrentSubscription
             .PriceInfo;
 
@@ -151,6 +168,7 @@ query PriceData($after: String, $first: Int) {
 
     private class Home
     {
+        public Guid Id { get; set; }
         public Subscription CurrentSubscription { get; set; }
     }
 
