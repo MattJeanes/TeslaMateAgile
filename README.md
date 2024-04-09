@@ -55,7 +55,7 @@ See below for how to configure the environment variables appropriately
 ```yaml
 - TeslaMate__EnergyProvider=Tibber
 - Tibber__AccessToken=abc123 # See below Tibber Access Token section
-- Tibber__HomeId=c0693acc-567d-49d4-87d9-71a66d10f5c7 # Optional: If you have multiple homes, you can specify the home ID here
+- Tibber__HomeId=c0693acc-567d-49d4-87d9-71a66d10f5c7 # Optional: See below Tibber Multiple Homes section
 ```
 
 ### Fixed Price
@@ -142,11 +142,15 @@ Or if you're familar with curl / postman / etc
 1. Call `GET https://api.octopus.energy/v1/industry/grid-supply-points?postcode=POSTCODEHERE`
 2. You will get a response with `"group_id": "_A"` for example, A is your region code
 
-### Tibber Access Token
+### Tibber
+
+#### Tibber Access Token
 
 Tibber requires users to supply their access token to provide pricing information for their tarriff. It is only used to query tarriff information and at no point does TeslaMateAgile request or access any data related to consumption or any account details. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/master/TeslaMateAgile/Services/TibberService.cs).
 
 You can acquire this token here: https://developer.tibber.com/settings/accesstoken
+
+#### Tibber Multiple Homes
 
 If you have multiple homes, you can specify `Tibber__HomeId` to select the home you want to use. To find it, you can use the [Tibber GraphQL Explorer](https://developer.tibber.com/explorer) and run the following query:
 
