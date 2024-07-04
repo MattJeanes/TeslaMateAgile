@@ -16,6 +16,8 @@ public class EnerginetOptions
     public decimal? VAT { get; set; }
 
     public FixedPriceOptions FixedPrices { get; set; }
+
+    public bool ClampNegativePrices { get; set; }
 }
 
 public enum EnerginetRegion

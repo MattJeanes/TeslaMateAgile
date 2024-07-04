@@ -90,6 +90,7 @@ public class IntegrationTests
                 ["Energinet:Region"] = "DK1",
                 ["Energinet:Currency"] = "DKK",
                 ["Energinet:VAT"] = "1.25",
+                ["Energinet:ClampNegativePrices"] = "true",
                 ["Energinet:FixedPrices:TimeZone"] = "Europe/London",
                 ["Energinet:FixedPrices:Prices:0"] = "00:00-12:00=0.25",
                 ["Energinet:FixedPrices:Prices:1"] = "12:00-00:00=0.50"

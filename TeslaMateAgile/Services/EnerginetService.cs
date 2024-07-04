@@ -52,7 +52,12 @@ public class EnerginetService : IPriceDataService
                     _ => throw new ArgumentOutOfRangeException(nameof(_options.Currency)),
                 };
 
-                var price = ((spotPrice / 1000) + fixedPrice);
+                if (_options.ClampNegativePrices)
+                {
+                    spotPrice = Math.Max(0, spotPrice);
+                }
+
+                var price = (spotPrice / 1000) + fixedPrice;
                 if (_options.VAT.HasValue)
                 {
                     price *= _options.VAT.Value;
