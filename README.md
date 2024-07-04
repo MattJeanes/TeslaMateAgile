@@ -84,6 +84,7 @@ See below for how to configure the environment variables appropriately
 - Energinet__Region=YYYYY # See below Energinet regions section
 - Energinet__Currency=DKK # See below Energinet currencies section
 - Energinet__VAT=1.25 # Optional: VAT multiplier. In this example 25%
+- Energinet__ClampNegativePrices=false # Optional: Clamp negative prices to 0 (default: false)
 - Energinet__FixedPrices__TimeZone=Europe/Copenhagen # Optional: IANA (tz database) time zone code, used for below times 
 - Energinet__FixedPrices__Prices__0=00:00-17:00=0.1432 # Optional: You can have as many as these as you need
 - Energinet__FixedPrices__Prices__1=17:00-20:00=0.3983
