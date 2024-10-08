@@ -19,7 +19,7 @@ public class TibberService : IPriceDataService
     private readonly TibberOptions _options;
     private readonly IGraphQLJsonSerializer _graphQLJsonSerializer;
 
-    private readonly static ProductInfoHeaderValue _userAgent = new("TeslaMateAgile", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+    private readonly static ProductInfoHeaderValue _userAgent = new(nameof(TeslaMateAgile), Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
     public TibberService(
         HttpClient client,
