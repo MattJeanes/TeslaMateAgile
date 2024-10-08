@@ -2,6 +2,8 @@
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using TeslaMateAgile.Data;
@@ -17,6 +19,8 @@ public class TibberService : IPriceDataService
     private readonly TibberOptions _options;
     private readonly IGraphQLJsonSerializer _graphQLJsonSerializer;
 
+    private readonly static ProductInfoHeaderValue _userAgent = new("TeslaMateAgile", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+
     public TibberService(
         HttpClient client,
         IGraphQLJsonSerializer graphQLJsonSerializer,
@@ -25,7 +29,7 @@ public class TibberService : IPriceDataService
     {
         _client = client;
         _options = options.Value;
-        _graphQLHttpClientOptions = new GraphQLHttpClientOptions { EndPoint = new Uri(_options.BaseUrl) };
+        _graphQLHttpClientOptions = new GraphQLHttpClientOptions { EndPoint = new Uri(_options.BaseUrl), DefaultUserAgentRequestHeader = _userAgent };
         _graphQLJsonSerializer = graphQLJsonSerializer;
     }
 
