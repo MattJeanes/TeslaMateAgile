@@ -108,6 +108,7 @@ See below for how to configure the environment variables appropriately
 - TeslaMate__EnergyProvider=Monta
 - Monta__ClientId=abc123 # Client ID of your Monta Public API app
 - Monta__ClientSecret=abc123 # Client secret of your Monta Publiic API app
+- Monta__ChargePointId=123 # Optional: Restrict searches to a particular charge point ID
 ```
 
 ## Optional environment variables

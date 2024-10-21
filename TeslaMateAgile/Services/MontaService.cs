@@ -52,7 +52,13 @@ namespace TeslaMateAgile.Services
 
         private async Task<Charge[]> GetCharges(string accessToken, DateTimeOffset from, DateTimeOffset to)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_options.BaseUrl}/charges?fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}");
+            var requestUri = $"{_options.BaseUrl}/charges?fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}";
+            if (_options.ChargePointId.HasValue)
+            {
+                requestUri += $"&chargePointId={_options.ChargePointId.Value}";
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _client.SendAsync(request);

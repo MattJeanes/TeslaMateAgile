@@ -12,4 +12,6 @@ public class MontaOptions
 
     [Required]
     public string ClientSecret { get; set; }
+
+    public int? ChargePointId { get; set; }
 }
