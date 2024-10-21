@@ -19,15 +19,15 @@ namespace TeslaMateAgile.Services
             _options = options.Value;
         }
 
-        public async Task<IEnumerable<ProviderCharge>> GetTotalPrice(DateTimeOffset from, DateTimeOffset to)
+        public async Task<IEnumerable<ProviderCharge>> GetCharges(DateTimeOffset from, DateTimeOffset to)
         {
             var accessToken = await GetAccessToken();
             var charges = await GetCharges(accessToken, from, to);
-            return charges.Select(c => new ProviderCharge
+            return charges.Select(x => new ProviderCharge
             {
-                Cost = c.Cost,
-                StartTime = from,
-                EndTime = to
+                Cost = x.Cost,
+                StartTime = x.StartedAt,
+                EndTime = x.StoppedAt
             });
         }
 
@@ -52,7 +52,7 @@ namespace TeslaMateAgile.Services
 
         private async Task<Charge[]> GetCharges(string accessToken, DateTimeOffset from, DateTimeOffset to)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_options.BaseUrl}/charges?from={from:o}&to={to:o}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_options.BaseUrl}/charges?fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _client.SendAsync(request);
@@ -78,6 +78,12 @@ namespace TeslaMateAgile.Services
 
         private class Charge
         {
+            [JsonPropertyName("startedAt")]
+            public DateTimeOffset StartedAt { get; set; }
+
+            [JsonPropertyName("stoppedAt")]
+            public DateTimeOffset StoppedAt { get; set; }
+
             [JsonPropertyName("cost")]
             public decimal Cost { get; set; }
         }

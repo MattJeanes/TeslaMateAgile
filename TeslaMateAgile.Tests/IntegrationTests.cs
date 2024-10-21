@@ -151,10 +151,10 @@ public class IntegrationTests
 
         var priceDataService = services.BuildServiceProvider().GetRequiredService<IWholePriceDataService>();
 
-        var from = DateTimeOffset.Parse("2020-01-01T00:25:00+00:00");
-        var to = DateTimeOffset.Parse("2020-01-01T15:55:00+00:00");
+        var from = DateTimeOffset.Parse("2024-10-17T00:00:00+00:00");
+        var to = DateTimeOffset.Parse("2024-10-17T15:00:00+00:00");
 
-        var possibleCharges = await priceDataService.GetTotalPrice(from, to);
+        var possibleCharges = await priceDataService.GetCharges(from, to);
 
         Assert.That(possibleCharges, Is.Not.Empty);
     }

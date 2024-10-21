@@ -97,7 +97,7 @@ public class PriceHelper : IPriceHelper
 
         if (_priceDataService is IWholePriceDataService wholePriceDataService)
         {
-            var possibleCharges = await wholePriceDataService.GetTotalPrice(minDate, maxDate);
+            var possibleCharges = await wholePriceDataService.GetCharges(minDate, maxDate);
             var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, charges);
             var wholeChargeEnergy = CalculateEnergyUsed(charges, ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges).Value);
             return (Math.Round(mostAppropriateCharge.Cost, 2), Math.Round(wholeChargeEnergy, 2));
