@@ -155,6 +155,28 @@ public class PriceHelperTests
         Assert.That(expectedEnergy, Is.EqualTo(energy));
     }
 
+    private static readonly object[][] PriceHelper_LocateMostAppropriateCharge_Cases = new object[][] {
+            new object[]
+            {
+                "LocateMostAppropriateCharge",
+                TestHelpers.GenerateProviderCharges(),
+                DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
+                DateTimeOffset.Parse("2023-08-25T03:00:00Z"),
+                10.00M
+            }
+        };
+
+    [Test]
+    [TestCaseSource(nameof(PriceHelper_LocateMostAppropriateCharge_Cases))]
+    public void PriceHelper_LocateMostAppropriateCharge(string testName, List<ProviderCharge> providerCharges, DateTimeOffset minDate, DateTimeOffset maxDate, decimal expectedCost)
+    {
+        Console.WriteLine($"Running locate most appropriate charge test '{testName}'");
+        SetupWholePriceDataService(providerCharges);
+        _subject = _mocker.CreateInstance<PriceHelper>();
+        var mostAppropriateCharge = _subject.LocateMostAppropriateCharge(providerCharges, minDate, maxDate);
+        Assert.That(expectedCost, Is.EqualTo(mostAppropriateCharge.Cost));
+    }
+
     private void SetupDynamicPriceDataService(List<Price> prices = null)
     {
         if (prices == null) { prices = new List<Price>(); }

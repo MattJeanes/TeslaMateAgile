@@ -164,7 +164,7 @@ public class PriceHelper : IPriceHelper
         return (Math.Round(mostAppropriateCharge.Cost, 2), Math.Round(wholeChargeEnergy, 2));
     }
 
-    private ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, DateTimeOffset minDate, DateTimeOffset maxDate)
+    public ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, DateTimeOffset minDate, DateTimeOffset maxDate)
     {
         var tolerance = _teslaMateOptions.MatchingToleranceMinutes;
 
