@@ -213,7 +213,7 @@ Home Assistant by default only keeps 10 days of history and will fail to calcula
 ### Monta
 
 #### Client ID and Secret
-Monta requires users to supply their Monta public API client ID and secret to request charging information. It is only used to query charging information and at no point does TeslaMateAgile request or access any data related to anything else. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/main/TeslaMateAgile/Services/MontaService.cs).
+Monta requires users to supply their Monta public API client ID and secret to request charging information. It is only used to query charging information and at no point does TeslaMateAgile request or access any data related to anything else. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/main/TeslaMateAgile/Services/MontaService.cs). To register an application, check out the [Monta public API documentation](https://docs.public-api.monta.com/reference/home).
 
 ## FAQ
 
