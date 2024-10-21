@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Moq.AutoMock;
 using NUnit.Framework;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
@@ -14,22 +15,25 @@ namespace TeslaMateAgile.Tests;
 
 public class PriceHelperTests
 {
+    private AutoMocker _mocker;
     private PriceHelper _subject;
 
     [SetUp]
     public void Setup()
     {
-        var priceDataService = new Mock<IPriceDataService>();
+        _mocker = new AutoMocker();
+
         var teslaMateDbContext = new Mock<TeslaMateDbContext>(new DbContextOptions<TeslaMateDbContext>());
+        _mocker.Use(teslaMateDbContext);
 
         var logger = new ServiceCollection()
             .AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Debug))
             .BuildServiceProvider()
             .GetRequiredService<ILogger<PriceHelper>>();
+        _mocker.Use(logger);
 
-        var teslaMateOptions = Options.Create(new TeslaMateOptions());
-
-        _subject = new PriceHelper(logger, teslaMateDbContext.Object, priceDataService.Object, teslaMateOptions);
+        var teslaMateOptions = Options.Create(new TeslaMateOptions() { MatchingToleranceMinutes = 30 });
+        _mocker.Use(teslaMateOptions);
     }
 
     private static readonly object[][] PriceHelper_CalculateChargeCost_Cases = new object[][] {
@@ -81,6 +85,7 @@ public class PriceHelperTests
     {
         Console.WriteLine($"Running calculate charge cost test '{testName}'");
         SetupDynamicPriceDataService(prices);
+        _subject = _mocker.CreateInstance<PriceHelper>();
         var (price, energy) = await _subject.CalculateChargeCost(charges);
         Assert.That(expectedPrice, Is.EqualTo(price));
         Assert.That(expectedEnergy, Is.EqualTo(energy));
@@ -101,6 +106,7 @@ public class PriceHelperTests
     {
         Console.WriteLine($"Running calculate energy used test '{testName}'");
         SetupDynamicPriceDataService();
+        _subject = _mocker.CreateInstance<PriceHelper>();
         var phases = _subject.DeterminePhases(charges);
         if (!phases.HasValue) { throw new Exception("Phases has no value"); }
         var energy = _subject.CalculateEnergyUsed(charges, phases.Value);
@@ -112,6 +118,7 @@ public class PriceHelperTests
     {
         var charges = TestHelpers.ImportCharges("nophasedata_test.csv");
         SetupDynamicPriceDataService();
+        _subject = _mocker.CreateInstance<PriceHelper>();
         var (price, energy) = await _subject.CalculateChargeCost(charges);
         Assert.That(0, Is.EqualTo(price));
         Assert.That(0, Is.EqualTo(energy));
@@ -126,7 +133,7 @@ public class PriceHelperTests
                     new ProviderCharge
                     {
                         Cost = 10.00M,
-                        StartTime = DateTimeOffset.Parse("2023-08-24T23:00:00Z"),
+                        StartTime = DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
                         EndTime = DateTimeOffset.Parse("2023-08-25T03:00:00Z")
                     }
                 },
@@ -142,6 +149,7 @@ public class PriceHelperTests
     {
         Console.WriteLine($"Running calculate whole charge cost test '{testName}'");
         SetupWholePriceDataService(providerCharges);
+        _subject = _mocker.CreateInstance<PriceHelper>();
         var (price, energy) = await _subject.CalculateChargeCost(charges);
         Assert.That(expectedPrice, Is.EqualTo(price));
         Assert.That(expectedEnergy, Is.EqualTo(energy));
@@ -150,22 +158,28 @@ public class PriceHelperTests
     private void SetupDynamicPriceDataService(List<Price> prices = null)
     {
         if (prices == null) { prices = new List<Price>(); }
-        
+
         var priceDataService = new Mock<IPriceDataService>();
+
         priceDataService
             .As<IDynamicPriceDataService>()
             .Setup(x => x.GetPriceData(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
             .ReturnsAsync(prices.OrderBy(x => x.ValidFrom));
+
+        _mocker.Use(priceDataService.Object);
     }
 
-    private Mock<IWholePriceDataService> SetupWholePriceDataService(List<ProviderCharge> providerCharges = null)
+    private void SetupWholePriceDataService(List<ProviderCharge> providerCharges = null)
     {
         if (providerCharges == null) { providerCharges = new List<ProviderCharge>(); }
 
-        _mockernew Mock<IPriceDataService>();
+        var priceDataService = new Mock<IPriceDataService>();
+
         priceDataService
             .As<IWholePriceDataService>()
             .Setup(x => x.GetCharges(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
             .ReturnsAsync(providerCharges);
+
+        _mocker.Use(priceDataService.Object);
     }
 }

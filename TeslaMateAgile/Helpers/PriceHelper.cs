@@ -95,7 +95,6 @@ public class PriceHelper : IPriceHelper
         var maxDate = charges.Max(x => x.Date);
         _logger.LogInformation("Calculating cost for charges {MinDate} UTC - {MaxDate} UTC", minDate.UtcDateTime, maxDate.UtcDateTime);
 
-
         return _priceDataService switch
         {
             IDynamicPriceDataService => await CalculateDynamicChargeCost(charges, minDate, maxDate),
@@ -176,8 +175,13 @@ public class PriceHelper : IPriceHelper
 
         if (!appropriateCharges.Any())
         {
-            throw new Exception("No appropriate charge found within the tolerance range.");
+            throw new Exception($"No appropriate charge found within the {tolerance} minute tolerance range.");
         }
+
+        var mostAppropriateCharge = appropriateCharges.First();
+
+        _logger.LogInformation("Found {Count} appropriate charge(s), using the most appropriate charge from {StartTime} UTC - {EndTime} UTC with a cost of {Cost}",
+            appropriateCharges.Count, mostAppropriateCharge.StartTime.UtcDateTime, mostAppropriateCharge.EndTime.UtcDateTime, mostAppropriateCharge.Cost);
 
         return appropriateCharges.First();
     }
