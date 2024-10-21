@@ -10,6 +10,7 @@ Supported energy providers / tarriffs:
 - [aWATTar](https://www.awattar.de/)
 - [Energinet](https://www.energidataservice.dk/tso-electricity/Elspotprices)
 - [Home Assistant](https://www.home-assistant.io/)
+- [Monta](https://monta.com/)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -101,6 +102,14 @@ See below for how to configure the environment variables appropriately
 - HomeAssistant__EntityId=input_number.energy_price # ID of the number-based entity containing price data in Home Assistant (Cost is in your currency e.g. pounds, euros, dollars (not pennies, cents, etc))
 ```
 
+### Monta
+
+```yaml
+- TeslaMate__EnergyProvider=Monta
+- Monta__ClientId=abc123 # Client ID of your Monta Public API app
+- Monta__ClientSecret=abc123 # Client secret of your Monta Publiic API app
+```
+
 ## Optional environment variables
 ```yaml
 - Logging__LogLevel__Default=Debug # Enables debug logging, useful for seeing exactly how a charge was calculated
@@ -109,6 +118,7 @@ See below for how to configure the environment variables appropriately
 - TeslaMate__FeePerKilowattHour=0.25 # Adds a flat fee per kWh, useful for certain arrangements (default: 0)
 - TeslaMate__LookbackDays=7 # Only calculate charges started in the last x days (default: null, all charges)
 - TeslaMate__Phases=1 # Number of phases your charger is connected to (default: null, auto-detect)
+- TeslaMate__MatchingToleranceMinutes=30 # Tolerance in minutes for matching charge times for whole cost providers (default: 30)
 ```
 
 ## Database connection
@@ -198,6 +208,11 @@ This is the ID of the number-based entity containing price data in Home Assistan
 
 #### Lookback Days
 Home Assistant by default only keeps 10 days of history and will fail to calculate charges if the data is missing. It is highly recommended to set this to a value lower than the number of days of history you have in Home Assistant. A good value is 7 days if you have the default 10 days of history.
+
+### Monta
+
+#### Client ID and Secret
+Monta requires users to supply their Monta public API client ID and secret to request charging information. It is only used to query charging information and at no point does TeslaMateAgile request or access any data related to anything else. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/master/TeslaMateAgile/Services/MontaService.cs).
 
 ## FAQ
 
