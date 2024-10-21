@@ -49,29 +49,4 @@ public class TestHelpers
 
         return charges;
     }
-
-    public static List<ProviderCharge> GenerateProviderCharges()
-    {
-        return new List<ProviderCharge>
-        {
-            new ProviderCharge
-            {
-                Cost = 10.00M,
-                StartTime = DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
-                EndTime = DateTimeOffset.Parse("2023-08-25T03:00:00Z")
-            },
-            new ProviderCharge
-            {
-                Cost = 15.00M,
-                StartTime = DateTimeOffset.Parse("2023-08-24T23:00:00Z"),
-                EndTime = DateTimeOffset.Parse("2023-08-25T03:30:00Z")
-            },
-            new ProviderCharge
-            {
-                Cost = 20.00M,
-                StartTime = DateTimeOffset.Parse("2023-08-24T22:30:00Z"),
-                EndTime = DateTimeOffset.Parse("2023-08-25T04:00:00Z")
-            }
-        };
-    }
 }
