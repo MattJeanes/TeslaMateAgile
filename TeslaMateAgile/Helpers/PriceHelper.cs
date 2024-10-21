@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeslaMateAgile.Data.Options;
@@ -28,6 +28,7 @@ public class PriceHelper : IPriceHelper
         _priceDataService = priceDataService;
         _teslaMateOptions = teslaMateOptions.Value;
     }
+
     public async Task Update()
     {
         var geofence = await _context.Geofences.FirstOrDefaultAsync(x => x.Id == _teslaMateOptions.GeofenceId);
@@ -42,7 +43,6 @@ public class PriceHelper : IPriceHelper
             _logger.LogWarning("Configured geofence '{Name}' (id: {Id}) should not have a cost set in TeslaMate as this may override TeslaMateAgile calculation", geofence.Name, geofence.Id);
             return;
         }
-
 
         var query = _context.ChargingProcesses
             .Include(x => x.Charges)
@@ -93,7 +93,15 @@ public class PriceHelper : IPriceHelper
         var minDate = charges.Min(x => x.Date);
         var maxDate = charges.Max(x => x.Date);
         _logger.LogInformation("Calculating cost for charges {MinDate} UTC - {MaxDate} UTC", minDate.UtcDateTime, maxDate.UtcDateTime);
-        var prices = (await _priceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
+
+        if (_priceDataService is IWholePriceDataService wholePriceDataService)
+        {
+            var wholeChargePrice = await wholePriceDataService.GetTotalPrice(minDate, maxDate);
+            var wholeChargeEnergy = CalculateEnergyUsed(charges, ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges).Value);
+            return (Math.Round(wholeChargePrice, 2), Math.Round(wholeChargeEnergy, 2));
+        }
+
+        var prices = (await ((IDynamicPriceDataService)_priceDataService).GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
 
         _logger.LogDebug("Retrieved {Count} prices:", prices.Count());
         foreach (var price in prices)
@@ -101,8 +109,8 @@ public class PriceHelper : IPriceHelper
             _logger.LogDebug("{ValidFrom} UTC - {ValidTo} UTC: {Value}", price.ValidFrom.UtcDateTime, price.ValidTo.UtcDateTime, price.Value);
         }
 
-        var totalPrice = 0M;
-        var totalEnergy = 0M;
+        var totalChargePrice = 0M;
+        var totalChargeEnergy = 0M;
         Charge lastCharge = null;
         var chargesCalculated = 0;
         var phases = ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges);
@@ -126,8 +134,8 @@ public class PriceHelper : IPriceHelper
             chargesForPrice = chargesForPrice.OrderBy(x => x.Date).ToList();
             var energyAddedInDateRange = CalculateEnergyUsed(chargesForPrice, phases.Value);
             var priceForEnergy = (energyAddedInDateRange * price.Value) + (energyAddedInDateRange * _teslaMateOptions.FeePerKilowattHour);
-            totalPrice += priceForEnergy;
-            totalEnergy += energyAddedInDateRange;
+            totalChargePrice += priceForEnergy;
+            totalChargeEnergy += energyAddedInDateRange;
             lastCharge = chargesForPrice.Last();
             _logger.LogDebug("Calculated charge cost for {ValidFrom} UTC - {ValidTo} UTC (unit cost: {Cost}, fee per kWh: {FeePerKilowattHour}): {PriceForEnergy} for {EnergyAddedInDateRange} energy",
                 price.ValidFrom.UtcDateTime, price.ValidTo.UtcDateTime, price.Value, _teslaMateOptions.FeePerKilowattHour, priceForEnergy, energyAddedInDateRange);
@@ -137,7 +145,7 @@ public class PriceHelper : IPriceHelper
         {
             throw new Exception($"Charge calculation failed, pricing calculated for {chargesCalculated} / {chargesCount}, likely missing price data");
         }
-        return (Math.Round(totalPrice, 2), Math.Round(totalEnergy, 2));
+        return (Math.Round(totalChargePrice, 2), Math.Round(totalChargeEnergy, 2));
     }
 
     public decimal CalculateEnergyUsed(IEnumerable<Charge> charges, decimal phases)

@@ -28,13 +28,13 @@ public class IntegrationTests
         services.AddHttpClient();
         services.AddTransient<IGraphQLJsonSerializer, SystemTextJsonSerializer>();
         services.Configure<TibberOptions>(config.GetSection("Tibber"));
-        services.AddHttpClient<IPriceDataService, TibberService>((serviceProvider, client) =>
+        services.AddHttpClient<IDynamicPriceDataService, TibberService>((serviceProvider, client) =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<TibberOptions>>().Value;
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.AccessToken);
         });
 
-        var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
+        var priceDataService = services.BuildServiceProvider().GetRequiredService<IDynamicPriceDataService>();
 
         var from = DateTimeOffset.Parse("2020-01-01T00:25:00+00:00");
         var to = DateTimeOffset.Parse("2020-01-01T15:00:00+00:00");
@@ -60,7 +60,7 @@ public class IntegrationTests
         services.AddOptions<AwattarOptions>()
                         .Bind(config.GetSection("Awattar"))
                         .ValidateDataAnnotations();
-        services.AddHttpClient<IPriceDataService, AwattarService>((serviceProvider, client) =>
+        services.AddHttpClient<IDynamicPriceDataService, AwattarService>((serviceProvider, client) =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<AwattarOptions>>().Value;
             var baseUrl = options.BaseUrl;
@@ -68,7 +68,7 @@ public class IntegrationTests
             client.BaseAddress = new Uri(baseUrl);
         });
 
-        var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
+        var priceDataService = services.BuildServiceProvider().GetRequiredService<IDynamicPriceDataService>();
 
         var from = DateTimeOffset.Parse("2020-01-01T00:25:00+00:00");
         var to = DateTimeOffset.Parse("2020-01-01T15:55:00+00:00");
@@ -103,14 +103,14 @@ public class IntegrationTests
         services.AddOptions<EnerginetOptions>()
                         .Bind(config.GetSection("Energinet"))
                         .ValidateDataAnnotations();
-        services.AddHttpClient<IPriceDataService, EnerginetService>((serviceProvider, client) =>
+        services.AddHttpClient<IDynamicPriceDataService, EnerginetService>((serviceProvider, client) =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<EnerginetOptions>>().Value;
             var baseUrl = options.BaseUrl;
             if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
             client.BaseAddress = new Uri(baseUrl);
         });
-        var priceDataService = services.BuildServiceProvider().GetRequiredService<IPriceDataService>();
+        var priceDataService = services.BuildServiceProvider().GetRequiredService<IDynamicPriceDataService>();
 
         var from = new DateTimeOffset(2022, 2, 20, 0, 0, 0, new TimeSpan(1, 0, 0));
         var to = new DateTimeOffset(2022, 2, 20, 23, 59, 0, new TimeSpan(1, 0, 0));
@@ -124,5 +124,38 @@ public class IntegrationTests
 
         Assert.That(priceData.Min(x => x.ValidFrom), Is.LessThanOrEqualTo(from));
         Assert.That(priceData.Max(x => x.ValidTo), Is.GreaterThanOrEqualTo(to));
+    }
+
+    [Ignore(IntegrationTest)]
+    [Test]
+    public async Task IntegrationTests_Monta()
+    {
+        var configBuilder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .AddUserSecrets<Program>();
+
+        var config = configBuilder.Build();
+
+        var services = new ServiceCollection();
+        services.AddHttpClient();
+        services.AddOptions<MontaOptions>()
+                        .Bind(config.GetSection("Monta"))
+                        .ValidateDataAnnotations();
+        services.AddHttpClient<IWholePriceDataService, MontaService>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<MontaOptions>>().Value;
+            var baseUrl = options.BaseUrl;
+            if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+            client.BaseAddress = new Uri(baseUrl);
+        });
+
+        var priceDataService = services.BuildServiceProvider().GetRequiredService<IWholePriceDataService>();
+
+        var from = DateTimeOffset.Parse("2020-01-01T00:25:00+00:00");
+        var to = DateTimeOffset.Parse("2020-01-01T15:55:00+00:00");
+
+        var totalPrice = await priceDataService.GetTotalPrice(from, to);
+
+        Assert.That(totalPrice, Is.GreaterThan(0));
     }
 }

@@ -7,7 +7,7 @@ using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile.Services;
 
-public class EnerginetService : IPriceDataService
+public class EnerginetService : IDynamicPriceDataService
 {
     private readonly HttpClient _client;
     private readonly EnerginetOptions _options;
