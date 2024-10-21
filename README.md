@@ -158,7 +158,7 @@ Or if you're familar with curl / postman / etc
 
 #### Tibber Access Token
 
-Tibber requires users to supply their access token to provide pricing information for their tarriff. It is only used to query tarriff information and at no point does TeslaMateAgile request or access any data related to consumption or any account details. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/master/TeslaMateAgile/Services/TibberService.cs).
+Tibber requires users to supply their access token to provide pricing information for their tarriff. It is only used to query tarriff information and at no point does TeslaMateAgile request or access any data related to consumption or any account details. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/main/TeslaMateAgile/Services/TibberService.cs).
 
 You can acquire this token here: https://developer.tibber.com/settings/accesstoken
 
@@ -213,7 +213,7 @@ Home Assistant by default only keeps 10 days of history and will fail to calcula
 ### Monta
 
 #### Client ID and Secret
-Monta requires users to supply their Monta public API client ID and secret to request charging information. It is only used to query charging information and at no point does TeslaMateAgile request or access any data related to anything else. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/master/TeslaMateAgile/Services/MontaService.cs).
+Monta requires users to supply their Monta public API client ID and secret to request charging information. It is only used to query charging information and at no point does TeslaMateAgile request or access any data related to anything else. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/main/TeslaMateAgile/Services/MontaService.cs).
 
 ## FAQ
 
