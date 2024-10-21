@@ -96,7 +96,7 @@ public class Program
                         .Bind(config.GetSection("Octopus"))
                         .ValidateDataAnnotations()
                         .ValidateOnStart();
-                    services.AddHttpClient<IDynamicPriceDataService, OctopusService>((serviceProvider, client) =>
+                    services.AddHttpClient<IPriceDataService, OctopusService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<OctopusOptions>>().Value;
                         var baseUrl = options.BaseUrl;
@@ -111,7 +111,7 @@ public class Program
                         .ValidateDataAnnotations()
                         .ValidateOnStart();
                     services.AddTransient<IGraphQLJsonSerializer, SystemTextJsonSerializer>();
-                    services.AddHttpClient<IDynamicPriceDataService, TibberService>((serviceProvider, client) =>
+                    services.AddHttpClient<IPriceDataService, TibberService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<TibberOptions>>().Value;
                         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.AccessToken);
@@ -123,7 +123,7 @@ public class Program
                        .Bind(config.GetSection("FixedPrice"))
                        .ValidateDataAnnotations()
                        .ValidateOnStart();
-                    services.AddSingleton<IDynamicPriceDataService, FixedPriceService>();
+                    services.AddSingleton<IPriceDataService, FixedPriceService>();
                 }
                 else if (energyProvider == EnergyProvider.Awattar)
                 {
@@ -131,7 +131,7 @@ public class Program
                         .Bind(config.GetSection("Awattar"))
                         .ValidateDataAnnotations()
                         .ValidateOnStart();
-                    services.AddHttpClient<IDynamicPriceDataService, AwattarService>((serviceProvider, client) =>
+                    services.AddHttpClient<IPriceDataService, AwattarService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<AwattarOptions>>().Value;
                         var baseUrl = options.BaseUrl;
@@ -145,7 +145,7 @@ public class Program
                         .Bind(config.GetSection("Energinet"))
                         .ValidateDataAnnotations()
                         .ValidateOnStart();
-                    services.AddHttpClient<IDynamicPriceDataService, EnerginetService>((serviceProvider, client) =>
+                    services.AddHttpClient<IPriceDataService, EnerginetService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<EnerginetOptions>>().Value;
                         var baseUrl = options.BaseUrl;
@@ -159,7 +159,7 @@ public class Program
                         .Bind(config.GetSection("HomeAssistant"))
                         .ValidateDataAnnotations()
                         .ValidateOnStart();
-                    services.AddHttpClient<IDynamicPriceDataService, HomeAssistantService>((serviceProvider, client) =>
+                    services.AddHttpClient<IPriceDataService, HomeAssistantService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<HomeAssistantOptions>>().Value;
                         var baseUrl = options.BaseUrl;
@@ -174,7 +174,7 @@ public class Program
                         .Bind(config.GetSection("Monta"))
                         .ValidateDataAnnotations()
                         .ValidateOnStart();
-                    services.AddHttpClient<IWholePriceDataService, MontaService>((serviceProvider, client) =>
+                    services.AddHttpClient<IPriceDataService, MontaService>((serviceProvider, client) =>
                     {
                         var options = serviceProvider.GetRequiredService<IOptions<MontaOptions>>().Value;
                         var baseUrl = options.BaseUrl;
