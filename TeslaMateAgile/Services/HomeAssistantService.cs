@@ -8,7 +8,7 @@ using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile.Services;
 
-public class HomeAssistantService : IPriceDataService
+public class HomeAssistantService : IDynamicPriceDataService
 {
     private readonly HomeAssistantOptions _options;
     private readonly HttpClient _client;

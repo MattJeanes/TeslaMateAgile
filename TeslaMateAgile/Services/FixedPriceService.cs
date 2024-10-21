@@ -7,7 +7,7 @@ using TimeZoneConverter;
 
 namespace TeslaMateAgile.Services;
 
-public class FixedPriceService : IPriceDataService
+public class FixedPriceService : IDynamicPriceDataService
 {
     private readonly List<FixedPrice> _fixedPrices;
 

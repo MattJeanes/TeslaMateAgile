@@ -7,7 +7,7 @@ using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile.Services;
 
-public class OctopusService : IPriceDataService
+public class OctopusService : IDynamicPriceDataService
 {
     private readonly OctopusOptions _options;
     private readonly HttpClient _client;

@@ -20,4 +20,7 @@ public class TeslaMateOptions
 
     [Range(1, 3)]
     public int? Phases { get; set; }
+
+    [Range(0, 240)]
+    public int MatchingToleranceMinutes { get; set; }
 }

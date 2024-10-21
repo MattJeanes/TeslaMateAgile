@@ -12,7 +12,7 @@ using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile.Services;
 
-public class TibberService : IPriceDataService
+public class TibberService : IDynamicPriceDataService
 {
     private readonly HttpClient _client;
     private readonly GraphQLHttpClientOptions _graphQLHttpClientOptions;

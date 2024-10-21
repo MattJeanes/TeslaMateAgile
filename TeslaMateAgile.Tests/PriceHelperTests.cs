@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Moq.AutoMock;
 using NUnit.Framework;
 using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
@@ -14,25 +15,25 @@ namespace TeslaMateAgile.Tests;
 
 public class PriceHelperTests
 {
-    public PriceHelper Setup(List<Price> prices = null)
-    {
-        if (prices == null) { prices = new List<Price>(); }
+    private AutoMocker _mocker;
+    private PriceHelper _subject;
 
-        var priceDataService = new Mock<IPriceDataService>();
-        priceDataService
-            .Setup(x => x.GetPriceData(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
-            .ReturnsAsync(prices.OrderBy(x => x.ValidFrom));
+    [SetUp]
+    public void Setup()
+    {
+        _mocker = new AutoMocker();
 
         var teslaMateDbContext = new Mock<TeslaMateDbContext>(new DbContextOptions<TeslaMateDbContext>());
+        _mocker.Use(teslaMateDbContext);
 
         var logger = new ServiceCollection()
             .AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Debug))
             .BuildServiceProvider()
             .GetRequiredService<ILogger<PriceHelper>>();
+        _mocker.Use(logger);
 
-        var teslaMateOptions = Options.Create(new TeslaMateOptions());
-
-        return new PriceHelper(logger, teslaMateDbContext.Object, priceDataService.Object, teslaMateOptions);
+        var teslaMateOptions = Options.Create(new TeslaMateOptions() { MatchingToleranceMinutes = 30 });
+        _mocker.Use(teslaMateOptions);
     }
 
     private static readonly object[][] PriceHelper_CalculateChargeCost_Cases = new object[][] {
@@ -83,8 +84,9 @@ public class PriceHelperTests
     public async Task PriceHelper_CalculateChargeCost(string testName, List<Price> prices, List<Charge> charges, decimal expectedPrice, decimal expectedEnergy)
     {
         Console.WriteLine($"Running calculate charge cost test '{testName}'");
-        var priceHelper = Setup(prices);
-        var (price, energy) = await priceHelper.CalculateChargeCost(charges);
+        SetupDynamicPriceDataService(prices);
+        _subject = _mocker.CreateInstance<PriceHelper>();
+        var (price, energy) = await _subject.CalculateChargeCost(charges);
         Assert.That(expectedPrice, Is.EqualTo(price));
         Assert.That(expectedEnergy, Is.EqualTo(energy));
     }
@@ -103,10 +105,11 @@ public class PriceHelperTests
     public void PriceHelper_CalculateEnergyUsed(string testName, List<Charge> charges, decimal expectedEnergy)
     {
         Console.WriteLine($"Running calculate energy used test '{testName}'");
-        var priceHelper = Setup();
-        var phases = priceHelper.DeterminePhases(charges);
+        SetupDynamicPriceDataService();
+        _subject = _mocker.CreateInstance<PriceHelper>();
+        var phases = _subject.DeterminePhases(charges);
         if (!phases.HasValue) { throw new Exception("Phases has no value"); }
-        var energy = priceHelper.CalculateEnergyUsed(charges, phases.Value);
+        var energy = _subject.CalculateEnergyUsed(charges, phases.Value);
         Assert.That(expectedEnergy, Is.EqualTo(Math.Round(energy, 2)));
     }
 
@@ -114,9 +117,111 @@ public class PriceHelperTests
     public async Task PriceHelper_NoPhaseData()
     {
         var charges = TestHelpers.ImportCharges("nophasedata_test.csv");
-        var priceHelper = Setup();
-        var (price, energy) = await priceHelper.CalculateChargeCost(charges);
+        SetupDynamicPriceDataService();
+        _subject = _mocker.CreateInstance<PriceHelper>();
+        var (price, energy) = await _subject.CalculateChargeCost(charges);
         Assert.That(0, Is.EqualTo(price));
         Assert.That(0, Is.EqualTo(energy));
+    }
+
+    private static readonly object[][] PriceHelper_CalculateWholeChargeCost_Cases = new object[][] {
+            new object[]
+            {
+                "WholeCharge",
+                new List<ProviderCharge>
+                {
+                    new ProviderCharge
+                    {
+                        Cost = 10.00M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T03:00:00Z")
+                    }
+                },
+                TestHelpers.ImportCharges("exactmillisecond_test.csv"),
+                10.00M,
+                21.41M,
+            }
+        };
+
+    [Test]
+    [TestCaseSource(nameof(PriceHelper_CalculateWholeChargeCost_Cases))]
+    public async Task PriceHelper_CalculateWholeChargeCost(string testName, List<ProviderCharge> providerCharges, List<Charge> charges, decimal expectedPrice, decimal expectedEnergy)
+    {
+        Console.WriteLine($"Running calculate whole charge cost test '{testName}'");
+        SetupWholePriceDataService(providerCharges);
+        _subject = _mocker.CreateInstance<PriceHelper>();
+        var (price, energy) = await _subject.CalculateChargeCost(charges);
+        Assert.That(expectedPrice, Is.EqualTo(price));
+        Assert.That(expectedEnergy, Is.EqualTo(energy));
+    }
+
+    private static readonly object[][] PriceHelper_LocateMostAppropriateCharge_Cases = new object[][] {
+            new object[]
+            {
+                "LocateMostAppropriateCharge",
+                new List<ProviderCharge>
+                {
+                    new ProviderCharge
+                    {
+                        Cost = 10.00M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T03:00:00Z")
+                    },
+                    new ProviderCharge
+                    {
+                        Cost = 15.00M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T23:00:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T03:30:00Z")
+                    },
+                    new ProviderCharge
+                    {
+                        Cost = 20.00M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T22:30:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T04:00:00Z")
+                    }
+                },
+                DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
+                DateTimeOffset.Parse("2023-08-25T03:00:00Z"),
+                10.00M
+            }
+        };
+
+    [Test]
+    [TestCaseSource(nameof(PriceHelper_LocateMostAppropriateCharge_Cases))]
+    public void PriceHelper_LocateMostAppropriateCharge(string testName, List<ProviderCharge> providerCharges, DateTimeOffset minDate, DateTimeOffset maxDate, decimal expectedCost)
+    {
+        Console.WriteLine($"Running locate most appropriate charge test '{testName}'");
+        SetupWholePriceDataService(providerCharges);
+        _subject = _mocker.CreateInstance<PriceHelper>();
+        var mostAppropriateCharge = _subject.LocateMostAppropriateCharge(providerCharges, minDate, maxDate);
+        Assert.That(expectedCost, Is.EqualTo(mostAppropriateCharge.Cost));
+    }
+
+    private void SetupDynamicPriceDataService(List<Price> prices = null)
+    {
+        if (prices == null) { prices = new List<Price>(); }
+
+        var priceDataService = new Mock<IPriceDataService>();
+
+        priceDataService
+            .As<IDynamicPriceDataService>()
+            .Setup(x => x.GetPriceData(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+            .ReturnsAsync(prices.OrderBy(x => x.ValidFrom));
+
+        _mocker.Use(priceDataService.Object);
+    }
+
+    private void SetupWholePriceDataService(List<ProviderCharge> providerCharges = null)
+    {
+        if (providerCharges == null) { providerCharges = new List<ProviderCharge>(); }
+
+        var priceDataService = new Mock<IPriceDataService>();
+
+        priceDataService
+            .As<IWholePriceDataService>()
+            .Setup(x => x.GetCharges(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+            .ReturnsAsync(providerCharges);
+
+        _mocker.Use(priceDataService.Object);
     }
 }

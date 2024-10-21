@@ -7,7 +7,7 @@ using TeslaMateAgile.Services.Interfaces;
 
 namespace TeslaMateAgile.Services;
 
-public class AwattarService : IPriceDataService
+public class AwattarService : IDynamicPriceDataService
 {
     private readonly HttpClient _client;
     private readonly AwattarOptions _options;
