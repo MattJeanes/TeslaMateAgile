@@ -98,8 +98,8 @@ public class PriceHelper : IPriceHelper
 
         return _priceDataService switch
         {
-            IWholePriceDataService => await CalculateWholeChargeCost(charges, minDate, maxDate),
             IDynamicPriceDataService => await CalculateDynamicChargeCost(charges, minDate, maxDate),
+            IWholePriceDataService => await CalculateWholeChargeCost(charges, minDate, maxDate),
             _ => throw new ArgumentOutOfRangeException(nameof(_priceDataService), "Unknown price data service")
         };
     }
@@ -157,17 +157,29 @@ public class PriceHelper : IPriceHelper
     private async Task<(decimal Price, decimal Energy)> CalculateWholeChargeCost(IEnumerable<Charge> charges, DateTimeOffset minDate, DateTimeOffset maxDate)
     {
         var wholePriceDataService = _priceDataService as IWholePriceDataService;
-        var possibleCharges = await wholePriceDataService.GetCharges(minDate, maxDate);
-        var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, charges);
+        var searchMinDate = minDate.AddMinutes(-_teslaMateOptions.MatchingToleranceMinutes);
+        var searchMaxDate = maxDate.AddMinutes(_teslaMateOptions.MatchingToleranceMinutes);
+        var possibleCharges = await wholePriceDataService.GetCharges(searchMinDate, searchMaxDate);
+        var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, minDate, maxDate);
         var wholeChargeEnergy = CalculateEnergyUsed(charges, ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges).Value);
         return (Math.Round(mostAppropriateCharge.Cost, 2), Math.Round(wholeChargeEnergy, 2));
     }
 
-    private ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, IEnumerable<Charge> actualCharges)
+    private ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, DateTimeOffset minDate, DateTimeOffset maxDate)
     {
-        // Implement logic to locate the most appropriate charge from the list of possible charges
-        // This is a placeholder implementation and should be replaced with the actual logic
-        return possibleCharges.First();
+        var tolerance = _teslaMateOptions.MatchingToleranceMinutes;
+
+        var appropriateCharges = possibleCharges
+            .Where(pc => pc.StartTime >= minDate.AddMinutes(-tolerance) && pc.EndTime <= maxDate.AddMinutes(tolerance))
+            .OrderBy(pc => Math.Min(Math.Abs((pc.StartTime - minDate).TotalMinutes), Math.Abs((pc.EndTime - maxDate).TotalMinutes)))
+            .ToList();
+
+        if (!appropriateCharges.Any())
+        {
+            throw new Exception("No appropriate charge found within the tolerance range.");
+        }
+
+        return appropriateCharges.First();
     }
 
     public decimal CalculateEnergyUsed(IEnumerable<Charge> charges, decimal phases)
