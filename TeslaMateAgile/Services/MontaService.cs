@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services.Interfaces;
 
@@ -18,12 +19,16 @@ namespace TeslaMateAgile.Services
             _options = options.Value;
         }
 
-        public async Task<decimal> GetTotalPrice(DateTimeOffset from, DateTimeOffset to)
+        public async Task<IEnumerable<ProviderCharge>> GetTotalPrice(DateTimeOffset from, DateTimeOffset to)
         {
             var accessToken = await GetAccessToken();
             var charges = await GetCharges(accessToken, from, to);
-            var totalPrice = CalculateTotalPrice(charges);
-            return totalPrice;
+            return charges.Select(c => new ProviderCharge
+            {
+                Cost = c.Cost,
+                StartTime = from,
+                EndTime = to
+            });
         }
 
         private async Task<string> GetAccessToken()
@@ -57,16 +62,6 @@ namespace TeslaMateAgile.Services
             var chargesResponse = JsonSerializer.Deserialize<ChargesResponse>(responseBody);
 
             return chargesResponse.Data;
-        }
-
-        private decimal CalculateTotalPrice(Charge[] charges)
-        {
-            decimal totalPrice = 0;
-            foreach (var charge in charges)
-            {
-                totalPrice += charge.Cost;
-            }
-            return totalPrice;
         }
 
         private class TokenResponse

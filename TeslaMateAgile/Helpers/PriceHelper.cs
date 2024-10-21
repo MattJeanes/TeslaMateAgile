@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TeslaMateAgile.Data;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Data.TeslaMate;
 using TeslaMateAgile.Data.TeslaMate.Entities;
@@ -96,9 +97,10 @@ public class PriceHelper : IPriceHelper
 
         if (_priceDataService is IWholePriceDataService wholePriceDataService)
         {
-            var wholeChargePrice = await wholePriceDataService.GetTotalPrice(minDate, maxDate);
+            var possibleCharges = await wholePriceDataService.GetTotalPrice(minDate, maxDate);
+            var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, charges);
             var wholeChargeEnergy = CalculateEnergyUsed(charges, ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges).Value);
-            return (Math.Round(wholeChargePrice, 2), Math.Round(wholeChargeEnergy, 2));
+            return (Math.Round(mostAppropriateCharge.Cost, 2), Math.Round(wholeChargeEnergy, 2));
         }
 
         var prices = (await ((IDynamicPriceDataService)_priceDataService).GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
@@ -146,6 +148,13 @@ public class PriceHelper : IPriceHelper
             throw new Exception($"Charge calculation failed, pricing calculated for {chargesCalculated} / {chargesCount}, likely missing price data");
         }
         return (Math.Round(totalChargePrice, 2), Math.Round(totalChargeEnergy, 2));
+    }
+
+    private ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, IEnumerable<Charge> actualCharges)
+    {
+        // Implement logic to locate the most appropriate charge from the list of possible charges
+        // This is a placeholder implementation and should be replaced with the actual logic
+        return possibleCharges.First();
     }
 
     public decimal CalculateEnergyUsed(IEnumerable<Charge> charges, decimal phases)

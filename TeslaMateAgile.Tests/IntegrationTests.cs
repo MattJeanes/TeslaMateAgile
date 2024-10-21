@@ -154,8 +154,8 @@ public class IntegrationTests
         var from = DateTimeOffset.Parse("2020-01-01T00:25:00+00:00");
         var to = DateTimeOffset.Parse("2020-01-01T15:55:00+00:00");
 
-        var totalPrice = await priceDataService.GetTotalPrice(from, to);
+        var possibleCharges = await priceDataService.GetTotalPrice(from, to);
 
-        Assert.That(totalPrice, Is.GreaterThan(0));
+        Assert.That(possibleCharges, Is.Not.Empty);
     }
 }
