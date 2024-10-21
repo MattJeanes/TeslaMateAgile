@@ -95,15 +95,19 @@ public class PriceHelper : IPriceHelper
         var maxDate = charges.Max(x => x.Date);
         _logger.LogInformation("Calculating cost for charges {MinDate} UTC - {MaxDate} UTC", minDate.UtcDateTime, maxDate.UtcDateTime);
 
-        if (_priceDataService is IWholePriceDataService wholePriceDataService)
-        {
-            var possibleCharges = await wholePriceDataService.GetCharges(minDate, maxDate);
-            var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, charges);
-            var wholeChargeEnergy = CalculateEnergyUsed(charges, ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges).Value);
-            return (Math.Round(mostAppropriateCharge.Cost, 2), Math.Round(wholeChargeEnergy, 2));
-        }
 
-        var prices = (await ((IDynamicPriceDataService)_priceDataService).GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
+        return _priceDataService switch
+        {
+            IWholePriceDataService => await CalculateWholeChargeCost(charges, minDate, maxDate),
+            IDynamicPriceDataService => await CalculateDynamicChargeCost(charges, minDate, maxDate),
+            _ => throw new ArgumentOutOfRangeException(nameof(_priceDataService), "Unknown price data service")
+        };
+    }
+
+    private async Task<(decimal Price, decimal Energy)> CalculateDynamicChargeCost(IEnumerable<Charge> charges, DateTimeOffset minDate, DateTimeOffset maxDate)
+    {
+        var dynamicPriceDataService = _priceDataService as IDynamicPriceDataService;
+        var prices = (await dynamicPriceDataService.GetPriceData(minDate, maxDate)).OrderBy(x => x.ValidFrom);
 
         _logger.LogDebug("Retrieved {Count} prices:", prices.Count());
         foreach (var price in prices)
@@ -148,6 +152,15 @@ public class PriceHelper : IPriceHelper
             throw new Exception($"Charge calculation failed, pricing calculated for {chargesCalculated} / {chargesCount}, likely missing price data");
         }
         return (Math.Round(totalChargePrice, 2), Math.Round(totalChargeEnergy, 2));
+    }
+
+    private async Task<(decimal Price, decimal Energy)> CalculateWholeChargeCost(IEnumerable<Charge> charges, DateTimeOffset minDate, DateTimeOffset maxDate)
+    {
+        var wholePriceDataService = _priceDataService as IWholePriceDataService;
+        var possibleCharges = await wholePriceDataService.GetCharges(minDate, maxDate);
+        var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, charges);
+        var wholeChargeEnergy = CalculateEnergyUsed(charges, ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges).Value);
+        return (Math.Round(mostAppropriateCharge.Cost, 2), Math.Round(wholeChargeEnergy, 2));
     }
 
     private ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, IEnumerable<Charge> actualCharges)
