@@ -1,9 +1,7 @@
-using System;
-using System.Net.Http;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services.Interfaces;
 
@@ -33,9 +31,8 @@ namespace TeslaMateAgile.Services
             var request = new HttpRequestMessage(HttpMethod.Post, $"{_options.BaseUrl}/auth/token");
             var content = new StringContent(JsonSerializer.Serialize(new
             {
-                client_id = _options.ClientId,
-                client_secret = _options.ClientSecret,
-                grant_type = "client_credentials"
+                clientId = _options.ClientId,
+                clientSecret = _options.ClientSecret,
             }), System.Text.Encoding.UTF8, "application/json");
             request.Content = content;
 
@@ -45,7 +42,7 @@ namespace TeslaMateAgile.Services
             var responseBody = await response.Content.ReadAsStringAsync();
             var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseBody);
 
-            return tokenResponse.access_token;
+            return tokenResponse.AccessToken;
         }
 
         private async Task<Charge[]> GetCharges(string accessToken, DateTimeOffset from, DateTimeOffset to)
@@ -59,7 +56,7 @@ namespace TeslaMateAgile.Services
             var responseBody = await response.Content.ReadAsStringAsync();
             var chargesResponse = JsonSerializer.Deserialize<ChargesResponse>(responseBody);
 
-            return chargesResponse.data;
+            return chargesResponse.Data;
         }
 
         private decimal CalculateTotalPrice(Charge[] charges)
@@ -67,24 +64,27 @@ namespace TeslaMateAgile.Services
             decimal totalPrice = 0;
             foreach (var charge in charges)
             {
-                totalPrice += charge.cost;
+                totalPrice += charge.Cost;
             }
             return totalPrice;
         }
 
         private class TokenResponse
         {
-            public string access_token { get; set; }
+            [JsonPropertyName("accessToken")]
+            public string AccessToken { get; set; }
         }
 
         private class ChargesResponse
         {
-            public Charge[] data { get; set; }
+            [JsonPropertyName("data")]
+            public Charge[] Data { get; set; }
         }
 
         private class Charge
         {
-            public decimal cost { get; set; }
+            [JsonPropertyName("cost")]
+            public decimal Cost { get; set; }
         }
     }
 }

@@ -20,7 +20,8 @@ public class PriceHelperTests
 
         var priceDataService = new Mock<IPriceDataService>();
         priceDataService
-            .Setup(x => ((IDynamicPriceDataService)x).GetPriceData(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+            .As<IDynamicPriceDataService>()
+            .Setup(x => x.GetPriceData(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
             .ReturnsAsync(prices.OrderBy(x => x.ValidFrom));
 
         var teslaMateDbContext = new Mock<TeslaMateDbContext>(new DbContextOptions<TeslaMateDbContext>());
