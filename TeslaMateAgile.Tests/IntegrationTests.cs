@@ -2,6 +2,7 @@
 using GraphQL.Client.Serializer.SystemTextJson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using TeslaMateAgile.Data.Options;
@@ -149,12 +150,29 @@ public class IntegrationTests
             client.BaseAddress = new Uri(baseUrl);
         });
 
+        var logger = new ServiceCollection()
+            .AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Debug))
+            .BuildServiceProvider()
+            .GetRequiredService<ILogger<PriceHelper>>();
+
         var priceDataService = services.BuildServiceProvider().GetRequiredService<IWholePriceDataService>();
 
-        var from = DateTimeOffset.Parse("2024-10-17T00:00:00+00:00");
-        var to = DateTimeOffset.Parse("2024-10-17T15:00:00+00:00");
+        var options = new TeslaMateOptions
+        {
+            MatchingStartToleranceMinutes = 120,
+            MatchingEndToleranceMinutes = 240,
+            MatchingEnergyToleranceRatio = 0.2M
+        };
+        var priceHelper = new PriceHelper(logger, null, priceDataService, Options.Create(options));
 
-        var possibleCharges = await priceDataService.GetCharges(from, to);
+        var from = DateTimeOffset.Parse("2024-10-17T05:51:55+00:00");
+        var to = DateTimeOffset.Parse("2024-10-17T08:57:54+00:00");
+        var energyUsed = 30M;
+
+        var possibleCharges = await priceDataService.GetCharges(from.AddMinutes(-120), to.AddMinutes(120));
+
+
+        var appropriateCharge = priceHelper.LocateMostAppropriateCharge(possibleCharges, energyUsed, from, to);
 
         Assert.That(possibleCharges, Is.Not.Empty);
     }

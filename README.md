@@ -119,7 +119,9 @@ See below for how to configure the environment variables appropriately
 - TeslaMate__FeePerKilowattHour=0.25 # Adds a flat fee per kWh, useful for certain arrangements (default: 0)
 - TeslaMate__LookbackDays=7 # Only calculate charges started in the last x days (default: null, all charges)
 - TeslaMate__Phases=1 # Number of phases your charger is connected to (default: null, auto-detect)
-- TeslaMate__MatchingToleranceMinutes=30 # Tolerance in minutes for matching charge times for whole cost providers (default: 30)
+- TeslaMate__MatchingStartToleranceMinutes=30 # Tolerance in minutes for matching charge times for whole cost providers (default: 30)
+- TeslaMate__MatchingEndToleranceMinutes=120 # Tolerance in minutes for matching charge times for whole cost providers (default: 30)
+- TeslaMate__MatchingEnergyToleranceRatio=0.1 # Tolerance ratio for matching energy for whole cost providers that provide energy data (default: 0.1)
 ```
 
 ## Database connection

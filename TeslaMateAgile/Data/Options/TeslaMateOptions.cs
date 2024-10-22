@@ -22,5 +22,11 @@ public class TeslaMateOptions
     public int? Phases { get; set; }
 
     [Range(0, 240)]
-    public int MatchingToleranceMinutes { get; set; }
+    public int MatchingStartToleranceMinutes { get; set; }
+
+    [Range(0, 240)]
+    public int MatchingEndToleranceMinutes { get; set; }
+
+    [Range(0, 1)]
+    public decimal MatchingEnergyToleranceRatio { get; set; }
 }

@@ -2,7 +2,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Contrib.HttpClient;
 using NUnit.Framework;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using TeslaMateAgile.Data.Options;
 using TeslaMateAgile.Services;
@@ -48,7 +47,8 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         startedAt = from,
                         stoppedAt = to,
-                        cost = 10.0M
+                        price = 10.0M,
+                        consumedKwh = 15.0M
                     }
                 }
             };
@@ -56,13 +56,14 @@ namespace TeslaMateAgile.Tests.Services
             _handler.SetupRequest(HttpMethod.Post, "https://public-api.monta.com/api/v1/auth/token")
                 .ReturnsResponse(JsonSerializer.Serialize(accessTokenResponse), "application/json");
 
-            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}&chargePointId=123")
+            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?state=completed&fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}&chargePointId=123")
                 .ReturnsResponse(JsonSerializer.Serialize(chargesResponse), "application/json");
 
             var charges = await _subject.GetCharges(from, to);
 
             Assert.That(charges, Is.Not.Empty);
             Assert.That(charges.First().Cost, Is.EqualTo(10.0M));
+            Assert.That(charges.First().EnergyKwh, Is.EqualTo(15.0M));
             Assert.That(charges.First().StartTime, Is.EqualTo(from));
             Assert.That(charges.First().EndTime, Is.EqualTo(to));
         }
@@ -93,7 +94,8 @@ namespace TeslaMateAgile.Tests.Services
                     {
                         startedAt = from,
                         stoppedAt = to,
-                        cost = 10.0M
+                        price = 10.0M,
+                        consumedKwh = 15.0M
                     }
                 }
             };
@@ -101,13 +103,14 @@ namespace TeslaMateAgile.Tests.Services
             _handler.SetupRequest(HttpMethod.Post, "https://public-api.monta.com/api/v1/auth/token")
                 .ReturnsResponse(JsonSerializer.Serialize(accessTokenResponse), "application/json");
 
-            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}")
+            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?state=completed&fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}")
                 .ReturnsResponse(JsonSerializer.Serialize(chargesResponse), "application/json");
 
             var charges = await _subject.GetCharges(from, to);
 
             Assert.That(charges, Is.Not.Empty);
             Assert.That(charges.First().Cost, Is.EqualTo(10.0M));
+            Assert.That(charges.First().EnergyKwh, Is.EqualTo(15.0M));
             Assert.That(charges.First().StartTime, Is.EqualTo(from));
             Assert.That(charges.First().EndTime, Is.EqualTo(to));
         }

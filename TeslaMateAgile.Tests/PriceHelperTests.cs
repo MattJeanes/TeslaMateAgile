@@ -32,7 +32,12 @@ public class PriceHelperTests
             .GetRequiredService<ILogger<PriceHelper>>();
         _mocker.Use(logger);
 
-        var teslaMateOptions = Options.Create(new TeslaMateOptions() { MatchingToleranceMinutes = 30 });
+        var teslaMateOptions = Options.Create(new TeslaMateOptions()
+        {
+            MatchingStartToleranceMinutes = 30,
+            MatchingEndToleranceMinutes = 120,
+            MatchingEnergyToleranceRatio = 0.1M
+        });
         _mocker.Use(teslaMateOptions);
     }
 
@@ -158,7 +163,7 @@ public class PriceHelperTests
     private static readonly object[][] PriceHelper_LocateMostAppropriateCharge_Cases = new object[][] {
             new object[]
             {
-                "LocateMostAppropriateCharge",
+                "WithoutEnergy",
                 new List<ProviderCharge>
                 {
                     new ProviderCharge
@@ -182,18 +187,58 @@ public class PriceHelperTests
                 },
                 DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
                 DateTimeOffset.Parse("2023-08-25T03:00:00Z"),
+                30M,
                 10.00M
+            },
+            new object[]
+            {
+                "WithEnergy",
+                new List<ProviderCharge>
+                {
+                    new ProviderCharge
+                    {
+                        Cost = 10.00M,
+                        EnergyKwh = 25M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T03:00:00Z")
+                    },
+                    new ProviderCharge
+                    {
+                        Cost = 15.00M,
+                        EnergyKwh = 31M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T23:05:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T03:35:00Z")
+                    },
+                    new ProviderCharge
+                    {
+                        Cost = 20.00M,
+                        EnergyKwh = 25M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T23:00:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T03:30:00Z")
+                    },
+                    new ProviderCharge
+                    {
+                        Cost = 25.00M,
+                        EnergyKwh = 25M,
+                        StartTime = DateTimeOffset.Parse("2023-08-24T22:30:00Z"),
+                        EndTime = DateTimeOffset.Parse("2023-08-25T04:00:00Z")
+                    }
+                },
+                DateTimeOffset.Parse("2023-08-24T23:30:00Z"),
+                DateTimeOffset.Parse("2023-08-25T03:00:00Z"),
+                30M,
+                15.00M
             }
         };
 
     [Test]
     [TestCaseSource(nameof(PriceHelper_LocateMostAppropriateCharge_Cases))]
-    public void PriceHelper_LocateMostAppropriateCharge(string testName, List<ProviderCharge> providerCharges, DateTimeOffset minDate, DateTimeOffset maxDate, decimal expectedCost)
+    public void PriceHelper_LocateMostAppropriateCharge(string testName, List<ProviderCharge> providerCharges, DateTimeOffset minDate, DateTimeOffset maxDate, decimal energyUsed, decimal expectedCost)
     {
         Console.WriteLine($"Running locate most appropriate charge test '{testName}'");
         SetupWholePriceDataService(providerCharges);
         _subject = _mocker.CreateInstance<PriceHelper>();
-        var mostAppropriateCharge = _subject.LocateMostAppropriateCharge(providerCharges, minDate, maxDate);
+        var mostAppropriateCharge = _subject.LocateMostAppropriateCharge(providerCharges, energyUsed, minDate, maxDate);
         Assert.That(expectedCost, Is.EqualTo(mostAppropriateCharge.Cost));
     }
 

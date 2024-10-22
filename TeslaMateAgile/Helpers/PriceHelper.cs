@@ -114,8 +114,8 @@ public class PriceHelper : IPriceHelper
             _logger.LogDebug("{ValidFrom} UTC - {ValidTo} UTC: {Value}", price.ValidFrom.UtcDateTime, price.ValidTo.UtcDateTime, price.Value);
         }
 
-        var totalChargePrice = 0M;
-        var totalChargeEnergy = 0M;
+        var totalPrice = 0M;
+        var totalEnergy = 0M;
         Charge lastCharge = null;
         var chargesCalculated = 0;
         var phases = ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges);
@@ -139,8 +139,8 @@ public class PriceHelper : IPriceHelper
             chargesForPrice = chargesForPrice.OrderBy(x => x.Date).ToList();
             var energyAddedInDateRange = CalculateEnergyUsed(chargesForPrice, phases.Value);
             var priceForEnergy = (energyAddedInDateRange * price.Value) + (energyAddedInDateRange * _teslaMateOptions.FeePerKilowattHour);
-            totalChargePrice += priceForEnergy;
-            totalChargeEnergy += energyAddedInDateRange;
+            totalPrice += priceForEnergy;
+            totalEnergy += energyAddedInDateRange;
             lastCharge = chargesForPrice.Last();
             _logger.LogDebug("Calculated charge cost for {ValidFrom} UTC - {ValidTo} UTC (unit cost: {Cost}, fee per kWh: {FeePerKilowattHour}): {PriceForEnergy} for {EnergyAddedInDateRange} energy",
                 price.ValidFrom.UtcDateTime, price.ValidTo.UtcDateTime, price.Value, _teslaMateOptions.FeePerKilowattHour, priceForEnergy, energyAddedInDateRange);
@@ -150,38 +150,79 @@ public class PriceHelper : IPriceHelper
         {
             throw new Exception($"Charge calculation failed, pricing calculated for {chargesCalculated} / {chargesCount}, likely missing price data");
         }
-        return (Math.Round(totalChargePrice, 2), Math.Round(totalChargeEnergy, 2));
+        return (Math.Round(totalPrice, 2), Math.Round(totalEnergy, 2));
     }
 
     private async Task<(decimal Price, decimal Energy)> CalculateWholeChargeCost(IEnumerable<Charge> charges, DateTimeOffset minDate, DateTimeOffset maxDate)
     {
         var wholePriceDataService = _priceDataService as IWholePriceDataService;
-        var searchMinDate = minDate.AddMinutes(-_teslaMateOptions.MatchingToleranceMinutes);
-        var searchMaxDate = maxDate.AddMinutes(_teslaMateOptions.MatchingToleranceMinutes);
+        var searchMinDate = minDate.AddMinutes(-_teslaMateOptions.MatchingStartToleranceMinutes);
+        var searchMaxDate = maxDate.AddMinutes(_teslaMateOptions.MatchingEndToleranceMinutes);
+        _logger.LogDebug("Searching for charges between {SearchMinDate} UTC and {SearchMaxDate} UTC", searchMinDate.UtcDateTime, searchMaxDate.UtcDateTime);
         var possibleCharges = await wholePriceDataService.GetCharges(searchMinDate, searchMaxDate);
-        var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, minDate, maxDate);
+        if (!possibleCharges.Any())
+        {
+            throw new Exception($"No possible charges found between {searchMinDate} and {searchMaxDate}");
+        }
+        _logger.LogDebug("Retrieved {Count} possible charges:", possibleCharges.Count());
+        foreach (var charge in possibleCharges)
+        {
+            _logger.LogDebug("{StartTime} UTC - {EndTime} UTC: {Cost}", charge.StartTime.UtcDateTime, charge.EndTime.UtcDateTime, charge.Cost);
+        }
         var wholeChargeEnergy = CalculateEnergyUsed(charges, ((decimal?)_teslaMateOptions.Phases) ?? DeterminePhases(charges).Value);
+        var mostAppropriateCharge = LocateMostAppropriateCharge(possibleCharges, wholeChargeEnergy, minDate, maxDate);
         return (Math.Round(mostAppropriateCharge.Cost, 2), Math.Round(wholeChargeEnergy, 2));
     }
 
-    public ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, DateTimeOffset minDate, DateTimeOffset maxDate)
+    public ProviderCharge LocateMostAppropriateCharge(IEnumerable<ProviderCharge> possibleCharges, decimal energyUsed, DateTimeOffset minDate, DateTimeOffset maxDate)
     {
-        var tolerance = _teslaMateOptions.MatchingToleranceMinutes;
+        var startToleranceMins = _teslaMateOptions.MatchingStartToleranceMinutes;
+        var endToleranceMins = _teslaMateOptions.MatchingEndToleranceMinutes;
+        var energyToleranceRatio = _teslaMateOptions.MatchingEnergyToleranceRatio;
 
-        var appropriateCharges = possibleCharges
-            .Where(pc => pc.StartTime >= minDate.AddMinutes(-tolerance) && pc.EndTime <= maxDate.AddMinutes(tolerance))
-            .OrderBy(pc => Math.Min(Math.Abs((pc.StartTime - minDate).TotalMinutes), Math.Abs((pc.EndTime - maxDate).TotalMinutes)))
-            .ToList();
 
-        if (!appropriateCharges.Any())
+        List<ProviderCharge> appropriateCharges;
+        if (possibleCharges.Any(x => x.EnergyKwh.HasValue))
         {
-            throw new Exception($"No appropriate charge found within the {tolerance} minute tolerance range.");
+            _logger.LogDebug("Energy data found in possible charges, using energy and start time matching of {StartToleranceMins} minutes from {StartDate} and {EnergyToleranceRatio} ratio of {EnergyUsed}kWh energy used", startToleranceMins, minDate, energyToleranceRatio, energyUsed);
+            appropriateCharges = possibleCharges
+                .Where(x => Math.Abs((x.StartTime - minDate).TotalMinutes) <= startToleranceMins
+                    && Math.Abs((x.EnergyKwh.Value - energyUsed) / energyUsed) <= energyToleranceRatio)
+                .OrderBy(x => Math.Abs((x.StartTime - minDate).TotalMinutes))
+                .ToList();
+
+            if (!appropriateCharges.Any())
+            {
+                throw new Exception($"No appropriate charge found (of {possibleCharges.Count()} evaluated) within the tolerance range of {startToleranceMins} minutes of {minDate} and {energyToleranceRatio} ratio of {energyUsed}kWh energy used");
+            }
+        }
+        else
+        {
+            _logger.LogDebug("No energy data found in possible charges, using start and end time matching of {StartToleranceMins} minutes from {StartDate} and {EndToleranceMins} minutes from {EndDate}", startToleranceMins, minDate, endToleranceMins, maxDate);
+            appropriateCharges = possibleCharges
+                .Where(x => Math.Abs((x.StartTime - minDate).TotalMinutes) <= startToleranceMins
+                    && Math.Abs((x.EndTime - maxDate).TotalMinutes) <= endToleranceMins)
+                .OrderBy(x => Math.Abs((x.StartTime - minDate).TotalMinutes))
+                .ToList();
+
+            if (!appropriateCharges.Any())
+            {
+                throw new Exception($"No appropriate charge found (of {possibleCharges.Count()} evaluated) within the tolerance range of {startToleranceMins} minutes before {minDate} and {endToleranceMins} minutes after {maxDate}");
+            }
         }
 
         var mostAppropriateCharge = appropriateCharges.First();
 
-        _logger.LogInformation("Found {Count} appropriate charge(s), using the most appropriate charge from {StartTime} UTC - {EndTime} UTC with a cost of {Cost}",
+        if (mostAppropriateCharge.EnergyKwh.HasValue)
+        {
+            _logger.LogInformation("Found {Count} appropriate charge(s), using the most appropriate charge from {StartTime} UTC - {EndTime} UTC with a cost of {Cost} and energy of {EnergyKwh}kWh",
+                appropriateCharges.Count, mostAppropriateCharge.StartTime.UtcDateTime, mostAppropriateCharge.EndTime.UtcDateTime, mostAppropriateCharge.Cost, mostAppropriateCharge.EnergyKwh);
+        }
+        else
+        {
+            _logger.LogInformation("Found {Count} appropriate charge(s), using the most appropriate charge from {StartTime} UTC - {EndTime} UTC with a cost of {Cost}",
             appropriateCharges.Count, mostAppropriateCharge.StartTime.UtcDateTime, mostAppropriateCharge.EndTime.UtcDateTime, mostAppropriateCharge.Cost);
+        }
 
         return appropriateCharges.First();
     }
