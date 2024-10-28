@@ -13,6 +13,9 @@ namespace TeslaMateAgile.Services
         private readonly HttpClient _client;
         private readonly MontaOptions _options;
 
+        public const int FetchHoursBeforeFrom = -24;
+        public const int FetchHoursAfterTo = 24;
+
         public MontaService(HttpClient client, IOptions<MontaOptions> options)
         {
             _client = client;
@@ -53,8 +56,8 @@ namespace TeslaMateAgile.Services
 
         private async Task<Charge[]> GetCharges(string accessToken, DateTimeOffset from, DateTimeOffset to)
         {
-            from = from.AddHours(-24);
-            to = to.AddHours(24);
+            from = from.AddHours(FetchHoursBeforeFrom);
+            to = to.AddHours(FetchHoursAfterTo);
             
             var requestUri = $"{_options.BaseUrl}/charges?state=completed&fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}";
             if (_options.ChargePointId.HasValue)
