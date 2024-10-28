@@ -56,7 +56,9 @@ namespace TeslaMateAgile.Tests.Services
             _handler.SetupRequest(HttpMethod.Post, "https://public-api.monta.com/api/v1/auth/token")
                 .ReturnsResponse(JsonSerializer.Serialize(accessTokenResponse), "application/json");
 
-            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?state=completed&fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}&chargePointId=123")
+            var fromDate = from.AddHours(MontaService.FetchHoursBeforeFrom).UtcDateTime;
+            var toDate = to.AddHours(MontaService.FetchHoursAfterTo).UtcDateTime;
+            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?state=completed&fromDate={fromDate:o}&toDate={toDate:o}&chargePointId=123")
                 .ReturnsResponse(JsonSerializer.Serialize(chargesResponse), "application/json");
 
             var charges = await _subject.GetCharges(from, to);
@@ -103,7 +105,9 @@ namespace TeslaMateAgile.Tests.Services
             _handler.SetupRequest(HttpMethod.Post, "https://public-api.monta.com/api/v1/auth/token")
                 .ReturnsResponse(JsonSerializer.Serialize(accessTokenResponse), "application/json");
 
-            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?state=completed&fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}")
+            var fromDate = from.AddHours(MontaService.FetchHoursBeforeFrom).UtcDateTime;
+            var toDate = to.AddHours(MontaService.FetchHoursAfterTo).UtcDateTime;
+            _handler.SetupRequest(HttpMethod.Get, $"https://public-api.monta.com/api/v1/charges?state=completed&fromDate={fromDate:o}&toDate={toDate:o}")
                 .ReturnsResponse(JsonSerializer.Serialize(chargesResponse), "application/json");
 
             var charges = await _subject.GetCharges(from, to);
