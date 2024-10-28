@@ -53,6 +53,9 @@ namespace TeslaMateAgile.Services
 
         private async Task<Charge[]> GetCharges(string accessToken, DateTimeOffset from, DateTimeOffset to)
         {
+            from = from.AddHours(-24);
+            to = to.AddHours(24);
+            
             var requestUri = $"{_options.BaseUrl}/charges?state=completed&fromDate={from.UtcDateTime:o}&toDate={to.UtcDateTime:o}";
             if (_options.ChargePointId.HasValue)
             {
