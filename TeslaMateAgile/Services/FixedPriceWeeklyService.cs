@@ -9,7 +9,7 @@ namespace TeslaMateAgile.Services;
 
 public class FixedPriceWeeklyService : IDynamicPriceDataService
 {
-    private readonly List<FixedPriceWeekly> _fixedPrices;
+    private readonly Dictionary<DayOfWeek, List<FixedPriceWeekly>> _fixedPrices;
 
     public FixedPriceWeeklyService(
         IOptions<FixedPriceWeeklyOptions> options
@@ -25,70 +25,137 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
     public Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
     {
         var prices = new List<Price>();
-        var started = false;
-        var dayIndex = -1;
-        int fpIndex = 0;
-        var maxIterations = 100; // fail-safe against infinite loop
-        for (var i = 0; i <= maxIterations; i++)
+
+        // Get all days between the range inclusive
+
+        var fromDate = from.Date;
+        var toDate = to.Date;
+        var days = new Dictionary<DateTimeOffset, List<Price>>();
+        for (var date = from.Date; date <= to.Date; date = date.AddDays(1))
         {
-            var fixedPrice = _fixedPrices[fpIndex];
-            var validFrom = DateTime.SpecifyKind(from.Date.AddDays(dayIndex).AddHours(fixedPrice.FromHour).AddMinutes(fixedPrice.FromMinute), DateTimeKind.Utc);
-            var validTo = DateTime.SpecifyKind(from.Date.AddDays(dayIndex).AddHours(fixedPrice.ToHour).AddMinutes(fixedPrice.ToMinute), DateTimeKind.Utc);
+            prices.AddRange(GetPriceDataForDate(date));
+        }
+
+        // Truncate the prices to the requested range, inclusive
+
+        prices = prices.Where(x => x.ValidFrom < to && x.ValidTo > from).ToList();
+
+        return Task.FromResult((IEnumerable<Price>)prices);
+    }
+
+    private List<Price> GetPriceDataForDate(DateTime date)
+    {
+        // Get all fixed prices for the day
+
+        var prices = new List<Price>();
+
+        var fixedPricesForDay = _fixedPrices[date.DayOfWeek];
+
+        decimal? crossoverPrice = null;
+        foreach (var fixedPrice in fixedPricesForDay)
+        {
+            var validFrom = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            var validTo = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+
+            if (fixedPrice.FromHour.HasValue && fixedPrice.FromMinute.HasValue && fixedPrice.ToHour.HasValue && fixedPrice.ToMinute.HasValue)
+            {
+                validFrom = validFrom.AddHours(fixedPrice.FromHour.Value).AddMinutes(fixedPrice.FromMinute.Value);
+                validTo = validTo.AddHours(fixedPrice.ToHour.Value).AddMinutes(fixedPrice.ToMinute.Value);
+            }
+            else
+            {
+                validTo = validTo.AddDays(1);
+            }
+
+            // Handle the scenario where they cross midnight
+
+            if (validFrom > validTo)
+            {
+                validFrom = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+                crossoverPrice = fixedPrice.Value;
+            }
+
             var price = new Price
             {
                 ValidFrom = validFrom.Add(-_timeZone.GetUtcOffset(validFrom)),
                 ValidTo = validTo.Add(-_timeZone.GetUtcOffset(validTo)),
                 Value = fixedPrice.Value
             };
-            if (price.ValidFrom < to && price.ValidTo > from)
+            prices.Add(price);
+        }
+
+        // Ensure we have the last price of the day to cover the entire day
+
+        prices = prices.OrderBy(x => x.ValidFrom).ToList();
+
+        if (crossoverPrice.HasValue)
+        {
+            var lastPrice = prices.Last();
+            var validTo = DateTime.SpecifyKind(date.AddDays(1), DateTimeKind.Utc);
+            var price = new Price
             {
-                prices.Add(price);
-                started = true;
-            }
-            else if (started)
+                ValidFrom = lastPrice.ValidTo,
+                ValidTo = validTo.Add(-_timeZone.GetUtcOffset(validTo)),
+                Value = crossoverPrice.Value
+            };
+            prices.Add(price);
+        }
+
+        // Verify that the prices cover the entire day
+
+        if (prices.First().ValidFrom > DateTime.SpecifyKind(date, DateTimeKind.Utc))
+        {
+            throw new Exception("Invalid fixed price data, does not cover the entire day");
+        }
+
+        if (prices.Last().ValidTo < DateTime.SpecifyKind(date.AddDays(1), DateTimeKind.Utc))
+        {
+            throw new Exception("Invalid fixed price data, does not cover the entire day");
+        }
+
+        // Verify that the prices are continuous and do not overlap or have gaps
+
+        for (var i = 1; i < prices.Count; i++)
+        {
+            if (prices[i - 1].ValidTo != prices[i].ValidFrom)
             {
-                break;
-            }
-            fpIndex++;
-            if (fpIndex >= _fixedPrices.Count)
-            {
-                fpIndex = 0;
-                dayIndex++;
-            }
-            if (i == maxIterations)
-            {
-                throw new Exception("Infinite loop detected within FixedPriceWeekly provider");
+                throw new Exception("Invalid fixed price data, prices are not continuous");
             }
         }
 
-        return Task.FromResult(prices.AsEnumerable());
+        return prices;
     }
 
     private class FixedPriceWeekly
     {
-        public int FromHour { get; set; }
-        public int FromMinute { get; set; }
-        public int ToHour { get; set; }
-        public int ToMinute { get; set; }
+        public int? FromHour { get; set; }
+        public int? FromMinute { get; set; }
+        public int? ToHour { get; set; }
+        public int? ToMinute { get; set; }
         public decimal Value { get; set; }
         public List<DayOfWeek> Days { get; set; }
     }
 
-    private static readonly Regex FixedPriceWeeklyRegex = new Regex("(?<days>[a-zA-Z,-]+)=(?<fromHour>\\d\\d):(?<fromMinute>\\d\\d)-(?<toHour>\\d\\d):(?<toMinute>\\d\\d)=(?<value>.+)");
+    private static readonly Regex FixedPriceWeeklyRegex = new Regex("(?<days>[a-zA-Z,-]+)(=(?<fromHour>\\d\\d):(?<fromMinute>\\d\\d)-(?<toHour>\\d\\d):(?<toMinute>\\d\\d))?=(?<value>.+)");
     private readonly TimeZoneInfo _timeZone;
 
-    private List<FixedPriceWeekly> GetFixedPrices(FixedPriceWeeklyOptions options)
+    private Dictionary<DayOfWeek, List<FixedPriceWeekly>> GetFixedPrices(FixedPriceWeeklyOptions options)
     {
-        var fixedPrices = new List<FixedPriceWeekly>();
+        var fixedPricesDict = new Dictionary<DayOfWeek, List<FixedPriceWeekly>>();
 
-        foreach (var price in options.Prices.OrderBy(x => x))
+        foreach (var price in options.Prices)
         {
             var match = FixedPriceWeeklyRegex.Match(price);
-            if (!match.Success) { throw new ArgumentException(nameof(price), $"Failed to parse fixed price: {price}"); }
-            var fromHour = int.Parse(match.Groups["fromHour"].Value);
-            var fromMinute = int.Parse(match.Groups["fromMinute"].Value);
-            var toHour = int.Parse(match.Groups["toHour"].Value);
-            var toMinute = int.Parse(match.Groups["toMinute"].Value);
+            if (!match.Success)
+            {
+                throw new ArgumentException(nameof(price), $"Failed to parse fixed price: {price}");
+            }
+
+            var fromHour = match.Groups["fromHour"].Success ? int.Parse(match.Groups["fromHour"].Value) : (int?)null;
+            var fromMinute = match.Groups["fromMinute"].Success ? int.Parse(match.Groups["fromMinute"].Value) : (int?)null;
+            var toHour = match.Groups["toHour"].Success ? int.Parse(match.Groups["toHour"].Value) : (int?)null;
+            var toMinute = match.Groups["toMinute"].Success ? int.Parse(match.Groups["toMinute"].Value) : (int?)null;
+
             if (!decimal.TryParse(match.Groups["value"].Value, out var value))
             {
                 throw new ArgumentException(nameof(value), $"Failed to parse fixed price value: {match.Groups["value"].Value}");
@@ -102,13 +169,20 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
                 FromMinute = fromMinute,
                 ToHour = toHour,
                 ToMinute = toMinute,
-                Value = value,
-                Days = days
+                Value = value
             };
-            fixedPrices.Add(fixedPrice);
+
+            foreach (var day in days)
+            {
+                if (!fixedPricesDict.ContainsKey(day))
+                {
+                    fixedPricesDict[day] = new List<FixedPriceWeekly>();
+                }
+                fixedPricesDict[day].Add(fixedPrice);
+            }
         }
 
-        return fixedPrices;
+        return fixedPricesDict;
     }
 
     private List<DayOfWeek> ParseDays(string days)
