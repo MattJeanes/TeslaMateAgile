@@ -125,6 +125,14 @@ public class Program
                        .ValidateOnStart();
                     services.AddSingleton<IPriceDataService, FixedPriceService>();
                 }
+                else if (energyProvider == EnergyProvider.FixedPriceWeekly)
+                {
+                    services.AddOptions<FixedPriceWeeklyOptions>()
+                       .Bind(config.GetSection("FixedPriceWeekly"))
+                       .ValidateDataAnnotations()
+                       .ValidateOnStart();
+                    services.AddSingleton<IPriceDataService, FixedPriceWeeklyService>();
+                }
                 else if (energyProvider == EnergyProvider.Awattar)
                 {
                     services.AddOptions<AwattarOptions>()

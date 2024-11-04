@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "build": "dotnet build",
+    "test": "dotnet test"
+  }
+}
