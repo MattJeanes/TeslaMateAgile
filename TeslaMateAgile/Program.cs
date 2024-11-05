@@ -72,7 +72,7 @@ public class Program
                         }
                         else
                         {
-                            throw new ArgumentException(databasePortVariable, $"Configuration '{databasePortVariable}' is invalid, must be an integer");
+                            throw new ArgumentException($"Configuration '{databasePortVariable}' is invalid, must be an integer", databasePortVariable);
                         }
                     }
 

@@ -15,11 +15,11 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
         IOptions<FixedPriceWeeklyOptions> options
         )
     {
-        _fixedPrices = GetFixedPrices(options.Value);
         if (!TZConvert.TryGetTimeZoneInfo(options.Value.TimeZone, out _timeZone))
         {
-            throw new ArgumentException(nameof(options.Value.TimeZone), $"Invalid TimeZone {options.Value.TimeZone}");
+            throw new ArgumentException($"Invalid TimeZone {options.Value.TimeZone}", nameof(options.Value.TimeZone));
         }
+        _fixedPrices = GetFixedPrices(options.Value);
     }
 
     public Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
@@ -47,6 +47,8 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
     {
         // Get all fixed prices for the day
 
+        var dateUtc = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+
         var prices = new List<Price>();
 
         var fixedPricesForDay = _fixedPrices[date.DayOfWeek];
@@ -54,8 +56,8 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
         decimal? crossoverPrice = null;
         foreach (var fixedPrice in fixedPricesForDay)
         {
-            var validFrom = DateTime.SpecifyKind(date, DateTimeKind.Utc);
-            var validTo = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            var validFrom = dateUtc;
+            var validTo = dateUtc;
 
             if (fixedPrice.FromHour.HasValue && fixedPrice.FromMinute.HasValue && fixedPrice.ToHour.HasValue && fixedPrice.ToMinute.HasValue)
             {
@@ -71,7 +73,7 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
 
             if (validFrom > validTo)
             {
-                validFrom = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+                validFrom = dateUtc;
                 crossoverPrice = fixedPrice.Value;
             }
 
@@ -103,12 +105,12 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
 
         // Verify that the prices cover the entire day
 
-        if (prices.First().ValidFrom > DateTime.SpecifyKind(date, DateTimeKind.Utc))
+        if (prices.First().ValidFrom > dateUtc.Add(-_timeZone.GetUtcOffset(dateUtc)))
         {
             throw new Exception("Invalid fixed price data, does not cover the entire day");
         }
 
-        if (prices.Last().ValidTo < DateTime.SpecifyKind(date.AddDays(1), DateTimeKind.Utc))
+        if (prices.Last().ValidTo < dateUtc.AddDays(1).Add(-_timeZone.GetUtcOffset(dateUtc)))
         {
             throw new Exception("Invalid fixed price data, does not cover the entire day");
         }
@@ -133,7 +135,6 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
         public int? ToHour { get; set; }
         public int? ToMinute { get; set; }
         public decimal Value { get; set; }
-        public List<DayOfWeek> Days { get; set; }
     }
 
     private static readonly Regex FixedPriceWeeklyRegex = new Regex("(?<days>[a-zA-Z,-]+)(=(?<fromHour>\\d\\d):(?<fromMinute>\\d\\d)-(?<toHour>\\d\\d):(?<toMinute>\\d\\d))?=(?<value>.+)");
@@ -148,7 +149,7 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
             var match = FixedPriceWeeklyRegex.Match(price);
             if (!match.Success)
             {
-                throw new ArgumentException(nameof(price), $"Failed to parse fixed price: {price}");
+                throw new ArgumentException($"Failed to parse fixed price: {price}", nameof(price));
             }
 
             var fromHour = match.Groups["fromHour"].Success ? int.Parse(match.Groups["fromHour"].Value) : (int?)null;
@@ -158,7 +159,29 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
 
             if (!decimal.TryParse(match.Groups["value"].Value, out var value))
             {
-                throw new ArgumentException(nameof(value), $"Failed to parse fixed price value: {match.Groups["value"].Value}");
+                throw new ArgumentException($"Failed to parse fixed price value: {match.Groups["value"].Value}", nameof(value));
+            }
+
+            // Validate appropriate hour and minute values
+
+            if (fromHour.HasValue && (fromHour < 0 || fromHour > 23))
+            {
+                throw new ArgumentException($"Invalid fromHour: {fromHour}", nameof(fromHour));
+            }
+
+            if (fromMinute.HasValue && (fromMinute < 0 || fromMinute > 59))
+            {
+                throw new ArgumentException($"Invalid fromMinute: {fromMinute}", nameof(fromMinute));
+            }
+
+            if (toHour.HasValue && (toHour < 0 || toHour > 23))
+            {
+                throw new ArgumentException($"Invalid toHour: {toHour}", nameof(toHour));
+            }
+
+            if (toMinute.HasValue && (toMinute < 0 || toMinute > 59))
+            {
+                throw new ArgumentException($"Invalid toMinute: {toMinute}", nameof(toMinute));
             }
 
             var days = ParseDays(match.Groups["days"].Value);
@@ -182,6 +205,64 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
             }
         }
 
+        // Validate that all days of the week are covered
+        var allDays = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>();
+        if (!allDays.All(day => fixedPricesDict.ContainsKey(day)))
+        {
+            throw new ArgumentException("Invalid fixed price data, does not cover the entire week");
+        }
+
+        // Validate that each day covers the entire 24 hours
+        foreach (var day in fixedPricesDict.Keys)
+        {
+            // if a full day one, skip
+            if (fixedPricesDict[day].Any(x => !x.FromHour.HasValue || !x.FromMinute.HasValue || !x.ToHour.HasValue || !x.ToMinute.HasValue))
+            {
+                // Verify there are no other prices for the day
+                if (fixedPricesDict[day].Count > 1)
+                {
+                    throw new ArgumentException("Invalid fixed price data, other prices specified for full day price");
+                }
+                continue;
+            }
+
+            var dayPrices = fixedPricesDict[day].OrderBy(x => x.FromHour).ThenBy(x => x.FromMinute).ToList();
+            var totalHours = 0M;
+            for (var i = 0; i < dayPrices.Count; i++)
+            {
+                var fromHours = dayPrices[i].FromHour.Value + (dayPrices[i].FromMinute.Value / 60M);
+                var toHours = dayPrices[i].ToHour.Value + (dayPrices[i].ToMinute.Value / 60M);
+                if (fromHours > toHours)
+                {
+                    toHours += 24;
+                }
+                totalHours += toHours - fromHours;
+            }
+            if (totalHours < 24)
+            {
+                throw new ArgumentException("Invalid fixed price data, does not cover the full 24 hours");
+            }
+            else if (totalHours > 24)
+            {
+                throw new ArgumentException("Invalid fixed price data, covers more than 24 hours");
+            }
+        }
+
+        // Validate that the prices are continuous and do not overlap or have gaps
+        foreach (var day in fixedPricesDict.Keys)
+        {
+            var dayPrices = fixedPricesDict[day].OrderBy(x => x.FromHour).ThenBy(x => x.FromMinute).ToList();
+            for (var i = 1; i < dayPrices.Count; i++)
+            {
+                var previousPrice = dayPrices[i - 1];
+                var currentPrice = dayPrices[i];
+                if (previousPrice.ToHour != currentPrice.FromHour || previousPrice.ToMinute != currentPrice.FromMinute)
+                {
+                    throw new ArgumentException("Invalid fixed price data, prices are not continuous");
+                }
+            }
+        }
+
         return fixedPricesDict;
     }
 
@@ -198,9 +279,23 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
                 var startDay = ParseDay(rangeParts[0]);
                 var endDay = ParseDay(rangeParts[1]);
 
-                for (var day = startDay; day <= endDay; day++)
+                if (startDay <= endDay)
                 {
-                    dayList.Add((DayOfWeek)day);
+                    for (var day = startDay; day <= endDay; day++)
+                    {
+                        dayList.Add(day);
+                    }
+                }
+                else
+                {
+                    for (var day = startDay; day <= DayOfWeek.Saturday; day++)
+                    {
+                        dayList.Add(day);
+                    }
+                    for (var day = DayOfWeek.Sunday; day <= endDay; day++)
+                    {
+                        dayList.Add(day);
+                    }
                 }
             }
             else
@@ -223,7 +318,7 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
             "fri" => DayOfWeek.Friday,
             "sat" => DayOfWeek.Saturday,
             "sun" => DayOfWeek.Sunday,
-            _ => throw new ArgumentException(nameof(day), $"Invalid day: {day}")
+            _ => throw new ArgumentException($"Invalid day: {day}", nameof(day))
         };
     }
 }

@@ -15,11 +15,11 @@ public class FixedPriceService : IDynamicPriceDataService
         IOptions<FixedPriceOptions> options
         )
     {
-        _fixedPrices = GetFixedPrices(options.Value);
         if (!TZConvert.TryGetTimeZoneInfo(options.Value.TimeZone, out _timeZone))
         {
-            throw new ArgumentException(nameof(options.Value.TimeZone), $"Invalid TimeZone {options.Value.TimeZone}");
+            throw new ArgumentException($"Invalid TimeZone {options.Value.TimeZone}", nameof(options.Value.TimeZone));
         }
+        _fixedPrices = GetFixedPrices(options.Value);
     }
 
     public Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
@@ -85,7 +85,7 @@ public class FixedPriceService : IDynamicPriceDataService
         foreach (var price in options.Prices.OrderBy(x => x))
         {
             var match = FixedPriceRegex.Match(price);
-            if (!match.Success) { throw new ArgumentException(nameof(price), $"Failed to parse fixed price: {price}"); }
+            if (!match.Success) { throw new ArgumentException($"Failed to parse fixed price: {price}", nameof(price)); }
             var fromHour = int.Parse(match.Groups[1].Value);
             var fromMinute = int.Parse(match.Groups[2].Value);
             var toHour = int.Parse(match.Groups[3].Value);
@@ -113,14 +113,14 @@ public class FixedPriceService : IDynamicPriceDataService
 
             if (lastFixedPrice != null && (fixedPrice.FromHour != lastFixedPrice.ToHour || fixedPrice.FromMinute != lastFixedPrice.ToMinute))
             {
-                throw new ArgumentException(nameof(price), $"Price from time does not match previous to time: {price}");
+                throw new ArgumentException($"Price from time does not match previous to time: {price}", nameof(price));
             }
             totalHours += toHours - fromHours;
             lastFixedPrice = fixedPrice;
         }
         if (totalHours != 24)
         {
-            throw new ArgumentException(nameof(totalHours), $"Total hours do not equal 24, currently {totalHours}");
+            throw new ArgumentException($"Total hours do not equal 24, currently {totalHours}", nameof(totalHours));
         }
         return fixedPrices;
     }
