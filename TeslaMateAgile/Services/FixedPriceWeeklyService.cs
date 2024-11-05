@@ -73,8 +73,12 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
 
             if (validFrom > validTo)
             {
-                validFrom = dateUtc;
                 crossoverPrice = fixedPrice.Value;
+                if (validTo == dateUtc)
+                {
+                    continue;
+                }
+                validFrom = dateUtc;
             }
 
             var price = new Price
