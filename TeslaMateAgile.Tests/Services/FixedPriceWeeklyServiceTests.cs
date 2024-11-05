@@ -122,6 +122,46 @@ namespace TeslaMateAgile.Tests.Services
             },
             new object[]
             {
+                "CommaSeparatedDays",
+                "Europe/London",
+                new List<string>
+                {
+                    "Mon-Wed=08:00-13:00=0.1559",
+                    "Mon-Wed=13:00-20:00=0.05",
+                    "Mon-Wed=20:00-08:00=0.04",
+                    "Thu,Fri=08:00-18:00=0.1559",
+                    "Thu,Fri=18:00-08:00=0.04",
+                    "Sat=04:00-08:00=0.035",
+                    "Sat=08:00-13:00=0.02",
+                    "Sat=13:00-04:00=0.05",
+                    "Sun=0.22"
+                },
+                new DateTimeOffset(new DateTime(2023, 1, 4, 2, 0, 0, DateTimeKind.Utc)), // Wed
+                new DateTimeOffset(new DateTime(2023, 1, 7, 4, 0, 0, DateTimeKind.Utc)), // Sat
+                new List<Price>
+                {
+                    // Wednesday
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 4, 0, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 4, 8, 0, 0, DateTimeKind.Utc)), Value = 0.04m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 4, 8, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 4, 13, 0, 0, DateTimeKind.Utc)), Value = 0.1559m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 4, 13, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 4, 20, 0, 0, DateTimeKind.Utc)), Value = 0.05m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 4, 20, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 5, 0, 0, 0, DateTimeKind.Utc)), Value = 0.04m },
+
+                    // Thursday
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 5, 0, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 5, 8, 0, 0, DateTimeKind.Utc)), Value = 0.04m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 5, 8, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 5, 18, 0, 0, DateTimeKind.Utc)), Value = 0.1559m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 5, 18, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 6, 0, 0, 0, DateTimeKind.Utc)), Value = 0.04m },
+
+                    // Friday
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 6, 0, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 6, 8, 0, 0, DateTimeKind.Utc)), Value = 0.04m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 6, 8, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 6, 18, 0, 0, DateTimeKind.Utc)), Value = 0.1559m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 6, 18, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 7, 0, 0, 0, DateTimeKind.Utc)), Value = 0.04m },
+
+                    // Saturday
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 7, 0, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 7, 4, 0, 0, DateTimeKind.Utc)), Value = 0.05m }
+                }
+            },
+            new object[]
+            {
                 "DifferentTimeZone",
                 "America/New_York",
                 new List<string>

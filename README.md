@@ -61,6 +61,8 @@ See below for how to configure the environment variables appropriately
 
 ### Fixed Price
 
+The Fixed Price provider allows you to use TeslaMateAgile if you have a fixed price for electricity at different times of the day. This is useful if you have a simple time-of-use tariff that isn't supported by the other providers.
+
 ```yaml
 - TeslaMate__EnergyProvider=FixedPrice
 - FixedPrice__TimeZone=Europe/London # IANA (tz database) time zone code, used for below times 
@@ -69,6 +71,23 @@ See below for how to configure the environment variables appropriately
 - FixedPrice__Prices__2=20:00-03:30=0.04
 - FixedPrice__Prices__3=03:30-06:00=0.035
 - FixedPrice__Prices__4=06:00-08:00=0.02
+```
+
+### Fixed Price (Weekly)
+
+The Fixed Price Weekly provider is similar to the Fixed Price provider but allows you to set different prices for different days of the week. This is useful if your electricity tariff changes on different days of the week but is consistent week-to-week, e.g. a weekday / weekend tariff.
+
+```yaml
+- TeslaMate__EnergyProvider=FixedPriceWeekly
+- FixedPriceWeekly__TimeZone=Europe/London # IANA (tz database) time zone code, used for below times
+- FixedPriceWeekly__Prices__0=Mon-Wed=08:00-13:00=0.1559 # Cost is in your currency e.g. pounds, euros, dollars (not pennies, cents, etc)
+- FixedPriceWeekly__Prices__1=Mon-Wed=13:00-08:00=0.05 # Day(s) of the week can be comma separated or a range (e.g. Mon-Fri or Mon,Wed,Fri)
+- FixedPriceWeekly__Prices__6=Thu=0.22 # The time range is optional and will be used for the whole day if unspecified
+- FixedPriceWeekly__Prices__3=Fri,Sat=08:00-18:00=0.1559 # You can have as many as these as you need
+- FixedPriceWeekly__Prices__4=Fri,Sat=18:00-08:00=0.04
+- FixedPriceWeekly__Prices__5=Sun=12:00-18:00=0.1559
+- FixedPriceWeekly__Prices__7=Sun=18:00-08:00=0.04
+- FixedPriceWeekly__Prices__8=Sun=08:00-12:00=0.1559
 ```
 
 ### aWATTar
