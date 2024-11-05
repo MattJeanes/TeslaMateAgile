@@ -180,6 +180,7 @@ namespace TeslaMateAgile.Tests.Services
                 new List<Price>
                 {
                     // Monday
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 1, 5, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 2, 5, 0, 0, DateTimeKind.Utc)), Value = 0.042m },
                     new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 2, 5, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 2, 8, 30, 0, DateTimeKind.Utc)), Value = 0.04m },
                     new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 2, 8, 30, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 2, 11, 0, 0, DateTimeKind.Utc)), Value = 0.035m },
                     new() { ValidFrom = new DateTimeOffset(new DateTime(2023, 1, 2, 11, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2023, 1, 2, 13, 0, 0, DateTimeKind.Utc)), Value = 0.02m },
@@ -256,7 +257,27 @@ namespace TeslaMateAgile.Tests.Services
                 new DateTimeOffset(new DateTime(2024, 11, 5, 20, 50, 33, DateTimeKind.Utc)),
                 new List<Price>
                 {
-                    new() { ValidFrom = new DateTimeOffset(new DateTime(2024, 11, 5, 17, 00, 00, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2024, 11, 5, 22, 0, 0, DateTimeKind.Utc)), Value = 0.052004m },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2024, 11, 5, 17, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2024, 11, 5, 22, 0, 0, DateTimeKind.Utc)), Value = 0.052004m },
+                }
+            },
+            new object[]
+            {
+                "TimeZonePreviousDay",
+                "America/Denver",
+                new List<string>
+                {
+                    "Mon-Fri=00:00-08:00=0.052004",
+                    "Mon-Fri=08:00-10:00=0.253532",
+                    "Mon-Fri=10:00-15:00=0.052004",
+                    "Mon-Fri=15:00-20:00=0.253532",
+                    "Mon-Fri=20:00-00:00=0.052004",
+                    "Sat-Sun=0.052004"
+                },
+                new DateTimeOffset(new DateTime(2024, 11, 4, 1, 22, 55, DateTimeKind.Utc)),
+                new DateTimeOffset(new DateTime(2024, 11, 4, 1, 40, 58, DateTimeKind.Utc)),
+                new List<Price>
+                {
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2024, 11, 3, 6, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2024, 11, 4, 7, 0, 0, DateTimeKind.Utc)), Value = 0.052004m },
                 }
             }
         };

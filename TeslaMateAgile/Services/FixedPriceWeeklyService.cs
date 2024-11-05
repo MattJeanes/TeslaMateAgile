@@ -28,10 +28,10 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
 
         // Get all days between the range inclusive
 
-        var fromDate = from.Date;
-        var toDate = to.Date;
+        var fromDate = from.Add(_timeZone.GetUtcOffset(from)).Date;
+        var toDate = to.Add(_timeZone.GetUtcOffset(to)).Date;
         var days = new Dictionary<DateTimeOffset, List<Price>>();
-        for (var date = from.Date; date <= to.Date; date = date.AddDays(1))
+        for (var date = fromDate; date <= toDate; date = date.AddDays(1))
         {
             prices.AddRange(GetPriceDataForDate(date));
         }
@@ -39,6 +39,7 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
         // Truncate the prices to the requested range, inclusive
 
         prices = prices.Where(x => x.ValidFrom < to && x.ValidTo > from).ToList();
+
 
         return Task.FromResult((IEnumerable<Price>)prices);
     }
