@@ -40,7 +40,6 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
 
         prices = prices.Where(x => x.ValidFrom < to && x.ValidTo > from).ToList();
 
-
         return Task.FromResult((IEnumerable<Price>)prices);
     }
 

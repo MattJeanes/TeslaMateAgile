@@ -35,7 +35,7 @@ public class TibberService : IDynamicPriceDataService
 
     public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
     {
-        var fetch = (int)Math.Ceiling((to - from).TotalHours) + 1;
+        var fetch = (int)Math.Ceiling((to - from).TotalHours) + 2;
         var request = new GraphQLHttpRequest
         {
             Query = @"
