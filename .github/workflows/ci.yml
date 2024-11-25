@@ -49,25 +49,25 @@ jobs:
         done
       
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
       with:
         name: TeslaMateAgile-linux-x64
         path: ./output/TeslaMateAgile-linux-x64
     
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
       with:
         name: TeslaMateAgile-linux-arm64
         path: ./output/TeslaMateAgile-linux-arm64
         
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
       with:
         name: TeslaMateAgile-linux-arm
         path: ./output/TeslaMateAgile-linux-arm
         
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
       with:
         name: TeslaMateAgile-win-x64
         path: ./output/TeslaMateAgile-win-x64
