@@ -14,7 +14,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Login to Kubernetes
-      uses: Azure/aks-set-context@4edaee69f820359371ee8bc85189ac03a21d3a58 # v3
+      uses: Azure/aks-set-context@1cf43fa609aaef0617c6a12deda238b920e926b0 # v4
       with:
         resource-group: abyss
         cluster-name: abyss
