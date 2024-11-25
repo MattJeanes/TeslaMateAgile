@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
     
     - name: Azure Login
-      uses: Azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1
+      uses: Azure/login@a65d910e8af852a8061c627c456678983e180302 # v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
