@@ -25,7 +25,7 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '9.0.x'
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@e2b57b01d64b69ac273abfbea5d3ed15231e1706 # v2

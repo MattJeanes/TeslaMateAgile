@@ -1,10 +1,10 @@
 ARG arch=bookworm-slim
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0-${arch} AS base
+FROM mcr.microsoft.com/dotnet/runtime:9.0-${arch} AS base
 USER app
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:f91f9181d68b5ed2c8dea199dbbd2f6d172e60bdc43f8a67878b1ad140cf8d6b AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0@sha256:7d24e90a392e88eb56093e4eb325ff883ad609382a55d42f17fd557b997022ca AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["TeslaMateAgile/TeslaMateAgile.csproj", "TeslaMateAgile/"]
