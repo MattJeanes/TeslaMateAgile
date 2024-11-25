@@ -6,15 +6,15 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
     
     - name: Azure Login
-      uses: Azure/login@v1
+      uses: Azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Login to Kubernetes
-      uses: Azure/aks-set-context@v3
+      uses: Azure/aks-set-context@4edaee69f820359371ee8bc85189ac03a21d3a58 # v3
       with:
         resource-group: abyss
         cluster-name: abyss
