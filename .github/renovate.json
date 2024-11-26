@@ -7,5 +7,9 @@
   ],
   "pinDigest": {
     "automerge": true
-  }
+  },
+  "ignoreDeps": [
+    // Docker build uses dynamic tags, so we can't pin them and Renovate fails to update them
+    "mcr.microsoft.com/dotnet/runtime"
+  ]
 }
