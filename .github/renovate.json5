@@ -5,6 +5,7 @@
     ":automergeDigest",
     ":automergeMinor"
   ],
+  "automergeType": "branch",
   "pinDigest": {
     "automerge": true
   },
