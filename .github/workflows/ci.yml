@@ -1,7 +1,9 @@
 name: CI
 on:
   push:
-    branches: [ main ]
+    branches:
+    - main
+    - renovate/*
     tags:
       - 'v*'
   pull_request:
