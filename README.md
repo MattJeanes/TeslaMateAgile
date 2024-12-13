@@ -82,12 +82,12 @@ The Fixed Price Weekly provider is similar to the Fixed Price provider but allow
 - FixedPriceWeekly__TimeZone=Europe/London # IANA (tz database) time zone code, used for below times
 - FixedPriceWeekly__Prices__0=Mon-Wed=08:00-13:00=0.1559 # Cost is in your currency e.g. pounds, euros, dollars (not pennies, cents, etc)
 - FixedPriceWeekly__Prices__1=Mon-Wed=13:00-08:00=0.05 # Day(s) of the week can be comma separated or a range (e.g. Mon-Fri or Mon,Wed,Fri)
-- FixedPriceWeekly__Prices__6=Thu=0.22 # The time range is optional and will be used for the whole day if unspecified
+- FixedPriceWeekly__Prices__2=Thu=0.22 # The time range is optional and will be used for the whole day if unspecified
 - FixedPriceWeekly__Prices__3=Fri,Sat=08:00-18:00=0.1559 # You can have as many as these as you need
 - FixedPriceWeekly__Prices__4=Fri,Sat=18:00-08:00=0.04
 - FixedPriceWeekly__Prices__5=Sun=12:00-18:00=0.1559
-- FixedPriceWeekly__Prices__7=Sun=18:00-08:00=0.04
-- FixedPriceWeekly__Prices__8=Sun=08:00-12:00=0.1559
+- FixedPriceWeekly__Prices__6=Sun=18:00-08:00=0.04
+- FixedPriceWeekly__Prices__7=Sun=08:00-12:00=0.1559
 ```
 
 ### aWATTar
