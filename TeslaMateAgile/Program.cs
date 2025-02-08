@@ -190,6 +190,20 @@ public class Program
                         client.BaseAddress = new Uri(baseUrl);
                     });
                 }
+                else if (energyProvider == EnergyProvider.EDFTempo)
+                {
+                    services.AddOptions<EDFTempoOptions>()
+                        .Bind(config.GetSection("EDFTempo"))
+                        .ValidateDataAnnotations()
+                        .ValidateOnStart();
+                    services.AddHttpClient<IPriceDataService, EDFTempoService>((serviceProvider, client) =>
+                    {
+                        var options = serviceProvider.GetRequiredService<IOptions<EDFTempoOptions>>().Value;
+                        var baseUrl = options.BaseUrl;
+                        if (!baseUrl.EndsWith("/")) { baseUrl += "/"; }
+                        client.BaseAddress = new Uri(baseUrl);
+                    });
+                }
                 else
                 {
                     throw new ArgumentException("Invalid energy provider set", nameof(energyProvider));
