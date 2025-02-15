@@ -19,6 +19,8 @@ namespace TeslaMateAgile.Services
         private readonly EDFTempoOptions _options;
         private readonly ILogger _logger;
 
+        private readonly TimeZoneInfo frenchTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+
         public EDFTempoService(HttpClient client, IOptions<EDFTempoOptions> options, ILogger<HomeAssistantService> logger)
         {
             _client = client;
@@ -28,6 +30,9 @@ namespace TeslaMateAgile.Services
 
         public async Task<IEnumerable<Price>> GetPriceData(DateTimeOffset from, DateTimeOffset to)
         {
+
+            from = TimeZoneInfo.ConvertTime(from, frenchTimeZone);
+            to = TimeZoneInfo.ConvertTime(to, frenchTimeZone);
 
             _logger.LogDebug("EDF : Range - {from} -> {to}", from, to);
 
@@ -89,7 +94,8 @@ namespace TeslaMateAgile.Services
             // For each day, add schedule (Peak/Off peak hours)
             for (int day = 1; day < data.Count; day++)
             {
-                DateTimeOffset date = DateTimeOffset.ParseExact(data[day].dateJour, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                DateTime dateLocal = DateTime.ParseExact(data[day].dateJour, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                DateTimeOffset date = new DateTimeOffset(dateLocal, frenchTimeZone.GetUtcOffset(dateLocal));
 
                 foreach (var segment in segments)
                 {
@@ -123,23 +129,23 @@ namespace TeslaMateAgile.Services
 
                 if (iter == startSchedule && iter == stopSchedule)
                 {
-                    schedList.Add(new Price { ValidFrom = fromDatetime, ValidTo = toDatetime, Value = price });
+                    schedList.Add(new Price { ValidFrom = fromDatetime.ToUniversalTime(), ValidTo = toDatetime.ToUniversalTime(), Value = price });
                     break;
                 }
 
                 if (iter == startSchedule)
                 {
-                    schedList.Add(new Price { ValidFrom = fromDatetime, ValidTo = schedule[iter].Item1.Add(schedule[iter].Item2.Item2), Value = price });
+                    schedList.Add(new Price { ValidFrom = fromDatetime.ToUniversalTime(), ValidTo = (schedule[iter].Item1.Add(schedule[iter].Item2.Item2)).ToUniversalTime(), Value = price });
                     continue;
                 }
 
                 if (iter == stopSchedule)
                 {
-                    schedList.Add(new Price { ValidFrom = schedule[iter].Item1.Add(schedule[iter].Item2.Item1), ValidTo = toDatetime, Value = price });
+                    schedList.Add(new Price { ValidFrom = (schedule[iter].Item1.Add(schedule[iter].Item2.Item1)).ToUniversalTime(), ValidTo = toDatetime.ToUniversalTime(), Value = price });
                     continue;
                 }
 
-                schedList.Add(new Price { ValidFrom = schedule[iter].Item1.Add(schedule[iter].Item2.Item1), ValidTo = schedule[iter].Item1.Add(schedule[iter].Item2.Item2), Value = price });
+                schedList.Add(new Price { ValidFrom = (schedule[iter].Item1.Add(schedule[iter].Item2.Item1)).ToUniversalTime(), ValidTo = (schedule[iter].Item1.Add(schedule[iter].Item2.Item2)).ToUniversalTime(), Value = price });
             }
 
             foreach (var item in schedList)
