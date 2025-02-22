@@ -80,9 +80,9 @@ namespace TeslaMateAgile.Services
             // Period Tuple : Start DateTime, End DateTime, color day associated (-1 = previous day), PeakHours (0=Off peak)
             List<Tuple<TimeSpan, TimeSpan, int, int>> segments = new List<Tuple<TimeSpan, TimeSpan, int, int>>()
             {
-                new Tuple<TimeSpan, TimeSpan, int, int>(TimeSpan.FromHours(0)+TimeSpan.FromMinutes(0)+TimeSpan.FromSeconds(0), TimeSpan.FromHours(5)+TimeSpan.FromMinutes(59)+TimeSpan.FromSeconds(59), -1, 0),
-                new Tuple<TimeSpan, TimeSpan, int, int>(TimeSpan.FromHours(6)+TimeSpan.FromMinutes(0)+TimeSpan.FromSeconds(0), TimeSpan.FromHours(21)+TimeSpan.FromMinutes(59)+TimeSpan.FromSeconds(59), 0, 1),
-                new Tuple<TimeSpan, TimeSpan, int, int>(TimeSpan.FromHours(22)+TimeSpan.FromMinutes(0)+TimeSpan.FromSeconds(0), TimeSpan.FromHours(23)+TimeSpan.FromMinutes(59)+TimeSpan.FromSeconds(59), 0, 0)
+                new Tuple<TimeSpan, TimeSpan, int, int>(TimeSpan.FromHours(0)+TimeSpan.FromMinutes(0)+TimeSpan.FromSeconds(0), TimeSpan.FromHours(5)+TimeSpan.FromMinutes(59)+TimeSpan.FromSeconds(59)+TimeSpan.FromMilliseconds(999), -1, 0),
+                new Tuple<TimeSpan, TimeSpan, int, int>(TimeSpan.FromHours(6)+TimeSpan.FromMinutes(0)+TimeSpan.FromSeconds(0), TimeSpan.FromHours(21)+TimeSpan.FromMinutes(59)+TimeSpan.FromSeconds(59)+TimeSpan.FromMilliseconds(999), 0, 1),
+                new Tuple<TimeSpan, TimeSpan, int, int>(TimeSpan.FromHours(22)+TimeSpan.FromMinutes(0)+TimeSpan.FromSeconds(0), TimeSpan.FromHours(23)+TimeSpan.FromMinutes(59)+TimeSpan.FromSeconds(59)+TimeSpan.FromMilliseconds(999), 0, 0)
             };
 
             // Price for each period
