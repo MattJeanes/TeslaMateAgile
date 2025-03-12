@@ -9,5 +9,6 @@ public enum EnergyProvider
     Awattar,
     Energinet,
     HomeAssistant,
-    Monta
+    Monta,
+    EDFTempo
 }
