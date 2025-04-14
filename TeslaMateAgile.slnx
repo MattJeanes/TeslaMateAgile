@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/workflows/build.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="TeslaMateAgile.Tests/TeslaMateAgile.Tests.csproj" />
+  <Project Path="TeslaMateAgile/TeslaMateAgile.csproj" />
+</Solution>
