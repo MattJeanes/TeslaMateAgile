@@ -11,6 +11,7 @@ Supported energy providers / tarriffs:
 - [Energinet](https://www.energidataservice.dk/tso-electricity/Elspotprices)
 - [Home Assistant](https://www.home-assistant.io/)
 - [Monta](https://monta.com/)
+- [EDF Tempo](https://particulier.edf.fr/fr/accueil/gestion-contrat/options/tempo/details.html)
 
 ## How to use
 You can either use it in a Docker container or go to the releases and download the zip of the latest one and run it on the command line using `./TeslaMateAgile`.
@@ -130,6 +131,25 @@ The Fixed Price Weekly provider is similar to the Fixed Price provider but allow
 - Monta__ChargePointId=123 # Optional: Restrict searches to a particular charge point ID
 ```
 
+### EDF Tempo
+
+The EDF Tempo provider allows you to use TeslaMateAgile with the EDF Tempo tariff, which offers different pricing based on day color (Blue, White, Red) and time of day (Peak/Off-peak hours).
+
+```yaml
+- TeslaMate__EnergyProvider=EDFTempo
+- EDFTempo__BaseUrl=https://www.api-couleur-tempo.fr/api/joursTempo # EDF Tempo API endpoint
+- EDFTempo__BLUE_HP=0.1369 # Blue day peak hours price (€/kWh)
+- EDFTempo__BLUE_HC=0.1056 # Blue day off-peak hours price (€/kWh)
+- EDFTempo__WHITE_HP=0.1654 # White day peak hours price (€/kWh)
+- EDFTempo__WHITE_HC=0.1254 # White day off-peak hours price (€/kWh)
+- EDFTempo__RED_HP=0.5486 # Red day peak hours price (€/kWh)
+- EDFTempo__RED_HC=0.1216 # Red day off-peak hours price (€/kWh)
+```
+
+Note: EDF Tempo pricing uses French time (Central European Time) and follows this schedule:
+- Off-peak hours: 22:00-06:00
+- Peak hours: 06:00-22:00
+
 ## Optional environment variables
 ```yaml
 - Logging__LogLevel__Default=Debug # Enables debug logging, useful for seeing exactly how a charge was calculated
@@ -235,6 +255,27 @@ Home Assistant by default only keeps 10 days of history and will fail to calcula
 
 #### Client ID and Secret
 Monta requires users to supply their Monta public API client ID and secret to request charging information. It is only used to query charging information and at no point does TeslaMateAgile request or access any data related to anything else. You can find the related code [here](https://github.com/MattJeanes/TeslaMateAgile/blob/main/TeslaMateAgile/Services/MontaService.cs). To register an application, check out the [Monta public API documentation](https://docs.public-api.monta.com/reference/home).
+
+### EDF Tempo
+
+#### Base Url
+This is the URL to the EDF Tempo API endpoint, which provides the pricing data for the tariff.
+
+#### Pricing
+EDF Tempo pricing uses French time (Central European Time) and follows this schedule:
+- Off-peak hours: 22:00-06:00
+- Peak hours: 06:00-22:00
+
+You can configure the pricing for each day color and time period using the following environment variables:
+
+```yaml
+- EDFTempo__BLUE_HP=0.1369 # Blue day peak hours price (€/kWh)
+- EDFTempo__BLUE_HC=0.1056 # Blue day off-peak hours price (€/kWh)
+- EDFTempo__WHITE_HP=0.1654 # White day peak hours price (€/kWh)
+- EDFTempo__WHITE_HC=0.1254 # White day off-peak hours price (€/kWh)
+- EDFTempo__RED_HP=0.5486 # Red day peak hours price (€/kWh)
+- EDFTempo__RED_HC=0.1216 # Red day off-peak hours price (€/kWh)
+```
 
 ## FAQ
 
