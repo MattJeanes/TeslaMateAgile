@@ -279,6 +279,28 @@ namespace TeslaMateAgile.Tests.Services
                 {
                     new() { ValidFrom = new DateTimeOffset(new DateTime(2024, 11, 3, 6, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2024, 11, 4, 7, 0, 0, DateTimeKind.Utc)), Value = 0.052004m },
                 }
+            },
+            new object[]
+            {
+                "DaylightSavingsTimeTransition",
+                "Europe/Madrid",
+                new List<string>
+                {
+                    "Mon-Fri=00:00-08:00=0.0925",
+                    "Mon-Fri=08:00-10:00=0.1329",
+                    "Mon-Fri=10:00-14:00=0.2220",
+                    "Mon-Fri=14:00-18:00=0.1329",
+                    "Mon-Fri=18:00-22:00=0.2220",
+                    "Mon-Fri=22:00-00:00=0.1329",
+                    "Sat,Sun=0.0925"
+                },
+                new DateTimeOffset(new DateTime(2025, 3, 30, 14, 08, 57, DateTimeKind.Utc)),
+                new DateTimeOffset(new DateTime(2025, 3, 31, 05, 03, 22, DateTimeKind.Utc)),
+                new List<Price>
+                {
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2025, 3, 29, 23, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2025, 3, 30, 22, 0, 0, DateTimeKind.Utc)), Value = 0.0925M },
+                    new() { ValidFrom = new DateTimeOffset(new DateTime(2025, 3, 30, 22, 0, 0, DateTimeKind.Utc)), ValidTo = new DateTimeOffset(new DateTime(2025, 3, 31, 6, 0, 0, DateTimeKind.Utc)), Value = 0.0925M }
+                }
             }
         };
 

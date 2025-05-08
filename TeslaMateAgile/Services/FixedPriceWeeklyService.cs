@@ -109,12 +109,16 @@ public class FixedPriceWeeklyService : IDynamicPriceDataService
 
         // Verify that the prices cover the entire day
 
-        if (prices.First().ValidFrom > dateUtc.Add(-_timeZone.GetUtcOffset(dateUtc)))
+        // Calculate the actual length of the day in this timezone (handles DST)
+        var dayStart = dateUtc.Add(-_timeZone.GetUtcOffset(dateUtc));
+        var dayEnd = dateUtc.AddDays(1).Add(-_timeZone.GetUtcOffset(dateUtc.AddDays(1)));
+
+        if (prices.First().ValidFrom > dayStart)
         {
             throw new Exception("Invalid fixed price data, does not cover the entire day");
         }
 
-        if (prices.Last().ValidTo < dateUtc.AddDays(1).Add(-_timeZone.GetUtcOffset(dateUtc)))
+        if (prices.Last().ValidTo < dayEnd)
         {
             throw new Exception("Invalid fixed price data, does not cover the entire day");
         }
