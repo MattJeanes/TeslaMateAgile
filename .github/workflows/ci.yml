@@ -142,7 +142,7 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     
     - name: Connect to Kubernetes
-      uses: MattJeanes/Abyss-Infrastructure/.github/actions/connect-k8s@main
+      uses: AmyJeanes/Abyss-Infrastructure/.github/actions/connect-k8s@main
       with:
         kubeconfig: "${{ secrets.KUBECONFIG }}"
         hostname: "${{ vars.KUBERNETES_API_HOSTNAME }}"
@@ -159,4 +159,4 @@ jobs:
           --values abyss.values.yaml
 
     - name: Disconnect from Kubernetes
-      uses: MattJeanes/Abyss-Infrastructure/.github/actions/disconnect-k8s@main
+      uses: AmyJeanes/Abyss-Infrastructure/.github/actions/disconnect-k8s@main
